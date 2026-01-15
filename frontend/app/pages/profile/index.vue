@@ -36,11 +36,15 @@
           <!-- Stats -->
           <div class="grid grid-cols-2 gap-4 text-center">
             <div>
-              <p class="text-2xl font-bold text-blue-600">25</p>
+              <p class="text-2xl font-bold text-blue-600">
+                {{ authStore.user?.statistics?.totalCompleted || 0 }}
+              </p>
               <p class="text-sm text-gray-600 dark:text-gray-400">รายการ</p>
             </div>
             <div>
-              <p class="text-2xl font-bold text-green-600">4.8</p>
+              <p class="text-2xl font-bold text-green-600">
+                {{ (authStore.user?.rating?.asSeller?.average || authStore.user?.rating?.asBuyer?.average || 0).toFixed(1) }}
+              </p>
               <p class="text-sm text-gray-600 dark:text-gray-400">คะแนน</p>
             </div>
           </div>
@@ -196,22 +200,29 @@ const getRoleText = (role?: string) => {
 const onSubmit = async () => {
   isLoading.value = true;
   try {
-    // TODO: Call API to update profile
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Call API to update profile
+    await authStore.updateProfile({
+      displayName: form.displayName,
+      phone: form.phone
+    });
 
     toast.add({
       title: "อัพเดทข้อมูลสำเร็จ",
       color: "green",
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error('Update profile error:', error);
     toast.add({
       title: "เกิดข้อผิดพลาด",
+      description: error.data?.message || 'ไม่สามารถอัพเดทข้อมูลได้',
       color: "red",
     });
   } finally {
     isLoading.value = false;
   }
 };
+
+const { apiFetch } = useApi();
 
 const changePassword = async () => {
   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
@@ -222,10 +233,25 @@ const changePassword = async () => {
     return;
   }
 
+  if (passwordForm.newPassword.length < 6) {
+    toast.add({
+      title: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+      color: "red",
+    });
+    return;
+  }
+
   isChangingPassword.value = true;
   try {
-    // TODO: Call API to change password
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Call API to change password
+    // Note: This endpoint needs to be added to backend if not exists
+    await apiFetch('/users/me/change-password', {
+      method: 'POST',
+      body: {
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword
+      }
+    });
 
     toast.add({
       title: "เปลี่ยนรหัสผ่านสำเร็จ",
@@ -236,9 +262,11 @@ const changePassword = async () => {
     passwordForm.currentPassword = "";
     passwordForm.newPassword = "";
     passwordForm.confirmPassword = "";
-  } catch (error) {
+  } catch (error: any) {
+    console.error('Change password error:', error);
     toast.add({
       title: "เกิดข้อผิดพลาด",
+      description: error.data?.message || 'ไม่สามารถเปลี่ยนรหัสผ่านได้',
       color: "red",
     });
   } finally {

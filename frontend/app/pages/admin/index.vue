@@ -217,13 +217,33 @@ const getStatusText = (status: string) => {
   return texts[status] || status;
 };
 
+const { apiFetch } = useApi();
+const toast = useToast();
+const isLoading = ref(true);
+
 onMounted(async () => {
-  // TODO: Fetch real data
-  stats.value = {
-    totalTransactions: 150,
-    pendingVerification: 5,
-    inDispute: 2,
-    completedToday: 12,
-  };
+  try {
+    // Fetch real dashboard data from API
+    const dashboardData = await apiFetch<any>('/admin/dashboard');
+    stats.value = {
+      totalTransactions: dashboardData.totalTransactions || 0,
+      pendingVerification: dashboardData.pendingVerification || 0,
+      inDispute: dashboardData.inDispute || 0,
+      completedToday: dashboardData.completedToday || 0,
+    };
+
+    // Fetch recent transactions
+    const transactions = await apiFetch<any[]>('/transactions?limit=5');
+    recentTransactions.value = transactions || [];
+  } catch (error) {
+    console.error('Failed to fetch dashboard data:', error);
+    toast.add({
+      title: 'เกิดข้อผิดพลาด',
+      description: 'ไม่สามารถโหลดข้อมูลแดชบอร์ดได้',
+      color: 'red'
+    });
+  } finally {
+    isLoading.value = false;
+  }
 });
 </script>
