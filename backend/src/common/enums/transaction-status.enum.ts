@@ -1,0 +1,17 @@
+export enum TransactionStatus {
+  DRAFT = 'draft',
+  INITIATED = 'initiated',
+  PENDING_SELLER_CONFIRM = 'pending_seller_confirm',
+  PENDING_PAYMENT = 'pending_payment',
+  PAYMENT_VERIFICATION = 'payment_verification',
+  PAYMENT_REJECTED = 'payment_rejected',
+  AWAITING_SHIPMENT = 'awaiting_shipment',
+  SHIPPED = 'shipped',
+  IN_TRANSIT = 'in_transit',
+  DELIVERED = 'delivered',
+  BUYER_CONFIRMING = 'buyer_confirming',
+  COMPLETED = 'completed',
+  DISPUTED = 'disputed',
+  CANCELLED = 'cancelled',
+  REFUNDED = 'refunded',
+}
