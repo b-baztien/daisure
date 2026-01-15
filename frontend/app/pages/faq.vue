@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: "blank"
+})
+
 useHead({
   title: 'คำถามที่พบบ่อย - DaiSure',
   meta: [

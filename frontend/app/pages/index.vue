@@ -454,94 +454,14 @@
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-300 py-12">
-      <div class="container mx-auto px-4">
-        <div class="grid md:grid-cols-4 gap-8">
-          <div>
-            <h3 class="font-bold text-white mb-4">DaiSure</h3>
-            <p class="text-sm">
-              บริการรับฝากเงินค้ำประกันการซื้อขายออนไลน์ที่ปลอดภัยที่สุด
-            </p>
-          </div>
-
-          <div>
-            <h4 class="font-semibold text-white mb-4">บริการ</h4>
-            <ul class="space-y-2 text-sm">
-              <li>
-                <NuxtLink to="/about" class="hover:text-white"
-                  >เกี่ยวกับเรา</NuxtLink
-                >
-              </li>
-              <li>
-                <NuxtLink to="/how-it-works" class="hover:text-white"
-                  >วิธีการใช้งาน</NuxtLink
-                >
-              </li>
-              <li>
-                <NuxtLink to="/pricing" class="hover:text-white"
-                  >อัตราค่าบริการ</NuxtLink
-                >
-              </li>
-              <li>
-                <NuxtLink to="/faq" class="hover:text-white"
-                  >คำถามที่พบบ่อย</NuxtLink
-                >
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 class="font-semibold text-white mb-4">ช่วยเหลือ</h4>
-            <ul class="space-y-2 text-sm">
-              <li>
-                <NuxtLink to="/contact" class="hover:text-white"
-                  >ติดต่อเรา</NuxtLink
-                >
-              </li>
-              <li>
-                <NuxtLink to="/support" class="hover:text-white"
-                  >ศูนย์ช่วยเหลือ</NuxtLink
-                >
-              </li>
-              <li>
-                <NuxtLink to="/terms" class="hover:text-white"
-                  >ข้อกำหนดการใช้งาน</NuxtLink
-                >
-              </li>
-              <li>
-                <NuxtLink to="/privacy" class="hover:text-white"
-                  >นโยบายความเป็นส่วนตัว</NuxtLink
-                >
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 class="font-semibold text-white mb-4">ติดตามเรา</h4>
-            <div class="flex gap-4">
-              <a href="#" class="hover:text-white">
-                <UIcon name="i-simple-icons-facebook" class="w-6 h-6" />
-              </a>
-              <a href="#" class="hover:text-white">
-                <UIcon name="i-simple-icons-line" class="w-6 h-6" />
-              </a>
-              <a href="#" class="hover:text-white">
-                <UIcon name="i-simple-icons-instagram" class="w-6 h-6" />
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div class="border-t border-gray-800 mt-8 pt-8 text-sm text-center">
-          <p>&copy; 2025 DaiSure. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
   </div>
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: "blank"
+})
+
 useHead({
   title: "DaiSure - ซื้อขายออนไลน์อย่างปลอดภัย",
   meta: [

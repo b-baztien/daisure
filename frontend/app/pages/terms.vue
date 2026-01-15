@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: "blank"
+})
+
 useHead({
   title: 'ข้อกำหนดการใช้งาน - DaiSure',
   meta: [
