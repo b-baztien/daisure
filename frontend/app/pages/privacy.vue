@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: "blank"
+})
+
 useHead({
   title: 'นโยบายความเป็นส่วนตัว - DaiSure',
   meta: [
