@@ -1,46 +1,48 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: false
-})
+  layout: false,
+});
 
-const authStore = useAuthStore()
-const router = useRouter()
-const config = useRuntimeConfig()
-const toast = useToast()
+const authStore = useAuthStore();
+const router = useRouter();
+const config = useRuntimeConfig();
+const toast = useToast();
 
 const form = reactive({
-  email: '',
-  password: '',
-  confirmPassword: '',
-  displayName: '',
-  phone: ''
-})
+  email: "",
+  password: "",
+  confirmPassword: "",
+  displayName: "",
+  phone: "",
+});
 
-const isLoading = ref(false)
-const showPassword = ref(false)
-const showConfirmPassword = ref(false)
+const isLoading = ref(false);
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 
 // Validation
 const emailError = computed(() => {
-  if (!form.email) return ''
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(form.email) ? '' : 'รูปแบบอีเมลไม่ถูกต้อง'
-})
+  if (!form.email) return "";
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(form.email) ? "" : "รูปแบบอีเมลไม่ถูกต้อง";
+});
 
 const passwordError = computed(() => {
-  if (!form.password) return ''
-  return form.password.length >= 6 ? '' : 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'
-})
+  if (!form.password) return "";
+  return form.password.length >= 6 ? "" : "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
+});
 
 const confirmPasswordError = computed(() => {
-  if (!form.confirmPassword) return ''
-  return form.password === form.confirmPassword ? '' : 'รหัสผ่านไม่ตรงกัน'
-})
+  if (!form.confirmPassword) return "";
+  return form.password === form.confirmPassword ? "" : "รหัสผ่านไม่ตรงกัน";
+});
 
 const displayNameError = computed(() => {
-  if (!form.displayName) return ''
-  return form.displayName.length >= 2 ? '' : 'ชื่อที่แสดงต้องมีอย่างน้อย 2 ตัวอักษร'
-})
+  if (!form.displayName) return "";
+  return form.displayName.length >= 2
+    ? ""
+    : "ชื่อที่แสดงต้องมีอย่างน้อย 2 ตัวอักษร";
+});
 
 const isFormValid = computed(() => {
   return (
@@ -52,82 +54,84 @@ const isFormValid = computed(() => {
     !passwordError.value &&
     !confirmPasswordError.value &&
     !displayNameError.value
-  )
-})
+  );
+});
 
 // Handle registration
 async function handleRegister() {
   if (!isFormValid.value) {
     toast.add({
-      title: 'กรุณาตรวจสอบข้อมูล',
-      description: 'กรุณากรอกข้อมูลให้ถูกต้องและครบถ้วน',
-      color: 'red'
-    })
-    return
+      title: "กรุณาตรวจสอบข้อมูล",
+      description: "กรุณากรอกข้อมูลให้ถูกต้องและครบถ้วน",
+      color: "red",
+    });
+    return;
   }
 
-  isLoading.value = true
+  isLoading.value = true;
   try {
     await authStore.register({
       email: form.email,
       password: form.password,
       displayName: form.displayName,
-      phone: form.phone || undefined
-    })
+      phone: form.phone || undefined,
+    });
 
     toast.add({
-      title: 'สมัครสมาชิกสำเร็จ',
+      title: "สมัครสมาชิกสำเร็จ",
       description: `ยินดีต้อนรับ ${authStore.displayName}`,
-      color: 'green'
-    })
+      color: "green",
+    });
 
     // Redirect to dashboard
-    router.push('/dashboard')
+    router.push("/dashboard");
   } catch (error: any) {
-    console.error('Register error:', error)
+    console.error("Register error:", error);
     toast.add({
-      title: 'สมัครสมาชิกไม่สำเร็จ',
-      description: error.data?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง',
-      color: 'red'
-    })
+      title: "สมัครสมาชิกไม่สำเร็จ",
+      description: error.data?.message || "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
+      color: "red",
+    });
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 // Handle LINE Login
 function handleLineLogin() {
-  const clientId = config.public.lineClientId
-  const redirectUri = config.public.lineRedirectUri
-  const state = Math.random().toString(36).substring(7)
+  const clientId = config.public.lineClientId;
+  const redirectUri = config.public.lineRedirectUri;
+  const state = Math.random().toString(36).substring(7);
 
   // Store state in sessionStorage for verification
   if (import.meta.client) {
-    sessionStorage.setItem('line_login_state', state)
+    sessionStorage.setItem("line_login_state", state);
   }
 
-  const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=profile%20openid%20email`
+  const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
+    redirectUri
+  )}&state=${state}&scope=profile%20openid%20email`;
 
   // Redirect to LINE Login
-  window.location.href = lineAuthUrl
+  window.location.href = lineAuthUrl;
 }
 
 // Check if already logged in
 onMounted(() => {
   if (authStore.isAuthenticated) {
-    router.push('/dashboard')
+    router.push("/dashboard");
   }
-})
+});
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4 py-8">
+  <div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4 py-8"
+  >
     <UCard class="w-full max-w-md">
       <template #header>
         <div class="text-center">
-          <NuxtLink to="/" class="inline-block mb-4">
-            <AppLogo class="h-12" />
-          </NuxtLink>
+          <NuxtLink to="/" class="inline-block mb-4"> DaiSure </NuxtLink>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
             สมัครสมาชิก
           </h1>
@@ -194,12 +198,18 @@ onMounted(() => {
             </template>
           </UInput>
           <template #help>
-            <span class="text-xs text-gray-500">รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</span>
+            <span class="text-xs text-gray-500"
+              >รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</span
+            >
           </template>
         </UFormGroup>
 
         <!-- Confirm Password -->
-        <UFormGroup label="ยืนยันรหัสผ่าน" required :error="confirmPasswordError">
+        <UFormGroup
+          label="ยืนยันรหัสผ่าน"
+          required
+          :error="confirmPasswordError"
+        >
           <UInput
             v-model="form.confirmPassword"
             :type="showConfirmPassword ? 'text' : 'password'"

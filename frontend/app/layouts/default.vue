@@ -1,68 +1,74 @@
 <script setup lang="ts">
-const authStore = useAuthStore()
-const router = useRouter()
+const authStore = useAuthStore();
+const router = useRouter();
 
-const isMenuOpen = ref(false)
+const isMenuOpen = ref(false);
 
 const navigationItems = computed(() => {
   const items = [
     {
-      label: 'แดชบอร์ด',
-      icon: 'i-heroicons-home',
-      to: '/dashboard'
+      label: "แดชบอร์ด",
+      icon: "i-heroicons-home",
+      to: "/dashboard",
     },
     {
-      label: 'ธุรกรรม',
-      icon: 'i-heroicons-shopping-bag',
-      to: '/transactions'
+      label: "ธุรกรรม",
+      icon: "i-heroicons-shopping-bag",
+      to: "/transactions",
     },
     {
-      label: 'รีวิว',
-      icon: 'i-heroicons-star',
-      to: '/reviews'
-    }
-  ]
+      label: "รีวิว",
+      icon: "i-heroicons-star",
+      to: "/reviews",
+    },
+  ];
 
   // Add admin link if user is admin
   if (authStore.isAdmin) {
     items.push({
-      label: 'ระบบจัดการ',
-      icon: 'i-heroicons-cog-6-tooth',
-      to: '/admin'
-    })
+      label: "ระบบจัดการ",
+      icon: "i-heroicons-cog-6-tooth",
+      to: "/admin",
+    });
   }
 
-  return items
-})
+  return items;
+});
 
 const userMenuItems = computed(() => [
-  [{
-    label: 'โปรไฟล์',
-    icon: 'i-heroicons-user',
-    click: () => router.push('/profile')
-  }],
-  [{
-    label: 'ออกจากระบบ',
-    icon: 'i-heroicons-arrow-right-on-rectangle',
-    click: () => authStore.logout()
-  }]
-])
+  [
+    {
+      label: "โปรไฟล์",
+      icon: "i-heroicons-user",
+      click: () => router.push("/profile"),
+    },
+  ],
+  [
+    {
+      label: "ออกจากระบบ",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+      click: () => authStore.logout(),
+    },
+  ],
+]);
 
 // Initialize auth when component mounts
 onMounted(() => {
-  authStore.initAuth()
-})
+  authStore.initAuth();
+});
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <header
+      class="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+    >
       <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16">
           <!-- Logo -->
           <NuxtLink to="/" class="flex items-center space-x-2">
-            <AppLogo class="h-8" />
+            DaiSure
           </NuxtLink>
 
           <!-- Desktop Navigation -->
@@ -115,11 +121,7 @@ onMounted(() => {
             </UDropdown>
 
             <!-- Login button (if not authenticated) -->
-            <UButton
-              v-else
-              to="/auth/login"
-              color="primary"
-            >
+            <UButton v-else to="/auth/login" color="primary">
               เข้าสู่ระบบ
             </UButton>
 
