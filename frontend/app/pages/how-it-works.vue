@@ -12,46 +12,46 @@ useHead({
 
 const steps = [
   {
-    number: '1',
     title: 'สร้างธุรกรรม',
     description: 'ผู้ขายหรือผู้ซื้อสร้างธุรกรรมใหม่ โดยระบุรายละเอียดสินค้า ราคา และข้อตกลง',
     icon: 'i-heroicons-plus-circle',
-    color: 'blue'
+    color: 'blue',
+    slot: '1'
   },
   {
-    number: '2',
     title: 'ผู้ซื้อชำระเงิน',
     description: 'ผู้ซื้อโอนเงินเข้าบัญชี DaiSure พร้อมแนบหลักฐานการโอนเงิน',
     icon: 'i-heroicons-credit-card',
-    color: 'green'
+    color: 'green',
+    slot: '2'
   },
   {
-    number: '3',
     title: 'ตรวจสอบการชำระเงิน',
     description: 'ระบบตรวจสอบการชำระเงิน เมื่อยืนยันแล้วจะแจ้งเตือนผู้ขายให้จัดส่งสินค้า',
     icon: 'i-heroicons-clipboard-document-check',
-    color: 'purple'
+    color: 'purple',
+    slot: '3'
   },
   {
-    number: '4',
     title: 'ผู้ขายจัดส่งสินค้า',
     description: 'ผู้ขายจัดส่งสินค้าและอัพเดทเลขพัสดุในระบบ',
     icon: 'i-heroicons-truck',
-    color: 'orange'
+    color: 'orange',
+    slot: '4'
   },
   {
-    number: '5',
     title: 'ผู้ซื้อรับสินค้า',
     description: 'ผู้ซื้อได้รับสินค้าและตรวจสอบความถูกต้อง จากนั้นยืนยันการรับสินค้า',
     icon: 'i-heroicons-check-circle',
-    color: 'indigo'
+    color: 'indigo',
+    slot: '5'
   },
   {
-    number: '6',
     title: 'โอนเงินให้ผู้ขาย',
     description: 'เมื่อผู้ซื้อยืนยันแล้ว ระบบจะโอนเงินให้กับผู้ขายทันที',
     icon: 'i-heroicons-banknotes',
-    color: 'teal'
+    color: 'green',
+    slot: '6'
   }
 ]
 
@@ -98,7 +98,7 @@ const features = [
     <!-- Steps Section -->
     <section class="py-16">
       <div class="container mx-auto px-4">
-        <div class="max-w-6xl mx-auto">
+        <div class="max-w-4xl mx-auto">
           <div class="text-center mb-12">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               ขั้นตอนการใช้งาน
@@ -108,51 +108,23 @@ const features = [
             </p>
           </div>
 
-          <div class="space-y-8">
-            <div
-              v-for="(step, index) in steps"
-              :key="step.number"
-              class="relative"
-            >
-              <!-- Connector Line -->
-              <div
-                v-if="index < steps.length - 1"
-                class="absolute left-8 top-20 w-0.5 h-24 bg-gray-300 dark:bg-gray-700 hidden md:block"
-              />
-
-              <UCard>
-                <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
-                  <!-- Step Number -->
-                  <div
-                    :class="`flex-shrink-0 w-16 h-16 bg-${step.color}-100 dark:bg-${step.color}-900 rounded-full flex items-center justify-center`"
-                  >
-                    <span :class="`text-2xl font-bold text-${step.color}-600`">
-                      {{ step.number }}
-                    </span>
-                  </div>
-
-                  <!-- Step Content -->
-                  <div class="flex-1">
-                    <div class="flex items-start gap-4">
-                      <div
-                        :class="`flex-shrink-0 w-12 h-12 bg-${step.color}-100 dark:bg-${step.color}-900 rounded-lg flex items-center justify-center`"
-                      >
-                        <Icon :name="step.icon" :class="`w-6 h-6 text-${step.color}-600`" />
-                      </div>
-                      <div>
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                          {{ step.title }}
-                        </h3>
-                        <p class="text-gray-600 dark:text-gray-400">
-                          {{ step.description }}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+          <UTimeline :items="steps">
+            <template #default="{ item }">
+              <div class="flex items-start gap-4">
+                <div :class="`flex-shrink-0 w-12 h-12 bg-${item.color}-100 dark:bg-${item.color}-900 rounded-lg flex items-center justify-center`">
+                  <UIcon :name="item.icon" :class="`w-6 h-6 text-${item.color}-600`" />
                 </div>
-              </UCard>
-            </div>
-          </div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                    {{ item.title }}
+                  </h3>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    {{ item.description }}
+                  </p>
+                </div>
+              </div>
+            </template>
+          </UTimeline>
         </div>
       </div>
     </section>
