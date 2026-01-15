@@ -15,37 +15,43 @@ const steps = [
     title: 'สร้างธุรกรรม',
     description: 'ผู้ขายหรือผู้ซื้อสร้างธุรกรรมใหม่ โดยระบุรายละเอียดสินค้า ราคา และข้อตกลง',
     icon: 'i-heroicons-plus-circle',
-    color: 'blue'
+    color: 'blue',
+    slot: '1'
   },
   {
     title: 'ผู้ซื้อชำระเงิน',
     description: 'ผู้ซื้อโอนเงินเข้าบัญชี DaiSure พร้อมแนบหลักฐานการโอนเงิน',
     icon: 'i-heroicons-credit-card',
-    color: 'green'
+    color: 'green',
+    slot: '2'
   },
   {
     title: 'ตรวจสอบการชำระเงิน',
     description: 'ระบบตรวจสอบการชำระเงิน เมื่อยืนยันแล้วจะแจ้งเตือนผู้ขายให้จัดส่งสินค้า',
     icon: 'i-heroicons-clipboard-document-check',
-    color: 'purple'
+    color: 'purple',
+    slot: '3'
   },
   {
     title: 'ผู้ขายจัดส่งสินค้า',
     description: 'ผู้ขายจัดส่งสินค้าและอัพเดทเลขพัสดุในระบบ',
     icon: 'i-heroicons-truck',
-    color: 'orange'
+    color: 'orange',
+    slot: '4'
   },
   {
     title: 'ผู้ซื้อรับสินค้า',
     description: 'ผู้ซื้อได้รับสินค้าและตรวจสอบความถูกต้อง จากนั้นยืนยันการรับสินค้า',
     icon: 'i-heroicons-check-circle',
-    color: 'indigo'
+    color: 'indigo',
+    slot: '5'
   },
   {
     title: 'โอนเงินให้ผู้ขาย',
     description: 'เมื่อผู้ซื้อยืนยันแล้ว ระบบจะโอนเงินให้กับผู้ขายทันที',
     icon: 'i-heroicons-banknotes',
-    color: 'green'
+    color: 'green',
+    slot: '6'
   }
 ]
 
@@ -103,20 +109,20 @@ const features = [
           </div>
 
           <UTimeline :items="steps">
-            <template #icon="{ item }">
-              <div class="flex items-center justify-center">
-                <UIcon :name="item.icon" class="w-5 h-5" />
-              </div>
-            </template>
             <template #default="{ item }">
-              <UCard>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  {{ item.title }}
-                </h3>
-                <p class="text-gray-600 dark:text-gray-400">
-                  {{ item.description }}
-                </p>
-              </UCard>
+              <div class="flex items-start gap-4">
+                <div :class="`flex-shrink-0 w-12 h-12 bg-${item.color}-100 dark:bg-${item.color}-900 rounded-lg flex items-center justify-center`">
+                  <UIcon :name="item.icon" :class="`w-6 h-6 text-${item.color}-600`" />
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                    {{ item.title }}
+                  </h3>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    {{ item.description }}
+                  </p>
+                </div>
+              </div>
             </template>
           </UTimeline>
         </div>
