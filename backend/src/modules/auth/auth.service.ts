@@ -80,16 +80,38 @@ export class AuthService {
 
   async lineLogin(lineLoginDto: LineLoginDto) {
     try {
-      // Verify LINE access token and get profile
-      const response = await axios.get('https://api.line.me/v2/profile', {
-        headers: {
-          Authorization: `Bearer ${lineLoginDto.accessToken}`,
+      // Step 1: Exchange authorization code for access token
+      const tokenResponse = await axios.post(
+        'https://api.line.me/oauth2/v2.1/token',
+        new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: lineLoginDto.code,
+          redirect_uri: this.configService.get('line.redirectUri'),
+          client_id: this.configService.get('line.channelId'),
+          client_secret: this.configService.get('line.channelSecret'),
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
         },
-      });
+      );
 
-      const lineProfile = response.data;
+      const accessToken = tokenResponse.data.access_token;
 
-      // Find or create user
+      // Step 2: Get LINE profile using access token
+      const profileResponse = await axios.get(
+        'https://api.line.me/v2/profile',
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const lineProfile = profileResponse.data;
+
+      // Step 3: Find or create user
       let user = await this.usersService.findByLineUserId(lineProfile.userId);
 
       if (!user) {
@@ -100,6 +122,7 @@ export class AuthService {
         });
       }
 
+      // Step 4: Generate JWT tokens
       const tokens = await this.generateTokens(user._id.toString(), user.role);
       await this.usersService.updateRefreshToken(
         user._id.toString(),
@@ -118,7 +141,8 @@ export class AuthService {
         ...tokens,
       };
     } catch (error) {
-      throw new UnauthorizedException('Invalid LINE access token');
+      console.error('LINE login error:', error.response?.data || error.message);
+      throw new UnauthorizedException('Invalid LINE authorization code');
     }
   }
 
