@@ -5,6 +5,7 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const toast = useToast()
+const { banks, fetchBanks } = useBanks()
 
 const isLoading = ref(false)
 const isAddingAccount = ref(false)
@@ -18,17 +19,23 @@ const newAccount = ref({
   accountName: ''
 })
 
-// Thai banks
-const thBanks = [
-  { label: 'ธนาคารกรุงเทพ', value: 'BBL', code: '002' },
-  { label: 'ธนาคารกสิกรไทย', value: 'KBANK', code: '004' },
-  { label: 'ธนาคารกรุงไทย', value: 'KTB', code: '006' },
-  { label: 'ธนาคารไทยพาณิชย์', value: 'SCB', code: '014' },
-  { label: 'ธนาคารกรุงศรีอยุธยา', value: 'BAY', code: '025' },
-  { label: 'ธนาคารทหารไทยธนชาต', value: 'TTB', code: '011' },
-  { label: 'ธนาคารออมสิน', value: 'GSB', code: '030' },
-  { label: 'ธนาคารอาคารสงเคราะห์', value: 'GHB', code: '033' }
-]
+// Fetch banks on mount
+onMounted(async () => {
+  try {
+    await fetchBanks()
+  } catch (error) {
+    console.error('Failed to load banks:', error)
+  }
+})
+
+// Transform banks for select menu
+const thBanks = computed(() => {
+  return banks.value.map(bank => ({
+    label: bank.name,
+    value: bank.uniqueId,
+    code: bank.uniqueId
+  }))
+})
 
 // Fetch bank accounts
 const bankAccounts = computed(() => authStore.user?.bankAccounts || [])
@@ -204,7 +211,7 @@ watch(() => newAccount.value.bankName, (bankValue) => {
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ thBanks.find(b => b.code === account.bankCode)?.label || account.bankName }}
+                {{ thBanks.find(b => b.value === account.bankCode)?.label || account.bankName }}
               </h3>
               <p class="text-gray-600 dark:text-gray-400 mt-1">
                 {{ account.accountNumber }}

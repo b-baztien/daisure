@@ -1,27 +1,30 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { UsersService } from '../modules/users/users.service';
-import { seedSuperAdmin } from './seeders';
+import { BanksService } from '../modules/banks/banks.service';
+import { seedSuperAdmin, seedBanks } from './seeders';
 
 // ประเภทของ seeders ที่มี
-type SeederName = 'superadmin' | 'all';
+type SeederName = 'superadmin' | 'banks' | 'all';
 
 // Configuration สำหรับแต่ละ seeder
 const SEEDERS = {
   superadmin: {
     name: 'Superadmin',
-    fn: seedSuperAdmin,
+  },
+  banks: {
+    name: 'Banks',
   },
   // เพิ่ม seeders อื่นๆ ในอนาคตที่นี่
   // users: {
   //   name: 'Demo Users',
-  //   fn: seedUsers,
   // },
 };
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const usersService = app.get(UsersService);
+  const banksService = app.get(BanksService);
 
   try {
     console.log('🌱 Starting database seeding process...\n');
@@ -40,6 +43,7 @@ async function bootstrap() {
 
       // รัน seeders ทั้งหมดตามลำดับ
       await seedSuperAdmin(usersService);
+      await seedBanks(banksService);
       // เพิ่ม seeders อื่นๆ ตามลำดับที่ต้องการ
       // await seedUsers(usersService);
       // await seedTransactions(transactionsService);
@@ -57,7 +61,13 @@ async function bootstrap() {
       }
 
       console.log(`📋 Running seeder: ${seeder.name}\n`);
-      await seeder.fn(usersService);
+
+      // เรียก seeder ที่เหมาะสมตาม seeder ที่เลือก
+      if (seederArg === 'superadmin') {
+        await seedSuperAdmin(usersService);
+      } else if (seederArg === 'banks') {
+        await seedBanks(banksService);
+      }
     }
 
     console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
