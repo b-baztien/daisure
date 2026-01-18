@@ -36,7 +36,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user._id.toString(), user.role);
     await this.usersService.updateRefreshToken(
       user._id.toString(),
-      tokens.refreshToken,
+      tokens.refresh_token,
     );
 
     return {
@@ -63,7 +63,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user._id.toString(), user.role);
     await this.usersService.updateRefreshToken(
       user._id.toString(),
-      tokens.refreshToken,
+      tokens.refresh_token,
     );
     await this.usersService.updateLastLogin(user._id.toString(), 'web');
 
@@ -80,15 +80,31 @@ export class AuthService {
 
   async lineLogin(lineLoginDto: LineLoginDto) {
     try {
+      // Validate LINE configuration
+      const redirectUri = this.configService.get('line.redirectUri');
+      const clientId = this.configService.get('line.channelId');
+      const clientSecret = this.configService.get('line.channelSecret');
+
+      if (!redirectUri || !clientId || !clientSecret) {
+        console.error('LINE configuration missing:', {
+          hasRedirectUri: !!redirectUri,
+          hasClientId: !!clientId,
+          hasClientSecret: !!clientSecret,
+        });
+        throw new UnauthorizedException(
+          'LINE login is not properly configured on the server',
+        );
+      }
+
       // Step 1: Exchange authorization code for access token
       const tokenResponse = await axios.post(
         'https://api.line.me/oauth2/v2.1/token',
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: lineLoginDto.code,
-          redirect_uri: this.configService.get('line.redirectUri') || '',
-          client_id: this.configService.get('line.channelId') || '',
-          client_secret: this.configService.get('line.channelSecret') || '',
+          redirect_uri: redirectUri,
+          client_id: clientId,
+          client_secret: clientSecret,
         }),
         {
           headers: {
@@ -126,7 +142,7 @@ export class AuthService {
       const tokens = await this.generateTokens(user._id.toString(), user.role);
       await this.usersService.updateRefreshToken(
         user._id.toString(),
-        tokens.refreshToken,
+        tokens.refresh_token,
       );
       await this.usersService.updateLastLogin(user._id.toString(), 'line');
 
@@ -141,8 +157,32 @@ export class AuthService {
         ...tokens,
       };
     } catch (error) {
-      console.error('LINE login error:', error.response?.data || error.message);
-      throw new UnauthorizedException('Invalid LINE authorization code');
+      // Log detailed error information
+      if (error.response) {
+        console.error('LINE API error:', {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers,
+        });
+
+        // Return specific error message from LINE API
+        const lineError = error.response.data;
+        if (lineError?.error_description) {
+          throw new UnauthorizedException(
+            `LINE login failed: ${lineError.error_description}`,
+          );
+        }
+        if (lineError?.error) {
+          throw new UnauthorizedException(
+            `LINE login failed: ${lineError.error}`,
+          );
+        }
+      }
+
+      console.error('LINE login error:', error.message);
+      throw new UnauthorizedException(
+        error.message || 'Invalid LINE authorization code',
+      );
     }
   }
 
@@ -151,7 +191,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user._id.toString(), user.role);
     await this.usersService.updateRefreshToken(
       user._id.toString(),
-      tokens.refreshToken,
+      tokens.refresh_token,
     );
     return tokens;
   }
@@ -176,8 +216,8 @@ export class AuthService {
     ]);
 
     return {
-      accessToken,
-      refreshToken,
+      access_token: accessToken,
+      refresh_token: refreshToken,
     };
   }
 }
