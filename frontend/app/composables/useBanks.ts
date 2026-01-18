@@ -6,7 +6,7 @@ export interface Bank {
 }
 
 export const useBanks = () => {
-  const api = useApi()
+  const { apiFetch } = useApi()
   const banks = useState<Bank[]>('banks', () => [])
   const isLoading = useState<boolean>('banks-loading', () => false)
 
@@ -17,7 +17,7 @@ export const useBanks = () => {
 
     isLoading.value = true
     try {
-      const response = await api<Bank[]>('/banks', {
+      const response = await apiFetch<Bank[]>('/banks', {
         method: 'GET'
       })
       banks.value = response
