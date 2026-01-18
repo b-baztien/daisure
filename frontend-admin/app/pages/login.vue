@@ -12,7 +12,7 @@
 
       <UCard>
         <form class="space-y-6" @submit.prevent="handleLogin">
-          <UFormGroup label="Email" name="email" required>
+          <UFormField label="Email" name="email" required>
             <UInput
               v-model="email"
               type="email"
@@ -20,9 +20,9 @@
               icon="i-heroicons-envelope"
               required
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="Password" name="password" required>
+          <UFormField label="Password" name="password" required>
             <UInput
               v-model="password"
               type="password"
@@ -30,7 +30,7 @@
               icon="i-heroicons-lock-closed"
               required
             />
-          </UFormGroup>
+          </UFormField>
 
           <UButton
             type="submit"

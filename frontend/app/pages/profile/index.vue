@@ -96,19 +96,19 @@
 
           <UForm :state="form" @submit="onSubmit" class="space-y-4">
             <!-- Display Name -->
-            <UFormGroup label="ชื่อ-นามสกุล">
+            <UFormField label="ชื่อ-นามสกุล">
               <UInput v-model="form.displayName" />
-            </UFormGroup>
+            </UFormField>
 
             <!-- Email -->
-            <UFormGroup label="อีเมล">
+            <UFormField label="อีเมล">
               <UInput v-model="form.email" type="email" disabled />
-            </UFormGroup>
+            </UFormField>
 
             <!-- Phone -->
-            <UFormGroup label="เบอร์โทร">
+            <UFormField label="เบอร์โทร">
               <UInput v-model="form.phone" />
-            </UFormGroup>
+            </UFormField>
 
             <!-- Submit -->
             <UButton type="submit" :loading="isLoading">
@@ -129,19 +129,19 @@
             class="space-y-4"
           >
             <!-- Current Password -->
-            <UFormGroup label="รหัสผ่านปัจจุบัน">
+            <UFormField label="รหัสผ่านปัจจุบัน">
               <UInput v-model="passwordForm.currentPassword" type="password" />
-            </UFormGroup>
+            </UFormField>
 
             <!-- New Password -->
-            <UFormGroup label="รหัสผ่านใหม่">
+            <UFormField label="รหัสผ่านใหม่">
               <UInput v-model="passwordForm.newPassword" type="password" />
-            </UFormGroup>
+            </UFormField>
 
             <!-- Confirm Password -->
-            <UFormGroup label="ยืนยันรหัสผ่านใหม่">
+            <UFormField label="ยืนยันรหัสผ่านใหม่">
               <UInput v-model="passwordForm.confirmPassword" type="password" />
-            </UFormGroup>
+            </UFormField>
 
             <!-- Submit -->
             <UButton type="submit" color="red" :loading="isChangingPassword">

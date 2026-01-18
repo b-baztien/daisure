@@ -30,34 +30,34 @@
 
         <div class="space-y-4">
           <!-- Product Name -->
-          <UFormGroup label="ชื่อสินค้า" required>
+          <UFormField label="ชื่อสินค้า" required>
             <UInput
               v-model="form.product.name"
               placeholder="iPhone 15 Pro 256GB"
               size="lg"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Description -->
-          <UFormGroup label="รายละเอียด" required>
+          <UFormField label="รายละเอียด" required>
             <UTextarea
               v-model="form.product.description"
               placeholder="อธิบายรายละเอียดสินค้า..."
               :rows="4"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Category -->
-          <UFormGroup label="หมวดหมู่">
+          <UFormField label="หมวดหมู่">
             <USelectMenu
               v-model="form.product.category"
               :options="categories"
               placeholder="เลือกหมวดหมู่"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Images -->
-          <UFormGroup label="รูปภาพสินค้า" required>
+          <UFormField label="รูปภาพสินค้า" required>
             <UInput
               v-model="imageUrl"
               placeholder="URL รูปภาพ"
@@ -82,10 +82,10 @@
                 />
               </div>
             </div>
-          </UFormGroup>
+          </UFormField>
 
           <!-- Price -->
-          <UFormGroup label="ราคา (บาท)" required>
+          <UFormField label="ราคา (บาท)" required>
             <UInput
               v-model.number="form.product.price"
               type="number"
@@ -96,15 +96,15 @@
                 <span class="text-gray-500">฿</span>
               </template>
             </UInput>
-          </UFormGroup>
+          </UFormField>
 
           <!-- Source URL -->
-          <UFormGroup label="ลิงค์ต้นทาง">
+          <UFormField label="ลิงค์ต้นทาง">
             <UInput
               v-model="form.product.sourceUrl"
               placeholder="https://facebook.com/..."
             />
-          </UFormGroup>
+          </UFormField>
         </div>
       </UCard>
 
@@ -116,7 +116,7 @@
 
         <div class="space-y-4">
           <!-- Seller ID -->
-          <UFormGroup label="ID ผู้ขาย" required>
+          <UFormField label="ID ผู้ขาย" required>
             <UInput
               v-model="form.sellerId"
               placeholder="65a1b2c3d4e5f6g7h8i9j0k1"
@@ -124,7 +124,7 @@
             <template #hint>
               <span class="text-sm">หา ID จากโปรไฟล์ผู้ขาย</span>
             </template>
-          </UFormGroup>
+          </UFormField>
         </div>
       </UCard>
 
@@ -136,50 +136,50 @@
 
         <div class="space-y-4">
           <!-- Recipient Name -->
-          <UFormGroup label="ชื่อผู้รับ" required>
+          <UFormField label="ชื่อผู้รับ" required>
             <UInput
               v-model="form.shippingAddress.recipientName"
               placeholder="สมชาย ใจดี"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Phone -->
-          <UFormGroup label="เบอร์โทร" required>
+          <UFormField label="เบอร์โทร" required>
             <UInput
               v-model="form.shippingAddress.phone"
               placeholder="08X-XXX-XXXX"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Address -->
-          <UFormGroup label="ที่อยู่" required>
+          <UFormField label="ที่อยู่" required>
             <UTextarea
               v-model="form.shippingAddress.address"
               placeholder="123 ถนนสุขุมวิท"
               :rows="3"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Grid: SubDistrict, District, Province -->
           <div class="grid md:grid-cols-3 gap-4">
-            <UFormGroup label="ตำบล/แขวง" required>
+            <UFormField label="ตำบล/แขวง" required>
               <UInput v-model="form.shippingAddress.subDistrict" />
-            </UFormGroup>
-            <UFormGroup label="อำเภอ/เขต" required>
+            </UFormField>
+            <UFormField label="อำเภอ/เขต" required>
               <UInput v-model="form.shippingAddress.district" />
-            </UFormGroup>
-            <UFormGroup label="จังหวัด" required>
+            </UFormField>
+            <UFormField label="จังหวัด" required>
               <UInput v-model="form.shippingAddress.province" />
-            </UFormGroup>
+            </UFormField>
           </div>
 
           <!-- Postal Code -->
-          <UFormGroup label="รหัสไปรษณีย์" required>
+          <UFormField label="รหัสไปรษณีย์" required>
             <UInput
               v-model="form.shippingAddress.postalCode"
               placeholder="10110"
             />
-          </UFormGroup>
+          </UFormField>
         </div>
       </UCard>
 
@@ -189,7 +189,7 @@
           <h2 class="text-xl font-semibold">ค่าจัดส่ง</h2>
         </template>
 
-        <UFormGroup label="ค่าจัดส่ง (บาท)">
+        <UFormField label="ค่าจัดส่ง (บาท)">
           <UInput
             v-model.number="form.shippingFee"
             type="number"
@@ -199,7 +199,7 @@
               <span class="text-gray-500">฿</span>
             </template>
           </UInput>
-        </UFormGroup>
+        </UFormField>
       </UCard>
 
       <!-- Summary -->

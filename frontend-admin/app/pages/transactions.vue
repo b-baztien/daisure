@@ -17,22 +17,22 @@
     <!-- Filters -->
     <UCard>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <UFormGroup label="Status">
+        <UFormField label="Status">
           <USelect
             v-model="filters.status"
             :options="statusOptions"
             @change="fetchTransactions"
           />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Search">
+        <UFormField label="Search">
           <UInput
             v-model="filters.search"
             placeholder="Search transaction ID..."
             icon="i-heroicons-magnifying-glass"
             @input="debouncedSearch"
           />
-        </UFormGroup>
+        </UFormField>
       </div>
     </UCard>
 
@@ -108,13 +108,13 @@
             </p>
           </div>
 
-          <UFormGroup label="Note (Optional)">
+          <UFormField label="Note (Optional)">
             <UTextarea
               v-model="verifyNote"
               placeholder="Add a note about this verification..."
               :rows="3"
             />
-          </UFormGroup>
+          </UFormField>
 
           <UAlert
             v-if="verifyAction === 'reject'"

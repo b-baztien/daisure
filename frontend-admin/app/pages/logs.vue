@@ -25,30 +25,30 @@
     <!-- Filters -->
     <UCard>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <UFormGroup label="Action Type">
+        <UFormField label="Action Type">
           <USelect
             v-model="filters.action"
             :options="actionOptions"
             @change="fetchLogs"
           />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Target Type">
+        <UFormField label="Target Type">
           <USelect
             v-model="filters.targetType"
             :options="targetTypeOptions"
             @change="fetchLogs"
           />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Search">
+        <UFormField label="Search">
           <UInput
             v-model="filters.search"
             placeholder="Search logs..."
             icon="i-heroicons-magnifying-glass"
             @input="debouncedSearch"
           />
-        </UFormGroup>
+        </UFormField>
       </div>
     </UCard>
 

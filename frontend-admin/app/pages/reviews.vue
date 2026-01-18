@@ -17,30 +17,30 @@
     <!-- Filters -->
     <UCard>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <UFormGroup label="Status">
+        <UFormField label="Status">
           <USelect
             v-model="filters.isHidden"
             :options="statusOptions"
             @change="fetchReviews"
           />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Minimum Rating">
+        <UFormField label="Minimum Rating">
           <USelect
             v-model="filters.minRating"
             :options="ratingOptions"
             @change="fetchReviews"
           />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Search">
+        <UFormField label="Search">
           <UInput
             v-model="filters.search"
             placeholder="Search reviews..."
             icon="i-heroicons-magnifying-glass"
             @input="debouncedSearch"
           />
-        </UFormGroup>
+        </UFormField>
       </div>
     </UCard>
 
@@ -129,13 +129,13 @@
             </p>
           </div>
 
-          <UFormGroup label="Reason for hiding" required>
+          <UFormField label="Reason for hiding" required>
             <UTextarea
               v-model="hideReason"
               placeholder="Enter reason for hiding this review..."
               :rows="3"
             />
-          </UFormGroup>
+          </UFormField>
 
           <UAlert
             color="amber"

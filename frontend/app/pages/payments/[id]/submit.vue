@@ -29,7 +29,7 @@
 
         <div class="space-y-4">
           <!-- Upload Input -->
-          <UFormGroup label="อัพโหลดรูปสลิป" required>
+          <UFormField label="อัพโหลดรูปสลิป" required>
             <UInput
               v-model="slipUrl"
               placeholder="URL ของรูปสลิป"
@@ -38,7 +38,7 @@
             <template #hint>
               <span class="text-sm">รองรับ JPG, PNG ขนาดไม่เกิน 5MB</span>
             </template>
-          </UFormGroup>
+          </UFormField>
 
           <!-- Preview -->
           <div v-if="form.slipImages.length > 0" class="grid grid-cols-2 gap-4">
@@ -81,16 +81,16 @@
 
         <div class="space-y-4">
           <!-- Payment Method -->
-          <UFormGroup label="วิธีการชำระเงิน" required>
+          <UFormField label="วิธีการชำระเงิน" required>
             <USelectMenu
               v-model="form.method"
               :options="paymentMethods"
               placeholder="เลือกวิธีการชำระเงิน"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Amount -->
-          <UFormGroup label="จำนวนเงินที่โอน (บาท)" required>
+          <UFormField label="จำนวนเงินที่โอน (บาท)" required>
             <UInput
               v-model.number="form.paidAmount"
               type="number"
@@ -101,16 +101,16 @@
                 <span class="text-gray-500">฿</span>
               </template>
             </UInput>
-          </UFormGroup>
+          </UFormField>
 
           <!-- Note -->
-          <UFormGroup label="หมายเหตุ">
+          <UFormField label="หมายเหตุ">
             <UTextarea
               v-model="form.note"
               placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)"
               :rows="3"
             />
-          </UFormGroup>
+          </UFormField>
         </div>
       </UCard>
 
