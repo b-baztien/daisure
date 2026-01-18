@@ -1,83 +1,88 @@
 <script setup lang="ts">
+import type { SelectItem } from "@nuxt/ui";
+
 definePageMeta({
-  middleware: ['auth']
-})
+  middleware: ["auth"],
+});
 
-const authStore = useAuthStore()
-const toast = useToast()
-const { banks, fetchBanks } = useBanks()
+const authStore = useAuthStore();
+const toast = useToast();
+const { banks, fetchBanks } = useBanks();
 
-const isLoading = ref(false)
-const isAddingAccount = ref(false)
-const showAddForm = ref(false)
+const isLoading = ref(false);
+const isAddingAccount = ref(false);
+const showAddForm = ref(false);
 
 // New bank account form
 const newAccount = ref({
   bank: null as any,
-  accountNumber: '',
-  accountName: ''
-})
+  accountNumber: "",
+  accountName: "",
+});
 
 // Fetch banks on mount
 onMounted(async () => {
   try {
-    await fetchBanks()
+    await fetchBanks();
   } catch (error) {
-    console.error('Failed to load banks:', error)
+    console.error("Failed to load banks:", error);
   }
-})
+});
 
 // Transform banks for select menu
-const thBanks = computed(() => {
-  return banks.value.map(bank => ({
+const thBanks = computed<SelectItem[]>(() => {
+  return banks.value.map((bank) => ({
     label: bank.name,
-    value: bank
-  }))
-})
+    value: bank,
+  }));
+});
 
 // Fetch bank accounts
-const bankAccounts = computed(() => authStore.user?.bankAccounts || [])
+const bankAccounts = computed(() => authStore.user?.bankAccounts || []);
 
 // Add bank account
 async function addBankAccount() {
-  if (!newAccount.value.bank || !newAccount.value.accountNumber || !newAccount.value.accountName) {
+  if (
+    !newAccount.value.bank ||
+    !newAccount.value.accountNumber ||
+    !newAccount.value.accountName
+  ) {
     toast.add({
-      title: 'กรุณากรอกข้อมูล',
-      description: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-      color: 'red'
-    })
-    return
+      title: "กรุณากรอกข้อมูล",
+      description: "กรุณากรอกข้อมูลให้ครบถ้วน",
+      color: "red",
+    });
+    return;
   }
 
-  isAddingAccount.value = true
+  isAddingAccount.value = true;
   try {
-    await authStore.addBankAccount(newAccount.value)
+    await authStore.addBankAccount(newAccount.value);
 
     toast.add({
-      title: 'สำเร็จ',
-      description: 'เพิ่มบัญชีธนาคารเรียบร้อยแล้ว',
-      color: 'green'
-    })
+      title: "สำเร็จ",
+      description: "เพิ่มบัญชีธนาคารเรียบร้อยแล้ว",
+      color: "green",
+    });
 
     // Reset form
     newAccount.value = {
       bank: null,
-      accountNumber: '',
-      accountName: ''
-    }
-    showAddForm.value = false
+      accountNumber: "",
+      accountName: "",
+    };
+    showAddForm.value = false;
   } catch (error: any) {
-    console.error('Failed to add bank account:', error)
+    console.error("Failed to add bank account:", error);
     toast.add({
-      title: 'เกิดข้อผิดพลาด',
-      description: error.data?.message || 'ไม่สามารถเพิ่มบัญชีธนาคารได้',
-      color: 'red'
-    })
+      title: "เกิดข้อผิดพลาด",
+      description: error.data?.message || "ไม่สามารถเพิ่มบัญชีธนาคารได้",
+      color: "red",
+    });
   } finally {
-    isAddingAccount.value = false
+    isAddingAccount.value = false;
   }
 }
-
 </script>
 
 <template>
@@ -122,10 +127,9 @@ async function addBankAccount() {
         <UFormField label="ธนาคาร" required>
           <USelectMenu
             v-model="newAccount.bank"
-            :options="thBanks"
+            :items="thBanks"
             placeholder="เลือกธนาคาร"
             size="lg"
-            value-attribute="value"
           />
         </UFormField>
 
@@ -174,9 +178,15 @@ async function addBankAccount() {
     </UCard>
 
     <!-- Bank Accounts List -->
-    <div v-if="bankAccounts.length === 0 && !showAddForm" class="text-center py-12">
+    <div
+      v-if="bankAccounts.length === 0 && !showAddForm"
+      class="text-center py-12"
+    >
       <UCard>
-        <Icon name="i-heroicons-credit-card" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
+        <Icon
+          name="i-heroicons-credit-card"
+          class="w-16 h-16 text-gray-400 mx-auto mb-4"
+        />
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
           ยังไม่มีบัญชีธนาคาร
         </h3>
@@ -201,7 +211,14 @@ async function addBankAccount() {
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                <<<<<<< Updated upstream
                 {{ account.bank?.name }}
+                =======
+                {{
+                  thBanks.value.find((b) => b.value === account.bankCode)
+                    ?.label || account.bankName
+                }}
+                >>>>>>> Stashed changes
               </h3>
               <p class="text-gray-600 dark:text-gray-400 mt-1">
                 {{ account.accountNumber }}
@@ -212,15 +229,17 @@ async function addBankAccount() {
             </div>
 
             <!-- Default Badge -->
-            <UBadge v-if="account.isDefault" color="blue">
-              บัญชีหลัก
-            </UBadge>
+            <UBadge v-if="account.isDefault" color="blue"> บัญชีหลัก </UBadge>
           </div>
 
           <!-- Verification Status -->
           <div class="flex items-center space-x-2">
             <Icon
-              :name="account.isVerified ? 'i-heroicons-check-circle' : 'i-heroicons-clock'"
+              :name="
+                account.isVerified
+                  ? 'i-heroicons-check-circle'
+                  : 'i-heroicons-clock'
+              "
               :class="account.isVerified ? 'text-green-600' : 'text-yellow-600'"
               class="w-5 h-5"
             />
@@ -228,18 +247,16 @@ async function addBankAccount() {
               :class="account.isVerified ? 'text-green-600' : 'text-yellow-600'"
               class="text-sm font-medium"
             >
-              {{ account.isVerified ? 'ยืนยันแล้ว' : 'รอการยืนยัน' }}
+              {{ account.isVerified ? "ยืนยันแล้ว" : "รอการยืนยัน" }}
             </span>
           </div>
 
           <!-- Actions -->
-          <div v-if="!account.isDefault" class="pt-4 border-t border-gray-200 dark:border-gray-700">
-            <UButton
-              color="gray"
-              variant="outline"
-              size="sm"
-              block
-            >
+          <div
+            v-if="!account.isDefault"
+            class="pt-4 border-t border-gray-200 dark:border-gray-700"
+          >
+            <UButton color="gray" variant="outline" size="sm" block>
               ตั้งเป็นบัญชีหลัก
             </UButton>
           </div>
@@ -250,7 +267,10 @@ async function addBankAccount() {
     <!-- Info Card -->
     <UCard class="mt-6 bg-blue-50 dark:bg-blue-950">
       <div class="flex items-start space-x-3">
-        <Icon name="i-heroicons-information-circle" class="w-6 h-6 text-blue-600 mt-0.5" />
+        <Icon
+          name="i-heroicons-information-circle"
+          class="w-6 h-6 text-blue-600 mt-0.5"
+        />
         <div class="text-sm">
           <p class="font-semibold text-blue-900 dark:text-blue-100 mb-2">
             ข้อมูลสำคัญ
