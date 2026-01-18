@@ -11,6 +11,7 @@ import jwtConfig from './config/jwt.config';
 import lineConfig from './config/line.config';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BanksModule } from './modules/banks/banks.module';
 import { LineModule } from './modules/line/line.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PaymentsModule } from './modules/payments/payments.module';
@@ -49,6 +50,7 @@ import { UsersModule } from './modules/users/users.module';
     LineModule,
     AdminModule,
     SettingsModule,
+    BanksModule,
   ],
 })
 export class AppModule {}

@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node -r tsconfig-paths/register src/scripts/seed.ts",
-    "seed:superadmin": "ts-node -r tsconfig-paths/register src/scripts/seed.ts superadmin"
+    "seed:superadmin": "ts-node -r tsconfig-paths/register src/scripts/seed.ts superadmin",
+    "seed:banks": "ts-node -r tsconfig-paths/register src/scripts/seed.ts banks"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.11",
