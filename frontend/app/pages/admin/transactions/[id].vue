@@ -281,7 +281,7 @@ onMounted(() => {
 
           <!-- Resolution Form -->
           <div class="space-y-4">
-            <UFormGroup label="การแก้ไข" required>
+            <UFormField label="การแก้ไข" required>
               <USelectMenu
                 v-model="disputeResolution.resolution"
                 :options="[
@@ -292,32 +292,32 @@ onMounted(() => {
                 placeholder="เลือกการแก้ไข"
                 value-attribute="value"
               />
-            </UFormGroup>
+            </UFormField>
 
             <div v-if="disputeResolution.resolution === 'partial'" class="grid grid-cols-2 gap-4">
-              <UFormGroup label="คืนเงินให้ผู้ซื้อ">
+              <UFormField label="คืนเงินให้ผู้ซื้อ">
                 <UInput
                   v-model.number="disputeResolution.refundToBuyer"
                   type="number"
                   placeholder="0"
                 />
-              </UFormGroup>
-              <UFormGroup label="จ่ายเงินให้ผู้ขาย">
+              </UFormField>
+              <UFormField label="จ่ายเงินให้ผู้ขาย">
                 <UInput
                   v-model.number="disputeResolution.payoutToSeller"
                   type="number"
                   placeholder="0"
                 />
-              </UFormGroup>
+              </UFormField>
             </div>
 
-            <UFormGroup label="หมายเหตุ">
+            <UFormField label="หมายเหตุ">
               <UTextarea
                 v-model="disputeResolution.notes"
                 :rows="3"
                 placeholder="บันทึกการตัดสินใจ..."
               />
-            </UFormGroup>
+            </UFormField>
 
             <UButton
               color="orange"

@@ -144,7 +144,7 @@ onMounted(() => {
 
         <form @submit.prevent="saveEscrowFee" class="space-y-6">
           <!-- Percentage -->
-          <UFormGroup label="เปอร์เซ็นต์ค่าธรรมเนียม (%)" required>
+          <UFormField label="เปอร์เซ็นต์ค่าธรรมเนียม (%)" required>
             <UInput
               v-model.number="escrowFeeSettings.percentage"
               type="number"
@@ -159,10 +159,10 @@ onMounted(() => {
                 เปอร์เซ็นต์ที่คิดจากมูลค่าธุรกรรม
               </span>
             </template>
-          </UFormGroup>
+          </UFormField>
 
           <!-- Minimum Fee -->
-          <UFormGroup label="ค่าธรรมเนียมขั้นต่ำ (บาท)">
+          <UFormField label="ค่าธรรมเนียมขั้นต่ำ (บาท)">
             <UInput
               v-model.number="escrowFeeSettings.minimumFee"
               type="number"
@@ -175,10 +175,10 @@ onMounted(() => {
                 ค่าธรรมเนียมขั้นต่ำที่เรียกเก็บ (ไม่บังคับ)
               </span>
             </template>
-          </UFormGroup>
+          </UFormField>
 
           <!-- Maximum Fee -->
-          <UFormGroup label="ค่าธรรมเนียมสูงสุด (บาท)">
+          <UFormField label="ค่าธรรมเนียมสูงสุด (บาท)">
             <UInput
               v-model.number="escrowFeeSettings.maximumFee"
               type="number"
@@ -191,7 +191,7 @@ onMounted(() => {
                 ค่าธรรมเนียมสูงสุดที่เรียกเก็บ (ไม่บังคับ)
               </span>
             </template>
-          </UFormGroup>
+          </UFormField>
 
           <!-- Example Calculation -->
           <div class="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
@@ -250,7 +250,7 @@ onMounted(() => {
             <UToggle v-model="autoCompleteSettings.enabled" />
           </div>
 
-          <UFormGroup
+          <UFormField
             v-if="autoCompleteSettings.enabled"
             label="จำนวนวันหลังจากได้รับสินค้า"
             required
@@ -268,7 +268,7 @@ onMounted(() => {
                 จำนวนวันที่รอหลังจากผู้ซื้อยืนยันว่าได้รับสินค้า
               </span>
             </template>
-          </UFormGroup>
+          </UFormField>
 
           <div class="p-4 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
             <div class="flex items-start space-x-3">

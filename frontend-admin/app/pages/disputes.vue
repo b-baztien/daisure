@@ -89,16 +89,16 @@
           </div>
 
           <!-- Decision -->
-          <UFormGroup label="Resolution Decision" required>
+          <UFormField label="Resolution Decision" required>
             <USelect
               v-model="resolution.decision"
               :options="decisionOptions"
               placeholder="Select resolution decision"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Partial Refund Amount (show only if partial_refund selected) -->
-          <UFormGroup
+          <UFormField
             v-if="resolution.decision === 'partial_refund'"
             label="Refund Amount"
             required
@@ -117,16 +117,16 @@
             <template #hint>
               Maximum: ฿{{ formatNumber(selectedDispute.totalAmount) }}
             </template>
-          </UFormGroup>
+          </UFormField>
 
           <!-- Explanation -->
-          <UFormGroup label="Explanation" required>
+          <UFormField label="Explanation" required>
             <UTextarea
               v-model="resolution.explanation"
               placeholder="Provide a detailed explanation for this decision..."
               :rows="4"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Decision Info -->
           <UAlert

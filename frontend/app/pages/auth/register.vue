@@ -160,7 +160,7 @@ onMounted(async () => {
 
       <form @submit.prevent="handleRegister" class="space-y-4">
         <!-- Display Name -->
-        <UFormGroup label="ชื่อที่แสดง" required :error="displayNameError">
+        <UFormField label="ชื่อที่แสดง" required :error="displayNameError">
           <UInput
             v-model="form.displayName"
             type="text"
@@ -169,10 +169,10 @@ onMounted(async () => {
             :disabled="isLoading"
             required
           />
-        </UFormGroup>
+        </UFormField>
 
         <!-- Email -->
-        <UFormGroup label="อีเมล" required :error="emailError">
+        <UFormField label="อีเมล" required :error="emailError">
           <UInput
             v-model="form.email"
             type="email"
@@ -181,10 +181,10 @@ onMounted(async () => {
             :disabled="isLoading"
             required
           />
-        </UFormGroup>
+        </UFormField>
 
         <!-- Phone (optional) -->
-        <UFormGroup label="เบอร์โทรศัพท์ (ไม่บังคับ)">
+        <UFormField label="เบอร์โทรศัพท์ (ไม่บังคับ)">
           <UInput
             v-model="form.phone"
             type="tel"
@@ -192,10 +192,10 @@ onMounted(async () => {
             size="lg"
             :disabled="isLoading"
           />
-        </UFormGroup>
+        </UFormField>
 
         <!-- Password -->
-        <UFormGroup label="รหัสผ่าน" required :error="passwordError">
+        <UFormField label="รหัสผ่าน" required :error="passwordError">
           <UInput
             v-model="form.password"
             :type="showPassword ? 'text' : 'password'"
@@ -219,10 +219,10 @@ onMounted(async () => {
               >รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</span
             >
           </template>
-        </UFormGroup>
+        </UFormField>
 
         <!-- Confirm Password -->
-        <UFormGroup
+        <UFormField
           label="ยืนยันรหัสผ่าน"
           required
           :error="confirmPasswordError"
@@ -245,7 +245,7 @@ onMounted(async () => {
               />
             </template>
           </UInput>
-        </UFormGroup>
+        </UFormField>
 
         <!-- Terms acceptance -->
         <div class="text-sm text-gray-600 dark:text-gray-400">

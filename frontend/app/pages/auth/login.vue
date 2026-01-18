@@ -118,7 +118,7 @@ onMounted(async () => {
 
       <form @submit.prevent="handleLogin" class="space-y-4">
         <!-- Email -->
-        <UFormGroup label="อีเมล" required>
+        <UFormField label="อีเมล" required>
           <UInput
             v-model="form.email"
             type="email"
@@ -127,10 +127,10 @@ onMounted(async () => {
             :disabled="isLoading"
             required
           />
-        </UFormGroup>
+        </UFormField>
 
         <!-- Password -->
-        <UFormGroup label="รหัสผ่าน" required>
+        <UFormField label="รหัสผ่าน" required>
           <UInput
             v-model="form.password"
             :type="showPassword ? 'text' : 'password'"
@@ -149,7 +149,7 @@ onMounted(async () => {
               />
             </template>
           </UInput>
-        </UFormGroup>
+        </UFormField>
 
         <!-- Forgot password link -->
         <div class="flex justify-end">

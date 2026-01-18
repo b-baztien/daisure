@@ -17,30 +17,30 @@
     <!-- Filters -->
     <UCard>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <UFormGroup label="Role">
+        <UFormField label="Role">
           <USelect
             v-model="filters.role"
             :options="roleOptions"
             @change="fetchUsers"
           />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Verification Status">
+        <UFormField label="Verification Status">
           <USelect
             v-model="filters.verificationStatus"
             :options="verificationOptions"
             @change="fetchUsers"
           />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Search" class="sm:col-span-2">
+        <UFormField label="Search" class="sm:col-span-2">
           <UInput
             v-model="filters.search"
             placeholder="Search by name or email..."
             icon="i-heroicons-magnifying-glass"
             @input="debouncedSearch"
           />
-        </UFormGroup>
+        </UFormField>
       </div>
     </UCard>
 

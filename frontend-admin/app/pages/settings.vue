@@ -80,7 +80,7 @@
           </h4>
 
           <form @submit.prevent="updateSettings" class="space-y-4">
-            <UFormGroup
+            <UFormField
               label="New Escrow Fee Percentage"
               hint="Enter a value between 0 and 100"
               required
@@ -97,7 +97,7 @@
                   <span class="text-gray-500 dark:text-gray-400">%</span>
                 </template>
               </UInput>
-            </UFormGroup>
+            </UFormField>
 
             <div class="flex items-center justify-between pt-4">
               <UAlert

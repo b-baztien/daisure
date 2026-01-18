@@ -129,7 +129,7 @@ watch(() => newAccount.value.bankName, (bankValue) => {
 
       <form @submit.prevent="addBankAccount" class="space-y-4">
         <!-- Bank Name -->
-        <UFormGroup label="ธนาคาร" required>
+        <UFormField label="ธนาคาร" required>
           <USelectMenu
             v-model="newAccount.bankName"
             :options="thBanks"
@@ -137,10 +137,10 @@ watch(() => newAccount.value.bankName, (bankValue) => {
             size="lg"
             value-attribute="value"
           />
-        </UFormGroup>
+        </UFormField>
 
         <!-- Account Number -->
-        <UFormGroup label="เลขที่บัญชี" required>
+        <UFormField label="เลขที่บัญชี" required>
           <UInput
             v-model="newAccount.accountNumber"
             type="text"
@@ -148,17 +148,17 @@ watch(() => newAccount.value.bankName, (bankValue) => {
             size="lg"
             maxlength="15"
           />
-        </UFormGroup>
+        </UFormField>
 
         <!-- Account Name -->
-        <UFormGroup label="ชื่อบัญชี" required>
+        <UFormField label="ชื่อบัญชี" required>
           <UInput
             v-model="newAccount.accountName"
             type="text"
             placeholder="ชื่อบัญชีตามบัตรประชาชน"
             size="lg"
           />
-        </UFormGroup>
+        </UFormField>
 
         <!-- Buttons -->
         <div class="flex space-x-4">

@@ -169,13 +169,13 @@
         </template>
 
         <UForm :state="responseForm" @submit="submitResponse" class="space-y-4">
-          <UFormGroup label="ข้อความตอบกลับ" required>
+          <UFormField label="ข้อความตอบกลับ" required>
             <UTextarea
               v-model="responseForm.comment"
               placeholder="ขอบคุณสำหรับรีวิว..."
               :rows="4"
             />
-          </UFormGroup>
+          </UFormField>
 
           <div class="flex gap-2 justify-end">
             <UButton

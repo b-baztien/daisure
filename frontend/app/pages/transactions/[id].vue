@@ -528,27 +528,27 @@ File: pages/transactions/[id].vue (COMPLETE)
         </template>
 
         <UForm :state="shippingForm" @submit="submitShipping" class="space-y-4">
-          <UFormGroup label="วิธีการจัดส่ง" required>
+          <UFormField label="วิธีการจัดส่ง" required>
             <USelectMenu
               v-model="shippingForm.method"
               :options="shippingMethods"
               placeholder="เลือกบริษัทขนส่ง"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="หมายเลขพัสดุ" required>
+          <UFormField label="หมายเลขพัสดุ" required>
             <UInput
               v-model="shippingForm.trackingNumber"
               placeholder="KRYTH123456789"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="ลิงค์ติดตามพัสดุ">
+          <UFormField label="ลิงค์ติดตามพัสดุ">
             <UInput
               v-model="shippingForm.trackingUrl"
               placeholder="https://track.kerryexpress.com/..."
             />
-          </UFormGroup>
+          </UFormField>
 
           <div class="flex gap-2 justify-end">
             <UButton
@@ -572,21 +572,21 @@ File: pages/transactions/[id].vue (COMPLETE)
         </template>
 
         <UForm :state="disputeForm" @submit="submitDispute" class="space-y-4">
-          <UFormGroup label="เหตุผล" required>
+          <UFormField label="เหตุผล" required>
             <USelectMenu
               v-model="disputeForm.reason"
               :options="disputeReasons"
               placeholder="เลือกเหตุผล"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="รายละเอียด" required>
+          <UFormField label="รายละเอียด" required>
             <UTextarea
               v-model="disputeForm.description"
               placeholder="อธิบายปัญหาที่พบ..."
               :rows="4"
             />
-          </UFormGroup>
+          </UFormField>
 
           <div class="flex gap-2 justify-end">
             <UButton

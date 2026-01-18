@@ -67,7 +67,7 @@
           <h2 class="text-xl font-semibold">ความคิดเห็น</h2>
         </template>
 
-        <UFormGroup label="เขียนรีวิว" required>
+        <UFormField label="เขียนรีวิว" required>
           <UTextarea
             v-model="form.comment"
             placeholder="บอกเล่าประสบการณ์การซื้อขายของคุณ..."
@@ -78,7 +78,7 @@
               >{{ form.comment.length }} / 500 ตัวอักษร</span
             >
           </template>
-        </UFormGroup>
+        </UFormField>
       </UCard>
 
       <!-- Images (Optional) -->
