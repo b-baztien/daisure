@@ -1,8 +1,8 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const authStore = useAuthStore()
 
-  // Wait for auth initialization to complete
-  if (!authStore.isInitialized) {
+  // Wait for auth initialization to complete (only on client side)
+  if (!authStore.isInitialized && import.meta.client) {
     // Wait for a short time for initialization to complete
     await new Promise((resolve) => {
       const checkInterval = setInterval(() => {
