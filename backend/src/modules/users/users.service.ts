@@ -59,6 +59,7 @@ export class UsersService {
     const user = await this.userModel
       .findById(id)
       .select('-auth.passwordHash -auth.salt')
+      .populate('bankAccounts.bank')
       .exec();
 
     if (!user) {
@@ -83,6 +84,7 @@ export class UsersService {
         { new: true },
       )
       .select('-auth.passwordHash -auth.salt')
+      .populate('bankAccounts.bank')
       .exec();
 
     if (!user) {
@@ -95,7 +97,14 @@ export class UsersService {
     userId: string,
     addBankAccountDto: AddBankAccountDto,
   ): Promise<User> {
-    const user = await this.findOne(userId);
+    const user = await this.userModel
+      .findById(userId)
+      .select('-auth.passwordHash -auth.salt')
+      .exec();
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
 
     // If this is set as default, unset others
     if (addBankAccountDto.isDefault) {
@@ -104,8 +113,25 @@ export class UsersService {
       });
     }
 
-    user.bankAccounts.push(addBankAccountDto as any);
-    return user.save();
+    // Create bank account object with bank reference
+    const bankAccount = {
+      bank: addBankAccountDto.bank._id,
+      accountNumber: addBankAccountDto.accountNumber,
+      accountName: addBankAccountDto.accountName,
+      branch: addBankAccountDto.branch,
+      isDefault: addBankAccountDto.isDefault || false,
+      isVerified: false,
+    };
+
+    user.bankAccounts.push(bankAccount as any);
+    await user.save();
+
+    // Populate bank data before returning
+    return this.userModel
+      .findById(userId)
+      .select('-auth.passwordHash -auth.salt')
+      .populate('bankAccounts.bank')
+      .exec();
   }
 
   async getBankAccounts(userId: string) {

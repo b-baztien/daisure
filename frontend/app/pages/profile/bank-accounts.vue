@@ -13,8 +13,7 @@ const showAddForm = ref(false)
 
 // New bank account form
 const newAccount = ref({
-  bankName: '',
-  bankCode: '',
+  bank: null as any,
   accountNumber: '',
   accountName: ''
 })
@@ -32,8 +31,7 @@ onMounted(async () => {
 const thBanks = computed(() => {
   return banks.value.map(bank => ({
     label: bank.name,
-    value: bank.uniqueId,
-    code: bank.uniqueId
+    value: bank
   }))
 })
 
@@ -42,7 +40,7 @@ const bankAccounts = computed(() => authStore.user?.bankAccounts || [])
 
 // Add bank account
 async function addBankAccount() {
-  if (!newAccount.value.bankName || !newAccount.value.accountNumber || !newAccount.value.accountName) {
+  if (!newAccount.value.bank || !newAccount.value.accountNumber || !newAccount.value.accountName) {
     toast.add({
       title: 'กรุณากรอกข้อมูล',
       description: 'กรุณากรอกข้อมูลให้ครบถ้วน',
@@ -63,8 +61,7 @@ async function addBankAccount() {
 
     // Reset form
     newAccount.value = {
-      bankName: '',
-      bankCode: '',
+      bank: null,
       accountNumber: '',
       accountName: ''
     }
@@ -81,13 +78,6 @@ async function addBankAccount() {
   }
 }
 
-// Handle bank selection
-watch(() => newAccount.value.bankName, (bankValue) => {
-  const bank = thBanks.value.find(b => b.value === bankValue)
-  if (bank) {
-    newAccount.value.bankCode = bank.code
-  }
-})
 </script>
 
 <template>
@@ -131,7 +121,7 @@ watch(() => newAccount.value.bankName, (bankValue) => {
         <!-- Bank Name -->
         <UFormField label="ธนาคาร" required>
           <USelectMenu
-            v-model="newAccount.bankName"
+            v-model="newAccount.bank"
             :options="thBanks"
             placeholder="เลือกธนาคาร"
             size="lg"
@@ -211,7 +201,7 @@ watch(() => newAccount.value.bankName, (bankValue) => {
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ thBanks.value.find(b => b.value === account.bankCode)?.label || account.bankName }}
+                {{ account.bank?.name }}
               </h3>
               <p class="text-gray-600 dark:text-gray-400 mt-1">
                 {{ account.accountNumber }}

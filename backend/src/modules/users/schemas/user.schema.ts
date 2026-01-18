@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Bank } from '../../banks/schemas/bank.schema';
 
 @Schema({ _id: false })
 class Auth {
@@ -48,11 +49,8 @@ class Profile {
 
 @Schema({ _id: false })
 class BankAccount {
-  @Prop()
-  bankName: string;
-
-  @Prop()
-  bankCode: string;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Bank', required: true })
+  bank: Bank;
 
   @Prop()
   accountNumber: string;
