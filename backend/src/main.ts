@@ -15,10 +15,11 @@ async function bootstrap() {
   );
 
   // CORS
-  app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,
-  });
+  // app.enableCors({
+  //   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  //   credentials: true,
+  // });
+  app.enableCors();
 
   // Global prefix
   app.setGlobalPrefix('api/v1');
