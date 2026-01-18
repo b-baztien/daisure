@@ -83,7 +83,7 @@ async function addBankAccount() {
 
 // Handle bank selection
 watch(() => newAccount.value.bankName, (bankValue) => {
-  const bank = thBanks.find(b => b.value === bankValue)
+  const bank = thBanks.value.find(b => b.value === bankValue)
   if (bank) {
     newAccount.value.bankCode = bank.code
   }
@@ -211,7 +211,7 @@ watch(() => newAccount.value.bankName, (bankValue) => {
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ thBanks.find(b => b.value === account.bankCode)?.label || account.bankName }}
+                {{ thBanks.value.find(b => b.value === account.bankCode)?.label || account.bankName }}
               </h3>
               <p class="text-gray-600 dark:text-gray-400 mt-1">
                 {{ account.accountNumber }}
