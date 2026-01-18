@@ -117,7 +117,24 @@ function handleLineLogin() {
 }
 
 // Check if already logged in
-onMounted(() => {
+onMounted(async () => {
+  // Wait for auth initialization
+  if (!authStore.isInitialized) {
+    await new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (authStore.isInitialized) {
+          clearInterval(checkInterval)
+          resolve(true)
+        }
+      }, 50)
+
+      setTimeout(() => {
+        clearInterval(checkInterval)
+        resolve(false)
+      }, 2000)
+    })
+  }
+
   if (authStore.isAuthenticated) {
     router.push("/dashboard");
   }
