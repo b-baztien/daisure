@@ -86,9 +86,9 @@ export class AuthService {
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: lineLoginDto.code,
-          redirect_uri: this.configService.get('line.redirectUri'),
-          client_id: this.configService.get('line.channelId'),
-          client_secret: this.configService.get('line.channelSecret'),
+          redirect_uri: this.configService.get('line.redirectUri') || '',
+          client_id: this.configService.get('line.channelId') || '',
+          client_secret: this.configService.get('line.channelSecret') || '',
         }),
         {
           headers: {
