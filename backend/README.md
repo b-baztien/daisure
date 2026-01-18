@@ -30,13 +30,34 @@ pnpm install
 
 Copy `.env.example` to `.env` and update:
 
-```
-PORT=3000
+```bash
+# Server Configuration
+PORT=3005
+
+# Database
 MONGODB_URI=mongodb://localhost:27017/escrow-service
-JWT_SECRET=your-secret-key
-LINE_CHANNEL_ACCESS_TOKEN=your-token
-LINE_CHANNEL_SECRET=your-secret
+
+# JWT Configuration
+JWT_SECRET=your-secret-key-here-please-change-in-production
+JWT_EXPIRES_IN=1d
+JWT_REFRESH_SECRET=your-refresh-secret-key-here-please-change-in-production
+JWT_REFRESH_EXPIRES_IN=7d
+
+# Frontend URL (for CORS)
+FRONTEND_URL=http://localhost:3000
+
+# LINE Configuration
+LINE_CHANNEL_ID=your-line-channel-id
+LINE_CHANNEL_SECRET=your-line-channel-secret
+LINE_CHANNEL_ACCESS_TOKEN=your-line-channel-access-token
+LINE_REDIRECT_URI=http://localhost:3000/auth/line-callback
+LINE_LIFF_ID=your-line-liff-id
 ```
+
+**Important for LINE Login:**
+- `LINE_REDIRECT_URI` must match the Callback URL configured in LINE Developers Console
+- Default is `http://localhost:3000/auth/line-callback` for local development
+- For production, update to your production frontend URL
 
 ## Running
 
@@ -84,6 +105,36 @@ pnpm run start:prod
 - `รายการซื้อ` - My purchases
 - `รายการขาย` - My sales
 - `track [number]` - Track transaction
+
+## Troubleshooting
+
+### LINE Login Returns 400 Error
+
+If you're getting a 400 error when calling `/api/v1/auth/line/login`, check:
+
+1. **Missing .env file**: Copy `.env.example` to `.env` and configure all LINE variables
+2. **LINE_REDIRECT_URI not set**: Make sure `LINE_REDIRECT_URI=http://localhost:3000/auth/line-callback` is in your `.env` file
+3. **LINE_REDIRECT_URI mismatch**: The redirect URI must match exactly with:
+   - The Callback URL in LINE Developers Console
+   - The URL where LINE redirects after authentication
+   - The frontend callback page (`/auth/line-callback`)
+4. **Request body validation**: Ensure you're sending both `code` and `state` as strings in the request body
+
+Example valid request:
+```bash
+curl "http://localhost:3005/api/v1/auth/line/login" \
+  -H "Content-Type: application/json" \
+  -d '{"code":"your-auth-code","state":"your-state"}'
+```
+
+### LINE API Exchange Token Fails (401 Error)
+
+If the token exchange with LINE API fails:
+
+1. Verify `LINE_CHANNEL_ID` and `LINE_CHANNEL_SECRET` are correct
+2. Verify the authorization `code` is still valid (codes expire quickly)
+3. Check that `LINE_REDIRECT_URI` matches the one in LINE Developers Console exactly
+4. Ensure your LINE Login channel is properly configured
 
 ## License
 
