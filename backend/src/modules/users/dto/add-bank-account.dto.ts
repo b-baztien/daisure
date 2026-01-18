@@ -1,11 +1,30 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsNotEmptyObject,
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+
+class BankDto {
+  @IsString()
+  _id: string;
+
+  @IsString()
+  name: string;
+
+  @IsString()
+  uniqueId: string;
+}
 
 export class AddBankAccountDto {
-  @IsString()
-  bankName: string;
-
-  @IsString()
-  bankCode: string;
+  @IsObject()
+  @IsNotEmptyObject()
+  @ValidateNested()
+  @Type(() => BankDto)
+  bank: BankDto;
 
   @IsString()
   accountNumber: string;

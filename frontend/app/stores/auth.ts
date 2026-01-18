@@ -17,8 +17,11 @@ interface User {
   role: string
   permissions: string[]
   bankAccounts: Array<{
-    bankName: string
-    bankCode: string
+    bank: {
+      _id: string
+      name: string
+      uniqueId: string
+    }
     accountNumber: string
     accountName: string
     isDefault: boolean
@@ -243,8 +246,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function addBankAccount(payload: {
-    bankName: string
-    bankCode: string
+    bank: {
+      _id: string
+      name: string
+      uniqueId: string
+    }
     accountNumber: string
     accountName: string
   }) {
