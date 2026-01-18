@@ -36,7 +36,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user._id.toString(), user.role);
     await this.usersService.updateRefreshToken(
       user._id.toString(),
-      tokens.refreshToken,
+      tokens.refresh_token,
     );
 
     return {
@@ -63,7 +63,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user._id.toString(), user.role);
     await this.usersService.updateRefreshToken(
       user._id.toString(),
-      tokens.refreshToken,
+      tokens.refresh_token,
     );
     await this.usersService.updateLastLogin(user._id.toString(), 'web');
 
@@ -142,7 +142,7 @@ export class AuthService {
       const tokens = await this.generateTokens(user._id.toString(), user.role);
       await this.usersService.updateRefreshToken(
         user._id.toString(),
-        tokens.refreshToken,
+        tokens.refresh_token,
       );
       await this.usersService.updateLastLogin(user._id.toString(), 'line');
 
@@ -191,7 +191,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user._id.toString(), user.role);
     await this.usersService.updateRefreshToken(
       user._id.toString(),
-      tokens.refreshToken,
+      tokens.refresh_token,
     );
     return tokens;
   }
@@ -216,8 +216,8 @@ export class AuthService {
     ]);
 
     return {
-      accessToken,
-      refreshToken,
+      access_token: accessToken,
+      refresh_token: refreshToken,
     };
   }
 }
