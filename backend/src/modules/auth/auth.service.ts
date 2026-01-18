@@ -81,20 +81,43 @@ export class AuthService {
   async lineLogin(lineLoginDto: LineLoginDto) {
     try {
       // Validate LINE configuration
-      const redirectUri = this.configService.get('line.redirectUri');
-      const clientId = this.configService.get('line.channelId');
-      const clientSecret = this.configService.get('line.channelSecret');
+      const redirectUri = this.configService.get<string>('line.redirectUri');
+      const clientId = this.configService.get<string>('line.channelId');
+      const clientSecret = this.configService.get<string>('line.channelSecret');
 
-      if (!redirectUri || !clientId || !clientSecret) {
-        console.error('LINE configuration missing:', {
-          hasRedirectUri: !!redirectUri,
-          hasClientId: !!clientId,
-          hasClientSecret: !!clientSecret,
+      // Log configuration values (mask sensitive data)
+      console.log('LINE configuration check:', {
+        redirectUri: redirectUri ? `${redirectUri.substring(0, 30)}...` : 'MISSING',
+        clientId: clientId ? `${clientId.substring(0, 10)}...` : 'MISSING',
+        hasClientSecret: !!clientSecret,
+        redirectUriType: typeof redirectUri,
+        redirectUriLength: redirectUri?.length || 0,
+      });
+
+      // Strict validation - check for empty strings and trim
+      const validRedirectUri = redirectUri?.trim();
+      const validClientId = clientId?.trim();
+      const validClientSecret = clientSecret?.trim();
+
+      if (!validRedirectUri || !validClientId || !validClientSecret) {
+        console.error('LINE configuration validation failed:', {
+          hasRedirectUri: !!validRedirectUri,
+          hasClientId: !!validClientId,
+          hasClientSecret: !!validClientSecret,
+          redirectUriValue: redirectUri,
+          clientIdValue: clientId,
         });
         throw new UnauthorizedException(
-          'LINE login is not properly configured on the server',
+          'LINE login is not properly configured on the server. Please check LINE_REDIRECT_URI, LINE_CHANNEL_ID, and LINE_CHANNEL_SECRET environment variables.',
         );
       }
+
+      // Log the request parameters (for debugging)
+      console.log('LINE token exchange request:', {
+        code: lineLoginDto.code?.substring(0, 20) + '...',
+        redirect_uri: validRedirectUri,
+        client_id: validClientId,
+      });
 
       // Step 1: Exchange authorization code for access token
       const tokenResponse = await axios.post(
@@ -102,9 +125,9 @@ export class AuthService {
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: lineLoginDto.code,
-          redirect_uri: redirectUri,
-          client_id: clientId,
-          client_secret: clientSecret,
+          redirect_uri: validRedirectUri,
+          client_id: validClientId,
+          client_secret: validClientSecret,
         }),
         {
           headers: {
