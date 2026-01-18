@@ -9,16 +9,5 @@
 </template>
 
 <script setup lang="ts">
-// Initialize auth on app startup
-const authStore = useAuthStore();
-
-onMounted(() => {
-  // Initialize auth from localStorage
-  authStore.initAuth();
-
-  // Fetch fresh user data if token exists
-  if (authStore.isAuthenticated) {
-    authStore.fetchUser();
-  }
-});
+// Auth initialization is now handled by the auth.client.ts plugin
 </script>
