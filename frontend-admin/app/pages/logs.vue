@@ -215,11 +215,11 @@ const targetTypeOptions = [
 ]
 
 const columns = [
-  { key: 'action', label: 'Action' },
-  { key: 'targetType', label: 'Target Type' },
-  { key: 'targetId', label: 'Target ID' },
-  { key: 'createdAt', label: 'Timestamp' },
-  { key: 'actions', label: 'Actions' }
+  { key: 'action', label: 'Action', id: 'action' },
+  { key: 'targetType', label: 'Target Type', id: 'targetType' },
+  { key: 'targetId', label: 'Target ID', id: 'targetId' },
+  { key: 'createdAt', label: 'Timestamp', id: 'createdAt' },
+  { key: 'actions', label: 'Actions', id: 'actions' }
 ]
 
 // Details modal state

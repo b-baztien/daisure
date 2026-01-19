@@ -181,12 +181,12 @@ const verificationOptions = [
 ]
 
 const columns = [
-  { key: 'name', label: 'Name' },
-  { key: 'email', label: 'Email' },
-  { key: 'role', label: 'Role' },
-  { key: 'verificationStatus', label: 'Status' },
-  { key: 'createdAt', label: 'Created' },
-  { key: 'actions', label: 'Actions' }
+  { key: 'name', label: 'Name', id: 'name' },
+  { key: 'email', label: 'Email', id: 'email' },
+  { key: 'role', label: 'Role', id: 'role' },
+  { key: 'verificationStatus', label: 'Status', id: 'verificationStatus' },
+  { key: 'createdAt', label: 'Created', id: 'createdAt' },
+  { key: 'actions', label: 'Actions', id: 'actions' }
 ]
 
 // Details modal state

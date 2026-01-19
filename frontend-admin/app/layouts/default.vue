@@ -141,12 +141,9 @@ const pageTitle = computed(() => {
   return currentNav?.label || 'Admin Panel'
 })
 
-// Check authentication on mount
-onMounted(async () => {
-  await authStore.initAuth()
-  if (!authStore.isAuthenticated) {
-    router.push('/login')
-  }
+// Auth check is now handled by middleware
+onMounted(() => {
+  // Layout initialization if needed
 })
 </script>
 

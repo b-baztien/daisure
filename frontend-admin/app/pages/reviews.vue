@@ -275,11 +275,11 @@ const ratingOptions = [
 ]
 
 const columns = [
-  { key: 'rating', label: 'Rating' },
-  { key: 'comment', label: 'Comment' },
-  { key: 'isHidden', label: 'Status' },
-  { key: 'createdAt', label: 'Created' },
-  { key: 'actions', label: 'Actions' }
+  { key: 'rating', label: 'Rating', id: 'rating' },
+  { key: 'comment', label: 'Comment', id: 'comment' },
+  { key: 'isHidden', label: 'Status', id: 'isHidden' },
+  { key: 'createdAt', label: 'Created', id: 'createdAt' },
+  { key: 'actions', label: 'Actions', id: 'actions' }
 ]
 
 // Hide modal state
