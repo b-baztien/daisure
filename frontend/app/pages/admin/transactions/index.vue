@@ -25,6 +25,48 @@ const statusOptions = [
   { label: 'ยกเลิก', value: 'cancelled' }
 ]
 
+// Table columns
+const columns = [
+  {
+    id: 'transactionNumber',
+    label: 'รหัสธุรกรรม',
+    sortable: true
+  },
+  {
+    id: 'product',
+    label: 'สินค้า'
+  },
+  {
+    id: 'buyer',
+    label: 'ผู้ซื้อ',
+    sortable: true
+  },
+  {
+    id: 'seller',
+    label: 'ผู้ขาย',
+    sortable: true
+  },
+  {
+    id: 'amount',
+    label: 'จำนวนเงิน',
+    sortable: true
+  },
+  {
+    id: 'status',
+    label: 'สถานะ',
+    sortable: true
+  },
+  {
+    id: 'createdAt',
+    label: 'วันที่สร้าง',
+    sortable: true
+  },
+  {
+    id: 'actions',
+    label: 'การดำเนินการ'
+  }
+]
+
 // Fetch transactions
 async function fetchTransactions() {
   isLoading.value = true
@@ -179,95 +221,74 @@ onMounted(() => {
       </div>
 
       <!-- Transactions Table -->
-      <div v-else class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                รหัสธุรกรรม
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                สินค้า
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                ผู้ซื้อ
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                ผู้ขาย
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                จำนวนเงิน
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                สถานะ
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                วันที่สร้าง
-              </th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                การดำเนินการ
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            <tr
-              v-for="transaction in filteredTransactions"
-              :key="transaction._id"
-              class="hover:bg-gray-50 dark:hover:bg-gray-800"
-            >
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-sm font-medium text-gray-900 dark:text-white">
-                  {{ transaction.transactionNumber }}
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <div class="text-sm text-gray-900 dark:text-white font-medium">
-                  {{ transaction.product?.name }}
-                </div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ transaction.product?.description?.substring(0, 50) }}...
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-sm text-gray-900 dark:text-white">
-                  {{ transaction.buyer?.profile?.displayName || 'N/A' }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-sm text-gray-900 dark:text-white">
-                  {{ transaction.seller?.profile?.displayName || 'N/A' }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">
-                  {{ formatCurrency(transaction.payment?.totalAmount || 0) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <UBadge :color="getStatusColor(transaction.status)">
-                  {{ getStatusLabel(transaction.status) }}
-                </UBadge>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ formatDate(transaction.createdAt) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right">
-                <UButton
-                  :to="`/admin/transactions/${transaction._id}`"
-                  color="gray"
-                  variant="ghost"
-                  icon="i-heroicons-eye"
-                  size="sm"
-                >
-                  ดู
-                </UButton>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <UTable v-else :columns="columns" :data="filteredTransactions">
+        <!-- Transaction Number Column -->
+        <template #transactionNumber-data="{ row }">
+          <span class="text-sm font-medium text-gray-900 dark:text-white">
+            {{ row.transactionNumber }}
+          </span>
+        </template>
+
+        <!-- Product Column -->
+        <template #product-data="{ row }">
+          <div>
+            <div class="text-sm text-gray-900 dark:text-white font-medium">
+              {{ row.product?.name }}
+            </div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              {{ row.product?.description?.substring(0, 50) }}...
+            </div>
+          </div>
+        </template>
+
+        <!-- Buyer Column -->
+        <template #buyer-data="{ row }">
+          <span class="text-sm text-gray-900 dark:text-white">
+            {{ row.buyer?.profile?.displayName || 'N/A' }}
+          </span>
+        </template>
+
+        <!-- Seller Column -->
+        <template #seller-data="{ row }">
+          <span class="text-sm text-gray-900 dark:text-white">
+            {{ row.seller?.profile?.displayName || 'N/A' }}
+          </span>
+        </template>
+
+        <!-- Amount Column -->
+        <template #amount-data="{ row }">
+          <span class="text-sm font-semibold text-gray-900 dark:text-white">
+            {{ formatCurrency(row.payment?.totalAmount || 0) }}
+          </span>
+        </template>
+
+        <!-- Status Column -->
+        <template #status-data="{ row }">
+          <UBadge :color="getStatusColor(row.status)">
+            {{ getStatusLabel(row.status) }}
+          </UBadge>
+        </template>
+
+        <!-- Created At Column -->
+        <template #createdAt-data="{ row }">
+          <span class="text-sm text-gray-500 dark:text-gray-400">
+            {{ formatDate(row.createdAt) }}
+          </span>
+        </template>
+
+        <!-- Actions Column -->
+        <template #actions-data="{ row }">
+          <UButton
+            :to="`/admin/transactions/${row._id}`"
+            color="gray"
+            variant="ghost"
+            icon="i-heroicons-eye"
+            size="sm"
+          >
+            ดู
+          </UButton>
+        </template>
+      </UTable>
     </UCard>
 
     <!-- Summary Stats -->
