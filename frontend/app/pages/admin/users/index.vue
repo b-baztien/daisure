@@ -11,6 +11,43 @@ const users = ref<any[]>([])
 const isLoading = ref(true)
 const searchQuery = ref('')
 
+// Table columns
+const columns = [
+  {
+    id: 'user',
+    label: 'ผู้ใช้',
+    sortable: true
+  },
+  {
+    id: 'email',
+    label: 'อีเมล',
+    sortable: true
+  },
+  {
+    id: 'phone',
+    label: 'เบอร์โทร'
+  },
+  {
+    id: 'role',
+    label: 'บทบาท',
+    sortable: true
+  },
+  {
+    id: 'status',
+    label: 'สถานะ',
+    sortable: true
+  },
+  {
+    id: 'createdAt',
+    label: 'สมัครเมื่อ',
+    sortable: true
+  },
+  {
+    id: 'statistics',
+    label: 'สถิติ'
+  }
+]
+
 // Fetch users
 async function fetchUsers() {
   isLoading.value = true
@@ -117,111 +154,76 @@ onMounted(() => {
       </div>
 
       <!-- Users Table -->
-      <div v-else class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                ผู้ใช้
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                อีเมล
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                เบอร์โทร
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                บทบาท
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                สถานะ
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                สมัครเมื่อ
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                สถิติ
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            <tr
-              v-for="user in filteredUsers"
-              :key="user._id"
-              class="hover:bg-gray-50 dark:hover:bg-gray-800"
-            >
-              <!-- User -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <UAvatar
-                    :src="user.profile?.pictureUrl"
-                    :alt="user.profile?.displayName"
-                    size="md"
-                  />
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ user.profile?.displayName }}
-                    </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                      ID: {{ user._id }}
-                    </div>
-                  </div>
-                </div>
-              </td>
+      <UTable v-else :columns="columns" :data="filteredUsers">
+        <!-- User Column -->
+        <template #user-data="{ row }">
+          <div class="flex items-center">
+            <UAvatar
+              :src="row.profile?.pictureUrl"
+              :alt="row.profile?.displayName"
+              size="md"
+            />
+            <div class="ml-4">
+              <div class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ row.profile?.displayName }}
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">
+                ID: {{ row._id }}
+              </div>
+            </div>
+          </div>
+        </template>
 
-              <!-- Email -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-sm text-gray-900 dark:text-white">
-                  {{ user.profile?.email || user.auth?.email || 'N/A' }}
-                </span>
-              </td>
+        <!-- Email Column -->
+        <template #email-data="{ row }">
+          <span class="text-sm text-gray-900 dark:text-white">
+            {{ row.profile?.email || row.auth?.email || 'N/A' }}
+          </span>
+        </template>
 
-              <!-- Phone -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-sm text-gray-900 dark:text-white">
-                  {{ user.profile?.phone || 'N/A' }}
-                </span>
-              </td>
+        <!-- Phone Column -->
+        <template #phone-data="{ row }">
+          <span class="text-sm text-gray-900 dark:text-white">
+            {{ row.profile?.phone || 'N/A' }}
+          </span>
+        </template>
 
-              <!-- Role -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <UBadge :color="getRoleColor(user.role)">
-                  {{ getRoleLabel(user.role) }}
-                </UBadge>
-              </td>
+        <!-- Role Column -->
+        <template #role-data="{ row }">
+          <UBadge :color="getRoleColor(row.role)">
+            {{ getRoleLabel(row.role) }}
+          </UBadge>
+        </template>
 
-              <!-- Status -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <UBadge :color="user.isBlocked ? 'red' : 'green'">
-                  {{ user.isBlocked ? 'ถูกบล็อก' : user.status }}
-                </UBadge>
-              </td>
+        <!-- Status Column -->
+        <template #status-data="{ row }">
+          <UBadge :color="row.isBlocked ? 'red' : 'green'">
+            {{ row.isBlocked ? 'ถูกบล็อก' : row.status }}
+          </UBadge>
+        </template>
 
-              <!-- Created At -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ formatDate(user.createdAt) }}
-                </span>
-              </td>
+        <!-- Created At Column -->
+        <template #createdAt-data="{ row }">
+          <span class="text-sm text-gray-500 dark:text-gray-400">
+            {{ formatDate(row.createdAt) }}
+          </span>
+        </template>
 
-              <!-- Statistics -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm">
-                  <div class="text-gray-900 dark:text-white">
-                    ซื้อ: {{ user.statistics?.totalBought || 0 }}
-                  </div>
-                  <div class="text-gray-900 dark:text-white">
-                    ขาย: {{ user.statistics?.totalSold || 0 }}
-                  </div>
-                  <div class="text-gray-600 dark:text-gray-400">
-                    เสร็จ: {{ user.statistics?.totalCompleted || 0 }}
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        <!-- Statistics Column -->
+        <template #statistics-data="{ row }">
+          <div class="text-sm">
+            <div class="text-gray-900 dark:text-white">
+              ซื้อ: {{ row.statistics?.totalBought || 0 }}
+            </div>
+            <div class="text-gray-900 dark:text-white">
+              ขาย: {{ row.statistics?.totalSold || 0 }}
+            </div>
+            <div class="text-gray-600 dark:text-gray-400">
+              เสร็จ: {{ row.statistics?.totalCompleted || 0 }}
+            </div>
+          </div>
+        </template>
+      </UTable>
     </UCard>
 
     <!-- Summary Stats -->
