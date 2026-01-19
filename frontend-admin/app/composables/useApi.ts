@@ -34,11 +34,16 @@ export const useApi = () => {
     return config
   })
 
-  // Handle 401 responses
+  // Handle 401 and 403 responses
   api.interceptors.response.use(
     (response) => response,
     (error) => {
       if (error.response?.status === 401) {
+        authStore.logout()
+        navigateTo('/login')
+      } else if (error.response?.status === 403) {
+        // Forbidden - user doesn't have admin access
+        console.error('Access forbidden - admin privileges required')
         authStore.logout()
         navigateTo('/login')
       }
