@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { SelectItem } from "@nuxt/ui";
-
 definePageMeta({
   middleware: ["auth"],
 });
@@ -27,14 +25,6 @@ onMounted(async () => {
   } catch (error) {
     console.error("Failed to load banks:", error);
   }
-});
-
-// Transform banks for select menu
-const thBanks = computed<SelectItem[]>(() => {
-  return banks.value.map((bank) => ({
-    label: bank.name,
-    value: bank,
-  }));
 });
 
 // Fetch bank accounts
@@ -127,7 +117,8 @@ async function addBankAccount() {
         <UFormField label="ธนาคาร" required>
           <USelectMenu
             v-model="newAccount.bank"
-            :items="thBanks"
+            :items="banks"
+            label-key="name"
             placeholder="เลือกธนาคาร"
             size="lg"
           />

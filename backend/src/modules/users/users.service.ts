@@ -127,11 +127,17 @@ export class UsersService {
     await user.save();
 
     // Populate bank data before returning
-    return this.userModel
+    const updatedUser = await this.userModel
       .findById(userId)
       .select('-auth.passwordHash -auth.salt')
       .populate('bankAccounts.bank')
       .exec();
+
+    if (!updatedUser) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    return updatedUser;
   }
 
   async getBankAccounts(userId: string) {

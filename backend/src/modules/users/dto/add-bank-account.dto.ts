@@ -5,7 +5,6 @@ import {
   IsObject,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
 
 class BankDto {
@@ -22,7 +21,6 @@ class BankDto {
 export class AddBankAccountDto {
   @IsObject()
   @IsNotEmptyObject()
-  @ValidateNested()
   @Type(() => BankDto)
   bank: BankDto;
 
