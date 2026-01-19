@@ -58,6 +58,9 @@ class BankAccount {
   @Prop()
   accountName: string;
 
+  @Prop()
+  branch?: string;
+
   @Prop({ default: false })
   isDefault: boolean;
 

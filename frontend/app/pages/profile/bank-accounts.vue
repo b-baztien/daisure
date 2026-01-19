@@ -211,14 +211,7 @@ async function addBankAccount() {
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                <<<<<<< Updated upstream
                 {{ account.bank?.name }}
-                =======
-                {{
-                  thBanks.value.find((b) => b.value === account.bankCode)
-                    ?.label || account.bankName
-                }}
-                >>>>>>> Stashed changes
               </h3>
               <p class="text-gray-600 dark:text-gray-400 mt-1">
                 {{ account.accountNumber }}
