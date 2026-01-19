@@ -197,11 +197,11 @@ const loading = ref(false)
 const error = ref('')
 
 const columns = [
-  { key: '_id', label: 'Transaction ID' },
-  { key: 'status', label: 'Status' },
-  { key: 'amount', label: 'Amount' },
-  { key: 'createdAt', label: 'Created' },
-  { key: 'actions', label: 'Actions' }
+  { key: '_id', label: 'Transaction ID', id: '_id' },
+  { key: 'status', label: 'Status', id: 'status' },
+  { key: 'amount', label: 'Amount', id: 'amount' },
+  { key: 'createdAt', label: 'Created', id: 'createdAt' },
+  { key: 'actions', label: 'Actions', id: 'actions' }
 ]
 
 const decisionOptions = [

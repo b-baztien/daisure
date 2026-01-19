@@ -254,11 +254,11 @@ const statusOptions = [
 ]
 
 const columns = [
-  { key: '_id', label: 'ID' },
-  { key: 'status', label: 'Status' },
-  { key: 'amount', label: 'Amount' },
-  { key: 'createdAt', label: 'Created' },
-  { key: 'actions', label: 'Actions' }
+  { key: '_id', label: 'ID', id: '_id' },
+  { key: 'status', label: 'Status', id: 'status' },
+  { key: 'amount', label: 'Amount', id: 'amount' },
+  { key: 'createdAt', label: 'Created', id: 'createdAt' },
+  { key: 'actions', label: 'Actions', id: 'actions' }
 ]
 
 // Verify modal state
