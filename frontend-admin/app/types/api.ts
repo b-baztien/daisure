@@ -85,3 +85,77 @@ export interface Settings {
 export interface UpdateEscrowFeeRequest {
   percentage: number
 }
+
+// KYC Types
+export interface KycSetting {
+  _id: string
+  key: string
+  minimumPrice: number
+  isEnabled: boolean
+  updatedBy?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface UpdateKycSettingRequest {
+  minimumPrice?: number
+  isEnabled?: boolean
+}
+
+export interface IdCardInfo {
+  idCardNumber: string
+  firstName: string
+  lastName: string
+  dateOfBirth?: string
+  address?: string
+}
+
+export interface ReviewInfo {
+  reviewedBy?: {
+    _id: string
+    profile: {
+      displayName: string
+    }
+  }
+  reviewedAt?: string
+  reason?: string
+  notes?: string
+}
+
+export interface KycVerification {
+  _id: string
+  userId: {
+    _id: string
+    profile: {
+      displayName: string
+      email?: string
+    }
+    auth: {
+      email?: string
+    }
+    bankAccounts?: Array<{
+      bank: any
+      accountNumber: string
+      accountName: string
+      isDefault: boolean
+    }>
+  }
+  status: 'pending' | 'approved' | 'rejected'
+  idCardImages: string[]
+  idCardInfo: IdCardInfo
+  review?: ReviewInfo
+  submittedAt: string
+  approvedAt?: string
+  rejectedAt?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ApproveKycRequest {
+  notes?: string
+}
+
+export interface RejectKycRequest {
+  reason: string
+  notes?: string
+}

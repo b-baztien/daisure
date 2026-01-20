@@ -110,6 +110,9 @@ export class User extends Document {
 
   @Prop()
   lastLoginPlatform?: string;
+
+  @Prop({ default: 'not_submitted' })
+  kycStatus?: string; // not_submitted | pending | approved | rejected
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
