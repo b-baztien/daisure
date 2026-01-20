@@ -11,6 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { TransactionStatus } from '../../common/enums/transaction-status.enum';
 import { ITransactionDocument } from '../../common/interfaces/transaction.interface';
+import { KycService } from '../kyc/kyc.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SettingsService } from '../settings/settings.service';
 import { UsersService } from '../users/users.service';
@@ -25,6 +26,7 @@ export class TransactionsService {
     private usersService: UsersService,
     private notificationsService: NotificationsService,
     private settingsService: SettingsService,
+    private kycService: KycService,
   ) {}
 
   async create(
@@ -37,9 +39,24 @@ export class TransactionsService {
     );
     const buyer = await this.usersService.findOne(createTransactionDto.buyerId);
 
+    const productPrice = createTransactionDto.product.price;
+
+    // ตรวจสอบ KYC ของผู้ขาย
+    const kycCheck = await this.kycService.checkKycRequired(
+      createTransactionDto.sellerId,
+      productPrice,
+    );
+
+    if (kycCheck.required && !kycCheck.verified) {
+      throw new BadRequestException({
+        message: kycCheck.message,
+        kycStatus: kycCheck.status,
+        requireKyc: true,
+      });
+    }
+
     // Calculate fees
     const settings = await this.settingsService.getEscrowFee();
-    const productPrice = createTransactionDto.product.price;
     const escrowFee = this.calculateEscrowFee(productPrice, settings);
     const shippingFee = createTransactionDto.shippingFee || 0;
     const totalAmount = productPrice + escrowFee + shippingFee;

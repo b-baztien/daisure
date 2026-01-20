@@ -12,6 +12,7 @@ import lineConfig from './config/line.config';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BanksModule } from './modules/banks/banks.module';
+import { KycModule } from './modules/kyc/kyc.module';
 import { LineModule } from './modules/line/line.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PaymentsModule } from './modules/payments/payments.module';
@@ -51,6 +52,7 @@ import { UsersModule } from './modules/users/users.module';
     AdminModule,
     SettingsModule,
     BanksModule,
+    KycModule,
   ],
 })
 export class AppModule {}

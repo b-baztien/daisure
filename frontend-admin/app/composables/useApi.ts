@@ -10,7 +10,12 @@ import type {
   Review,
   AdminLog,
   Settings,
-  UpdateEscrowFeeRequest
+  UpdateEscrowFeeRequest,
+  KycSetting,
+  UpdateKycSettingRequest,
+  KycVerification,
+  ApproveKycRequest,
+  RejectKycRequest
 } from '~/types/api'
 
 export const useApi = () => {
@@ -100,6 +105,22 @@ export const useApi = () => {
     // Admin Logs
     getAdminLogs: (params?: Record<string, any>) =>
       api.get<AdminLog[]>('/admin/logs', { params }),
+
+    // KYC
+    getKycSettings: () =>
+      api.get<KycSetting>('/kyc/settings'),
+
+    updateKycSettings: (data: UpdateKycSettingRequest) =>
+      api.put<KycSetting>('/kyc/settings', data),
+
+    getKycVerifications: (status?: string) =>
+      api.get<KycVerification[]>('/kyc/verifications', { params: { status } }),
+
+    approveKyc: (id: string, data: ApproveKycRequest) =>
+      api.put<KycVerification>(`/kyc/verifications/${id}/approve`, data),
+
+    rejectKyc: (id: string, data: RejectKycRequest) =>
+      api.put<KycVerification>(`/kyc/verifications/${id}/reject`, data),
 
     // Generic request method for custom calls
     request: <T>(config: AxiosRequestConfig) =>
