@@ -13,6 +13,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 import { KycService } from './kyc.service';
 import { SubmitKycDto } from './dto/submit-kyc.dto';
 import { UpdateKycSettingDto } from './dto/update-kyc-setting.dto';
@@ -59,8 +60,11 @@ export class KycController {
   // Admin ดูรายการ KYC ทั้งหมด
   @Get('verifications')
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-  getAllKycVerifications(@Query('status') status?: KycStatus) {
-    return this.kycService.getAllKycVerifications(status);
+  getAllKycVerifications(
+    @Query('status') status?: KycStatus,
+    @Query() paginationQuery?: PaginationQueryDto,
+  ) {
+    return this.kycService.getAllKycVerifications(status, paginationQuery);
   }
 
   // Admin อนุมัติ KYC

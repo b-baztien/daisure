@@ -7,6 +7,11 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { TransactionStatus } from '../../common/enums/transaction-status.enum';
+import {
+  PaginationQueryDto,
+  PaginatedResponse,
+  createPaginatedResponse,
+} from '../../common/dto/pagination.dto';
 import { TransactionsService } from '../transactions/transactions.service';
 import { UsersService } from '../users/users.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -100,35 +105,100 @@ export class ReviewsService {
     return saved;
   }
 
-  async findAll(filters?: any): Promise<Review[]> {
+  async findAll(
+    filters?: any,
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<Review[] | PaginatedResponse<Review>> {
     const query = { isHidden: false, ...filters };
 
-    return this.reviewModel
-      .find(query)
-      .populate('reviewer.userId reviewee.userId')
-      .sort({ createdAt: -1 })
-      .exec();
+    // If no pagination params provided, return all (backward compatibility)
+    if (!paginationQuery) {
+      return this.reviewModel
+        .find(query)
+        .populate('reviewer.userId reviewee.userId')
+        .sort({ createdAt: -1 })
+        .exec();
+    }
+
+    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const skip = (page - 1) * pageSize;
+
+    // Build sort object
+    const sort: any = {};
+    if (sortBy) {
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    } else {
+      sort.createdAt = -1;
+    }
+
+    // Execute query with pagination
+    const [data, total] = await Promise.all([
+      this.reviewModel
+        .find(query)
+        .populate('reviewer.userId reviewee.userId')
+        .sort(sort)
+        .skip(skip)
+        .limit(pageSize)
+        .exec(),
+      this.reviewModel.countDocuments(query).exec(),
+    ]);
+
+    return createPaginatedResponse(data, total, page, pageSize);
   }
 
-  async findByTransaction(transactionId: string): Promise<Review[]> {
+  async findByTransaction(
+    transactionId: string,
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<Review[] | PaginatedResponse<Review>> {
     if (!Types.ObjectId.isValid(transactionId)) {
       throw new BadRequestException('Invalid transaction ID');
     }
 
-    return this.reviewModel
-      .find({
-        transactionId,
-        isHidden: false,
-      })
-      .populate('reviewer.userId reviewee.userId')
-      .sort({ createdAt: -1 })
-      .exec();
+    const query = {
+      transactionId,
+      isHidden: false,
+    };
+
+    // If no pagination params provided, return all (backward compatibility)
+    if (!paginationQuery) {
+      return this.reviewModel
+        .find(query)
+        .populate('reviewer.userId reviewee.userId')
+        .sort({ createdAt: -1 })
+        .exec();
+    }
+
+    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const skip = (page - 1) * pageSize;
+
+    // Build sort object
+    const sort: any = {};
+    if (sortBy) {
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    } else {
+      sort.createdAt = -1;
+    }
+
+    // Execute query with pagination
+    const [data, total] = await Promise.all([
+      this.reviewModel
+        .find(query)
+        .populate('reviewer.userId reviewee.userId')
+        .sort(sort)
+        .skip(skip)
+        .limit(pageSize)
+        .exec(),
+      this.reviewModel.countDocuments(query).exec(),
+    ]);
+
+    return createPaginatedResponse(data, total, page, pageSize);
   }
 
   async findByUser(
     userId: string,
     type?: 'received' | 'given',
-  ): Promise<Review[]> {
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<Review[] | PaginatedResponse<Review>> {
     if (!Types.ObjectId.isValid(userId)) {
       throw new BadRequestException('Invalid user ID');
     }
@@ -146,11 +216,39 @@ export class ReviewsService {
       ];
     }
 
-    return this.reviewModel
-      .find(filter)
-      .populate('reviewer.userId reviewee.userId')
-      .sort({ createdAt: -1 })
-      .exec();
+    // If no pagination params provided, return all (backward compatibility)
+    if (!paginationQuery) {
+      return this.reviewModel
+        .find(filter)
+        .populate('reviewer.userId reviewee.userId')
+        .sort({ createdAt: -1 })
+        .exec();
+    }
+
+    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const skip = (page - 1) * pageSize;
+
+    // Build sort object
+    const sort: any = {};
+    if (sortBy) {
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    } else {
+      sort.createdAt = -1;
+    }
+
+    // Execute query with pagination
+    const [data, total] = await Promise.all([
+      this.reviewModel
+        .find(filter)
+        .populate('reviewer.userId reviewee.userId')
+        .sort(sort)
+        .skip(skip)
+        .limit(pageSize)
+        .exec(),
+      this.reviewModel.countDocuments(filter).exec(),
+    ]);
+
+    return createPaginatedResponse(data, total, page, pageSize);
   }
 
   async findOne(id: string): Promise<Review> {

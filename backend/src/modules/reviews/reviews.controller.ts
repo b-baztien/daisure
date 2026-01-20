@@ -13,6 +13,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ReviewsService } from './reviews.service';
 
@@ -27,24 +28,32 @@ export class ReviewsController {
   }
 
   @Get()
-  findAll(@Query('transactionId') transactionId?: string) {
+  findAll(
+    @Query('transactionId') transactionId?: string,
+    @Query() paginationQuery?: PaginationQueryDto,
+  ) {
     if (transactionId) {
-      return this.reviewsService.findByTransaction(transactionId);
+      return this.reviewsService.findByTransaction(transactionId, paginationQuery);
     }
-    return this.reviewsService.findAll();
+    return this.reviewsService.findAll(undefined, paginationQuery);
   }
 
   @Get('my-reviews')
-  getMyReviews(@Request() req, @Query('type') type?: 'received' | 'given') {
-    return this.reviewsService.findByUser(req.user.userId, type);
+  getMyReviews(
+    @Request() req,
+    @Query('type') type?: 'received' | 'given',
+    @Query() paginationQuery?: PaginationQueryDto,
+  ) {
+    return this.reviewsService.findByUser(req.user.userId, type, paginationQuery);
   }
 
   @Get('user/:userId')
   getUserReviews(
     @Param('userId') userId: string,
     @Query('type') type?: 'received' | 'given',
+    @Query() paginationQuery?: PaginationQueryDto,
   ) {
-    return this.reviewsService.findByUser(userId, type);
+    return this.reviewsService.findByUser(userId, type, paginationQuery);
   }
 
   @Get('user/:userId/stats')

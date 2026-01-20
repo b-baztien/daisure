@@ -6,6 +6,11 @@ import { AddBankAccountDto } from './dto/add-bank-account.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
+import {
+  PaginationQueryDto,
+  PaginatedResponse,
+  createPaginatedResponse,
+} from '../../common/dto/pagination.dto';
 
 @Injectable()
 export class UsersService {
@@ -51,8 +56,41 @@ export class UsersService {
     return user.save();
   }
 
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().select('-auth.passwordHash -auth.salt').exec();
+  async findAll(
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<User[] | PaginatedResponse<User>> {
+    // If no pagination params provided, return all users (backward compatibility)
+    if (!paginationQuery) {
+      return this.userModel
+        .find()
+        .select('-auth.passwordHash -auth.salt')
+        .exec();
+    }
+
+    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const skip = (page - 1) * pageSize;
+
+    // Build sort object
+    const sort: any = {};
+    if (sortBy) {
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    } else {
+      sort.createdAt = -1; // Default sort by creation date
+    }
+
+    // Execute query with pagination
+    const [data, total] = await Promise.all([
+      this.userModel
+        .find()
+        .select('-auth.passwordHash -auth.salt')
+        .sort(sort)
+        .skip(skip)
+        .limit(pageSize)
+        .exec(),
+      this.userModel.countDocuments().exec(),
+    ]);
+
+    return createPaginatedResponse(data, total, page, pageSize);
   }
 
   async findOne(id: string): Promise<User> {

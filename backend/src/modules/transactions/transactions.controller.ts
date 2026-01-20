@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { TransactionStatus } from '../../common/enums/transaction-status.enum';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionsService } from './transactions.service';
 
@@ -28,18 +29,31 @@ export class TransactionsController {
   }
 
   @Get()
-  findAll(@Query('status') status?: TransactionStatus, @Request() req?) {
-    return this.transactionsService.findAll({ status });
+  findAll(
+    @Query('status') status?: TransactionStatus,
+    @Query() paginationQuery?: PaginationQueryDto,
+    @Request() req?,
+  ) {
+    const filters = status ? { status } : undefined;
+    return this.transactionsService.findAll(filters, paginationQuery);
   }
 
   @Get('my-purchases')
-  getMyPurchases(@Request() req) {
-    return this.transactionsService.findByUser(req.user.userId, 'buyer');
+  getMyPurchases(@Request() req, @Query() paginationQuery?: PaginationQueryDto) {
+    return this.transactionsService.findByUser(
+      req.user.userId,
+      'buyer',
+      paginationQuery,
+    );
   }
 
   @Get('my-sales')
-  getMySales(@Request() req) {
-    return this.transactionsService.findByUser(req.user.userId, 'seller');
+  getMySales(@Request() req, @Query() paginationQuery?: PaginationQueryDto) {
+    return this.transactionsService.findByUser(
+      req.user.userId,
+      'seller',
+      paginationQuery,
+    );
   }
 
   @Get(':id')

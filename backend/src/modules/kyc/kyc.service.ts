@@ -6,6 +6,11 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import {
+  PaginationQueryDto,
+  PaginatedResponse,
+  createPaginatedResponse,
+} from '../../common/dto/pagination.dto';
 import { KycSetting } from './schemas/kyc-setting.schema';
 import {
   KycVerification,
@@ -100,15 +105,48 @@ export class KycService {
   }
 
   // Admin ดึงรายการ KYC ทั้งหมด
-  async getAllKycVerifications(status?: KycStatus) {
+  async getAllKycVerifications(
+    status?: KycStatus,
+    paginationQuery?: PaginationQueryDto,
+  ) {
     const query = status ? { status } : {};
-    const verifications = await this.kycVerificationModel
-      .find(query)
-      .populate('userId', 'profile auth.email bankAccounts')
-      .populate('review.reviewedBy', 'profile.displayName')
-      .sort({ submittedAt: -1 });
 
-    return verifications;
+    // If no pagination params provided, return all (backward compatibility)
+    if (!paginationQuery) {
+      const verifications = await this.kycVerificationModel
+        .find(query)
+        .populate('userId', 'profile auth.email bankAccounts')
+        .populate('review.reviewedBy', 'profile.displayName')
+        .sort({ submittedAt: -1 });
+
+      return verifications;
+    }
+
+    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const skip = (page - 1) * pageSize;
+
+    // Build sort object
+    const sort: any = {};
+    if (sortBy) {
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    } else {
+      sort.submittedAt = -1;
+    }
+
+    // Execute query with pagination
+    const [data, total] = await Promise.all([
+      this.kycVerificationModel
+        .find(query)
+        .populate('userId', 'profile auth.email bankAccounts')
+        .populate('review.reviewedBy', 'profile.displayName')
+        .sort(sort)
+        .skip(skip)
+        .limit(pageSize)
+        .exec(),
+      this.kycVerificationModel.countDocuments(query).exec(),
+    ]);
+
+    return createPaginatedResponse(data, total, page, pageSize);
   }
 
   // Admin อนุมัติ KYC

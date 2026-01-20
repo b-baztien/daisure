@@ -11,6 +11,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { TransactionStatus } from '../../common/enums/transaction-status.enum';
 import { ITransactionDocument } from '../../common/interfaces/transaction.interface';
+import {
+  PaginationQueryDto,
+  PaginatedResponse,
+  createPaginatedResponse,
+} from '../../common/dto/pagination.dto';
 import { KycService } from '../kyc/kyc.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SettingsService } from '../settings/settings.service';
@@ -113,12 +118,43 @@ export class TransactionsService {
     return saved;
   }
 
-  async findAll(filters?: any): Promise<Transaction[]> {
-    return this.transactionModel
-      .find(filters || {})
-      .populate('buyer.userId seller.userId admin.userId')
-      .sort({ createdAt: -1 })
-      .exec();
+  async findAll(
+    filters?: any,
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<Transaction[] | PaginatedResponse<Transaction>> {
+    // If no pagination params provided, return all (backward compatibility)
+    if (!paginationQuery) {
+      return this.transactionModel
+        .find(filters || {})
+        .populate('buyer.userId seller.userId admin.userId')
+        .sort({ createdAt: -1 })
+        .exec();
+    }
+
+    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const skip = (page - 1) * pageSize;
+
+    // Build sort object
+    const sort: any = {};
+    if (sortBy) {
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    } else {
+      sort.createdAt = -1;
+    }
+
+    // Execute query with pagination
+    const [data, total] = await Promise.all([
+      this.transactionModel
+        .find(filters || {})
+        .populate('buyer.userId seller.userId admin.userId')
+        .sort(sort)
+        .skip(skip)
+        .limit(pageSize)
+        .exec(),
+      this.transactionModel.countDocuments(filters || {}).exec(),
+    ]);
+
+    return createPaginatedResponse(data, total, page, pageSize);
   }
 
   async findOne(id: string): Promise<Transaction> {
@@ -200,7 +236,8 @@ export class TransactionsService {
   async findByUser(
     userId: string,
     role: 'buyer' | 'seller',
-  ): Promise<Transaction[]> {
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<Transaction[] | PaginatedResponse<Transaction>> {
     if (!Types.ObjectId.isValid(userId)) {
       throw new BadRequestException('Invalid user ID');
     }
@@ -210,11 +247,39 @@ export class TransactionsService {
         ? { 'buyer.userId': userId }
         : { 'seller.userId': userId };
 
-    return this.transactionModel
-      .find(filter)
-      .populate('buyer.userId seller.userId')
-      .sort({ createdAt: -1 })
-      .exec();
+    // If no pagination params provided, return all (backward compatibility)
+    if (!paginationQuery) {
+      return this.transactionModel
+        .find(filter)
+        .populate('buyer.userId seller.userId')
+        .sort({ createdAt: -1 })
+        .exec();
+    }
+
+    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const skip = (page - 1) * pageSize;
+
+    // Build sort object
+    const sort: any = {};
+    if (sortBy) {
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    } else {
+      sort.createdAt = -1;
+    }
+
+    // Execute query with pagination
+    const [data, total] = await Promise.all([
+      this.transactionModel
+        .find(filter)
+        .populate('buyer.userId seller.userId')
+        .sort(sort)
+        .skip(skip)
+        .limit(pageSize)
+        .exec(),
+      this.transactionModel.countDocuments(filter).exec(),
+    ]);
+
+    return createPaginatedResponse(data, total, page, pageSize);
   }
 
   async confirmDelivery(

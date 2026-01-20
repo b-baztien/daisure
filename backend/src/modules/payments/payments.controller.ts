@@ -4,10 +4,12 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 import { SubmitPaymentDto } from './dto/submit-payment.dto';
 import { PaymentsService } from './payments.service';
 
@@ -67,12 +69,12 @@ export class PaymentsController {
   }
 
   @Get('history')
-  getPaymentHistory(@Request() req) {
-    return this.paymentsService.getPaymentHistory(req.user.userId);
+  getPaymentHistory(@Request() req, @Query() paginationQuery?: PaginationQueryDto) {
+    return this.paymentsService.getPaymentHistory(req.user.userId, paginationQuery);
   }
 
   @Get('payouts')
-  getSellerPayouts(@Request() req) {
-    return this.paymentsService.getSellerPayouts(req.user.userId);
+  getSellerPayouts(@Request() req, @Query() paginationQuery?: PaginationQueryDto) {
+    return this.paymentsService.getSellerPayouts(req.user.userId, paginationQuery);
   }
 }

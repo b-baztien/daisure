@@ -15,7 +15,9 @@ import type {
   UpdateKycSettingRequest,
   KycVerification,
   ApproveKycRequest,
-  RejectKycRequest
+  RejectKycRequest,
+  PaginationQuery,
+  PaginatedResponse
 } from '~/types/api'
 
 export const useApi = () => {
@@ -70,7 +72,7 @@ export const useApi = () => {
 
     // Transactions
     getTransactions: (params?: Record<string, any>) =>
-      api.get<Transaction[]>('/transactions', { params }),
+      api.get<Transaction[] | PaginatedResponse<Transaction>>('/transactions', { params }),
 
     verifyPayment: (id: string, data: VerifyPaymentRequest) =>
       api.post<Transaction>(`/admin/transactions/${id}/verify-payment`, data),
@@ -80,14 +82,14 @@ export const useApi = () => {
 
     // Users
     getUsers: (params?: Record<string, any>) =>
-      api.get<User[]>('/users', { params }),
+      api.get<User[] | PaginatedResponse<User>>('/users', { params }),
 
     getUserById: (id: string) =>
       api.get<User>(`/users/${id}`),
 
     // Reviews
     getReviews: (params?: Record<string, any>) =>
-      api.get<Review[]>('/reviews', { params }),
+      api.get<Review[] | PaginatedResponse<Review>>('/reviews', { params }),
 
     hideReview: (id: string, reason: string) =>
       api.patch<Review>(`/reviews/${id}/hide`, { reason }),
@@ -104,7 +106,7 @@ export const useApi = () => {
 
     // Admin Logs
     getAdminLogs: (params?: Record<string, any>) =>
-      api.get<AdminLog[]>('/admin/logs', { params }),
+      api.get<AdminLog[] | PaginatedResponse<AdminLog>>('/admin/logs', { params }),
 
     // KYC
     getKycSettings: () =>
@@ -113,8 +115,8 @@ export const useApi = () => {
     updateKycSettings: (data: UpdateKycSettingRequest) =>
       api.put<KycSetting>('/kyc/settings', data),
 
-    getKycVerifications: (status?: string) =>
-      api.get<KycVerification[]>('/kyc/verifications', { params: { status } }),
+    getKycVerifications: (params?: Record<string, any>) =>
+      api.get<KycVerification[] | PaginatedResponse<KycVerification>>('/kyc/verifications', { params }),
 
     approveKyc: (id: string, data: ApproveKycRequest) =>
       api.put<KycVerification>(`/kyc/verifications/${id}/approve`, data),

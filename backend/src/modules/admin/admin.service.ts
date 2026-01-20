@@ -2,6 +2,11 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { TransactionStatus } from '../../common/enums/transaction-status.enum';
+import {
+  PaginationQueryDto,
+  PaginatedResponse,
+  createPaginatedResponse,
+} from '../../common/dto/pagination.dto';
 import { TransactionsService } from '../transactions/transactions.service';
 import { AdminLog } from './schemas/admin-log.schema';
 
@@ -111,13 +116,44 @@ export class AdminService {
     return saved;
   }
 
-  async getAdminLogs(filters?: any): Promise<AdminLog[]> {
-    return this.adminLogModel
-      .find(filters || {})
-      .populate('adminId')
-      .sort({ createdAt: -1 })
-      .limit(100)
-      .exec();
+  async getAdminLogs(
+    filters?: any,
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<AdminLog[] | PaginatedResponse<AdminLog>> {
+    // If no pagination params provided, return all with limit 100 (backward compatibility)
+    if (!paginationQuery) {
+      return this.adminLogModel
+        .find(filters || {})
+        .populate('adminId')
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .exec();
+    }
+
+    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const skip = (page - 1) * pageSize;
+
+    // Build sort object
+    const sort: any = {};
+    if (sortBy) {
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    } else {
+      sort.createdAt = -1;
+    }
+
+    // Execute query with pagination
+    const [data, total] = await Promise.all([
+      this.adminLogModel
+        .find(filters || {})
+        .populate('adminId')
+        .sort(sort)
+        .skip(skip)
+        .limit(pageSize)
+        .exec(),
+      this.adminLogModel.countDocuments(filters || {}).exec(),
+    ]);
+
+    return createPaginatedResponse(data, total, page, pageSize);
   }
 
   async getDashboardStats(): Promise<{
