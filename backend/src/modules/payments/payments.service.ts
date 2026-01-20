@@ -1,6 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { TransactionStatus } from '../../common/enums/transaction-status.enum';
 import { ITransactionDocument } from '../../common/interfaces/transaction.interface';
+import {
+  PaginationQueryDto,
+  PaginatedResponse,
+  createPaginatedResponse,
+} from '../../common/dto/pagination.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import { SubmitPaymentDto } from './dto/submit-payment.dto';
@@ -221,13 +226,38 @@ export class PaymentsService {
     return { message: 'Refund request submitted successfully' };
   }
 
-  async getPaymentHistory(userId: string): Promise<PaymentHistoryItem[]> {
+  async getPaymentHistory(
+    userId: string,
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<PaymentHistoryItem[] | PaginatedResponse<PaymentHistoryItem>> {
     const transactions = await this.transactionsService.findByUser(
       userId,
       'buyer',
+      paginationQuery,
     );
 
-    return transactions
+    // Handle paginated response
+    if (paginationQuery && 'pagination' in transactions) {
+      const mappedData = transactions.data
+        .filter((tx) => tx.payment.buyerPayment)
+        .map((tx) => ({
+          transactionNumber: tx.transactionNumber,
+          productName: tx.product.name,
+          amount: tx.payment.totalAmount,
+          paidAt: tx.payment.buyerPayment!.paidAt,
+          status: tx.status,
+          verifiedAt: tx.payment.buyerPayment!.verifiedAt,
+        }));
+
+      return {
+        data: mappedData,
+        pagination: transactions.pagination,
+      };
+    }
+
+    // Handle non-paginated response (backward compatibility)
+    const transactionList = transactions as any[];
+    return transactionList
       .filter((tx) => tx.payment.buyerPayment)
       .map((tx) => ({
         transactionNumber: tx.transactionNumber,
@@ -240,13 +270,37 @@ export class PaymentsService {
       .sort((a, b) => b.paidAt.getTime() - a.paidAt.getTime());
   }
 
-  async getSellerPayouts(userId: string): Promise<SellerPayoutItem[]> {
+  async getSellerPayouts(
+    userId: string,
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<SellerPayoutItem[] | PaginatedResponse<SellerPayoutItem>> {
     const transactions = await this.transactionsService.findByUser(
       userId,
       'seller',
+      paginationQuery,
     );
 
-    return transactions
+    // Handle paginated response
+    if (paginationQuery && 'pagination' in transactions) {
+      const mappedData = transactions.data
+        .filter((tx) => tx.payment.sellerPayment)
+        .map((tx) => ({
+          transactionNumber: tx.transactionNumber,
+          productName: tx.product.name,
+          amount: tx.payment.productPrice,
+          paidAt: tx.payment.sellerPayment!.paidAt,
+          status: tx.status,
+        }));
+
+      return {
+        data: mappedData,
+        pagination: transactions.pagination,
+      };
+    }
+
+    // Handle non-paginated response (backward compatibility)
+    const transactionList = transactions as any[];
+    return transactionList
       .filter((tx) => tx.payment.sellerPayment)
       .map((tx) => ({
         transactionNumber: tx.transactionNumber,

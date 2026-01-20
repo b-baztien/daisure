@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 import { AdminService } from './admin.service';
 
 @Controller('admin')
@@ -59,7 +61,7 @@ export class AdminController {
   }
 
   @Get('logs')
-  getLogs() {
-    return this.adminService.getAdminLogs();
+  getLogs(@Query() paginationQuery?: PaginationQueryDto) {
+    return this.adminService.getAdminLogs(undefined, paginationQuery);
   }
 }

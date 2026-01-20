@@ -79,6 +79,43 @@
           </UButton>
         </template>
       </UTable>
+
+      <!-- Pagination -->
+      <template #footer>
+        <div class="flex items-center justify-between px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+          <div class="text-sm text-gray-700 dark:text-gray-200">
+            Showing {{ (pagination.page - 1) * pagination.pageSize + 1 }} to
+            {{ Math.min(pagination.page * pagination.pageSize, pagination.total) }} of
+            {{ pagination.total }} results
+          </div>
+
+          <div class="flex gap-1.5">
+            <UButton
+              icon="i-heroicons-chevron-left"
+              size="xs"
+              color="gray"
+              :disabled="pagination.page === 1"
+              @click="goToPage(pagination.page - 1)"
+            />
+
+            <USelect
+              v-model="pagination.page"
+              :options="pageOptions"
+              size="xs"
+              @change="fetchUsers"
+              class="w-20"
+            />
+
+            <UButton
+              icon="i-heroicons-chevron-right"
+              size="xs"
+              color="gray"
+              :disabled="pagination.page >= pagination.totalPages"
+              @click="goToPage(pagination.page + 1)"
+            />
+          </div>
+        </div>
+      </template>
     </UCard>
 
     <!-- User Details Modal -->
@@ -149,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import type { User } from '~/types/api'
+import type { User, PaginatedResponse } from '~/types/api'
 import dayjs from 'dayjs'
 
 const api = useApi()
@@ -157,6 +194,13 @@ const api = useApi()
 const users = ref<User[]>([])
 const loading = ref(false)
 const error = ref('')
+
+const pagination = ref({
+  page: 1,
+  pageSize: 20,
+  total: 0,
+  totalPages: 0
+})
 
 const filters = ref({
   role: '',
@@ -225,24 +269,49 @@ const getVerificationColor = (status: string) => {
   return colors[status] || 'gray'
 }
 
+const pageOptions = computed(() => {
+  return Array.from({ length: pagination.value.totalPages }, (_, i) => ({
+    label: `Page ${i + 1}`,
+    value: i + 1
+  }))
+})
+
 const fetchUsers = async () => {
   loading.value = true
   error.value = ''
 
   try {
-    const params: Record<string, any> = {}
+    const params: Record<string, any> = {
+      page: pagination.value.page,
+      pageSize: pagination.value.pageSize
+    }
+
     if (filters.value.role) params.role = filters.value.role
     if (filters.value.verificationStatus) params.verificationStatus = filters.value.verificationStatus
     if (filters.value.search) params.search = filters.value.search
 
     const response = await api.getUsers(params)
-    users.value = response.data
+
+    // Check if response is paginated
+    if ('pagination' in response.data) {
+      const paginatedResponse = response.data as PaginatedResponse<User>
+      users.value = paginatedResponse.data
+      pagination.value = paginatedResponse.pagination
+    } else {
+      // Fallback for non-paginated response
+      users.value = response.data as User[]
+    }
   } catch (err: any) {
     error.value = err.response?.data?.message || 'Failed to load users'
     console.error('Failed to fetch users:', err)
   } finally {
     loading.value = false
   }
+}
+
+const goToPage = (page: number) => {
+  pagination.value.page = page
+  fetchUsers()
 }
 
 const viewUserDetails = (user: User) => {
@@ -254,6 +323,7 @@ let searchTimeout: NodeJS.Timeout
 const debouncedSearch = () => {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
+    pagination.value.page = 1 // Reset to first page on search
     fetchUsers()
   }, 500)
 }
