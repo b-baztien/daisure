@@ -13,6 +13,7 @@ import {
   createPaginatedResponse,
 } from '../../common/dto/pagination.dto';
 import { TransactionsService } from '../transactions/transactions.service';
+import { Transaction } from '../transactions/schemas/transaction.schema';
 import { UsersService } from '../users/users.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { CanReviewResult } from './interfaces/can-review-result.interface';
@@ -469,10 +470,10 @@ export class ReviewsService {
     userId: string,
   ): Promise<ReviewableTransaction[]> {
     // Get all completed transactions
-    const [buyerTransactions, sellerTransactions] = await Promise.all([
+    const [buyerTransactions, sellerTransactions] = (await Promise.all([
       this.transactionsService.findByUser(userId, 'buyer'),
       this.transactionsService.findByUser(userId, 'seller'),
-    ]);
+    ])) as [Transaction[], Transaction[]];
 
     const completedTransactions = [
       ...buyerTransactions,

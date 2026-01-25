@@ -8,6 +8,7 @@ import {
   createPaginatedResponse,
 } from '../../common/dto/pagination.dto';
 import { TransactionsService } from '../transactions/transactions.service';
+import { Transaction } from '../transactions/schemas/transaction.schema';
 import { AdminLog } from './schemas/admin-log.schema';
 
 interface LogActionData {
@@ -167,7 +168,7 @@ export class AdminService {
     today.setHours(0, 0, 0, 0);
 
     const [allTransactions, pendingVerification, inDispute, completedToday] =
-      await Promise.all([
+      (await Promise.all([
         this.transactionsService.findAll(),
         this.transactionsService.findAll({
           status: TransactionStatus.PAYMENT_VERIFICATION,
@@ -179,7 +180,7 @@ export class AdminService {
           status: TransactionStatus.COMPLETED,
           completedAt: { $gte: today },
         }),
-      ]);
+      ])) as [Transaction[], Transaction[], Transaction[], Transaction[]];
 
     const totalVolume = allTransactions
       .filter((tx) => tx.status === TransactionStatus.COMPLETED)
@@ -194,8 +195,8 @@ export class AdminService {
     };
   }
 
-  async getRecentTransactions(limit = 10): Promise<any[]> {
-    return this.transactionsService.findAll();
+  async getRecentTransactions(limit = 10): Promise<Transaction[]> {
+    return this.transactionsService.findAll() as Promise<Transaction[]>;
   }
 
   async assignTransactionToAdmin(
