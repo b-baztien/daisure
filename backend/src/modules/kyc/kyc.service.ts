@@ -79,7 +79,7 @@ export class KycService {
 
     // สร้าง KYC verification ใหม่
     const verification = await this.kycVerificationModel.create({
-      userId,
+      userId: userId as any,
       status: KycStatus.PENDING,
       idCardImages: submitDto.idCardImages,
       idCardInfo: submitDto.idCardInfo,

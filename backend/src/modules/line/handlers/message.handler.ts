@@ -1,6 +1,7 @@
 import { Client, TextMessage } from '@line/bot-sdk';
 import { Injectable } from '@nestjs/common';
 import { TransactionsService } from '../../transactions/transactions.service';
+import { Transaction } from '../../transactions/schemas/transaction.schema';
 import { UsersService } from '../../users/users.service';
 
 @Injectable()
@@ -100,10 +101,10 @@ export class MessageHandler {
       return;
     }
 
-    const transactions = await this.transactionsService.findByUser(
+    const transactions = (await this.transactionsService.findByUser(
       user._id.toString(),
       'buyer',
-    );
+    )) as Transaction[];
 
     if (transactions.length === 0) {
       const message: TextMessage = {
@@ -150,10 +151,10 @@ export class MessageHandler {
       return;
     }
 
-    const transactions = await this.transactionsService.findByUser(
+    const transactions = (await this.transactionsService.findByUser(
       user._id.toString(),
       'seller',
-    );
+    )) as Transaction[];
 
     if (transactions.length === 0) {
       const message: TextMessage = {

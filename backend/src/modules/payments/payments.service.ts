@@ -4,10 +4,10 @@ import { ITransactionDocument } from '../../common/interfaces/transaction.interf
 import {
   PaginationQueryDto,
   PaginatedResponse,
-  createPaginatedResponse,
 } from '../../common/dto/pagination.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { TransactionsService } from '../transactions/transactions.service';
+import { Transaction } from '../transactions/schemas/transaction.schema';
 import { SubmitPaymentDto } from './dto/submit-payment.dto';
 import { PaymentDeadline } from './interfaces/payment-deadline.interface';
 import { PaymentDetails } from './interfaces/payment-details.interface';
@@ -313,10 +313,10 @@ export class PaymentsService {
   }
 
   async getPendingPayments(userId: string): Promise<PendingPayment[]> {
-    const transactions = await this.transactionsService.findByUser(
+    const transactions = (await this.transactionsService.findByUser(
       userId,
       'buyer',
-    );
+    )) as Transaction[];
 
     return transactions
       .filter((tx) => tx.status === TransactionStatus.PENDING_PAYMENT)
@@ -331,10 +331,10 @@ export class PaymentsService {
   }
 
   async getPaymentSummary(userId: string): Promise<PaymentSummary> {
-    const [buyerTransactions, sellerTransactions] = await Promise.all([
+    const [buyerTransactions, sellerTransactions] = (await Promise.all([
       this.transactionsService.findByUser(userId, 'buyer'),
       this.transactionsService.findByUser(userId, 'seller'),
-    ]);
+    ])) as [Transaction[], Transaction[]];
 
     const totalPaid = buyerTransactions
       .filter((tx) => tx.payment.buyerPayment)
