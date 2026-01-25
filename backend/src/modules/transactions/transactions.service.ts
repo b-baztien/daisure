@@ -9,13 +9,13 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { TransactionStatus } from '../../common/enums/transaction-status.enum';
-import { ITransactionDocument } from '../../common/interfaces/transaction.interface';
 import {
-  PaginationQueryDto,
   PaginatedResponse,
+  PaginationQueryDto,
   createPaginatedResponse,
 } from '../../common/dto/pagination.dto';
+import { TransactionStatus } from '../../common/enums/transaction-status.enum';
+import { ITransactionDocument } from '../../common/interfaces/transaction.interface';
 import { KycService } from '../kyc/kyc.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SettingsService } from '../settings/settings.service';
@@ -131,7 +131,12 @@ export class TransactionsService {
         .exec();
     }
 
-    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const {
+      page = 1,
+      pageSize = 20,
+      sortBy,
+      sortOrder = 'desc',
+    } = paginationQuery;
     const skip = (page - 1) * pageSize;
 
     // Build sort object
@@ -256,7 +261,12 @@ export class TransactionsService {
         .exec();
     }
 
-    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const {
+      page = 1,
+      pageSize = 20,
+      sortBy,
+      sortOrder = 'desc',
+    } = paginationQuery;
     const skip = (page - 1) * pageSize;
 
     // Build sort object
