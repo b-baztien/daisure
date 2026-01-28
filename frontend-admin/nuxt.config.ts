@@ -11,9 +11,10 @@ export default defineNuxtConfig({
     "@nuxt/scripts",
     "@nuxt/ui",
     "@pinia/nuxt",
+    "@nuxtjs/i18n",
   ],
 
-  css: ["~/assets/css/main.css"],
+css: ["~/assets/css/main.css"],
 
   runtimeConfig: {
     public: {
