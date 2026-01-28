@@ -7,8 +7,8 @@
 
       <UButton
         icon="i-heroicons-arrow-path"
-        @click="fetchUsers"
         :loading="loading"
+        @click="fetchUsers"
       >
         Refresh
       </UButton>
@@ -47,7 +47,7 @@
     <!-- Users Table -->
     <UCard>
       <UTable
-        :rows="users"
+        :data="users"
         :columns="columns"
         :loading="loading"
         :empty-state="{ icon: 'i-heroicons-users', label: 'No users found' }"
@@ -82,11 +82,15 @@
 
       <!-- Pagination -->
       <template #footer>
-        <div class="flex items-center justify-between px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+        <div
+          class="flex items-center justify-between px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
+        >
           <div class="text-sm text-gray-700 dark:text-gray-200">
             Showing {{ (pagination.page - 1) * pagination.pageSize + 1 }} to
-            {{ Math.min(pagination.page * pagination.pageSize, pagination.total) }} of
-            {{ pagination.total }} results
+            {{
+              Math.min(pagination.page * pagination.pageSize, pagination.total)
+            }}
+            of {{ pagination.total }} results
           </div>
 
           <div class="flex gap-1.5">
@@ -102,8 +106,8 @@
               v-model="pagination.page"
               :options="pageOptions"
               size="xs"
-              @change="fetchUsers"
               class="w-20"
+              @change="fetchUsers"
             />
 
             <UButton
@@ -147,13 +151,19 @@
               </UBadge>
             </div>
             <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Verification Status</p>
-              <UBadge :color="getVerificationColor(selectedUser.verificationStatus)">
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Verification Status
+              </p>
+              <UBadge
+                :color="getVerificationColor(selectedUser.verificationStatus)"
+              >
                 {{ formatStatus(selectedUser.verificationStatus) }}
               </UBadge>
             </div>
             <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Member Since</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Member Since
+              </p>
               <p>{{ formatDate(selectedUser.createdAt) }}</p>
             </div>
           </div>
@@ -179,156 +189,183 @@
       color="red"
       variant="soft"
       :title="error"
-      :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link' }"
+      :close-button="{
+        icon: 'i-heroicons-x-mark-20-solid',
+        color: 'red',
+        variant: 'link',
+      }"
       @close="error = ''"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { User, PaginatedResponse } from '~/types/api'
-import dayjs from 'dayjs'
+import type { TableColumn } from "@nuxt/ui";
+import { useDateFormat } from "@vueuse/core";
+import dayjs from "dayjs";
+import type { PaginatedResponse, User } from "~/types/api";
 
-const api = useApi()
+const api = useApi();
 
-const users = ref<User[]>([])
-const loading = ref(false)
-const error = ref('')
+const users = ref<User[]>([]);
+const loading = ref(false);
+const error = ref("");
 
 const pagination = ref({
   page: 1,
   pageSize: 20,
   total: 0,
-  totalPages: 0
-})
+  totalPages: 0,
+});
 
 const filters = ref({
-  role: '',
-  verificationStatus: '',
-  search: ''
-})
+  role: "",
+  verificationStatus: "",
+  search: "",
+});
 
 const roleOptions = [
-  { label: 'All', value: '' },
-  { label: 'Buyer', value: 'buyer' },
-  { label: 'Seller', value: 'seller' },
-  { label: 'Admin', value: 'admin' },
-  { label: 'Super Admin', value: 'super_admin' }
-]
+  { label: "All", value: "" },
+  { label: "Buyer", value: "buyer" },
+  { label: "Seller", value: "seller" },
+  { label: "Admin", value: "admin" },
+  { label: "Super Admin", value: "super_admin" },
+];
 
 const verificationOptions = [
-  { label: 'All', value: '' },
-  { label: 'Unverified', value: 'unverified' },
-  { label: 'Pending', value: 'pending' },
-  { label: 'Verified', value: 'verified' },
-  { label: 'Rejected', value: 'rejected' }
-]
+  { label: "All", value: "" },
+  { label: "Unverified", value: "unverified" },
+  { label: "Pending", value: "pending" },
+  { label: "Verified", value: "verified" },
+  { label: "Rejected", value: "rejected" },
+];
 
-const columns = [
-  { key: 'name', label: 'Name', id: 'name' },
-  { key: 'email', label: 'Email', id: 'email' },
-  { key: 'role', label: 'Role', id: 'role' },
-  { key: 'verificationStatus', label: 'Status', id: 'verificationStatus' },
-  { key: 'createdAt', label: 'Created', id: 'createdAt' },
-  { key: 'actions', label: 'Actions', id: 'actions' }
-]
+const columns = computed<TableColumn<User>[]>(() => [
+  {
+    accessorKey: "profile.displayName",
+    header: "Display Name",
+  },
+  {
+    accessorKey: "profile.email",
+    header: "Email",
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Created At",
+    cell: ({ row }) =>
+      useDateFormat(row.original.createdAt, "DD/MM/YYYY HH:mm:ss").value,
+  },
+  {
+    accessorKey: "actions",
+    header: "Actions",
+  },
+]);
 
 // Details modal state
-const showDetailsModal = ref(false)
-const selectedUser = ref<User | null>(null)
+const showDetailsModal = ref(false);
+const selectedUser = ref<User | null>(null);
 
 const formatDate = (date: string) => {
-  return dayjs(date).format('DD/MM/YYYY HH:mm')
-}
+  return dayjs(date).format("DD/MM/YYYY HH:mm");
+};
 
 const formatRole = (role: string) => {
-  return role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-}
+  return role.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+};
 
 const formatStatus = (status: string) => {
-  return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-}
+  return status.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+};
 
 const getRoleColor = (role: string) => {
   const colors: Record<string, string> = {
-    'buyer': 'blue',
-    'seller': 'green',
-    'admin': 'purple',
-    'super_admin': 'red'
-  }
-  return colors[role] || 'gray'
-}
+    buyer: "blue",
+    seller: "green",
+    admin: "purple",
+    super_admin: "red",
+  };
+  return colors[role] || "gray";
+};
 
 const getVerificationColor = (status: string) => {
   const colors: Record<string, string> = {
-    'unverified': 'gray',
-    'pending': 'yellow',
-    'verified': 'green',
-    'rejected': 'red'
-  }
-  return colors[status] || 'gray'
-}
+    unverified: "gray",
+    pending: "yellow",
+    verified: "green",
+    rejected: "red",
+  };
+  return colors[status] || "gray";
+};
 
 const pageOptions = computed(() => {
   return Array.from({ length: pagination.value.totalPages }, (_, i) => ({
     label: `Page ${i + 1}`,
-    value: i + 1
-  }))
-})
+    value: i + 1,
+  }));
+});
 
 const fetchUsers = async () => {
-  loading.value = true
-  error.value = ''
+  loading.value = true;
+  error.value = "";
 
   try {
     const params: Record<string, any> = {
       page: pagination.value.page,
-      pageSize: pagination.value.pageSize
-    }
+      pageSize: pagination.value.pageSize,
+    };
 
-    if (filters.value.role) params.role = filters.value.role
-    if (filters.value.verificationStatus) params.verificationStatus = filters.value.verificationStatus
-    if (filters.value.search) params.search = filters.value.search
+    if (filters.value.role) params.role = filters.value.role;
+    if (filters.value.verificationStatus)
+      params.verificationStatus = filters.value.verificationStatus;
+    if (filters.value.search) params.search = filters.value.search;
 
-    const response = await api.getUsers(params)
+    const response = await api.getUsers(params);
 
     // Check if response is paginated
-    if ('pagination' in response.data) {
-      const paginatedResponse = response.data as PaginatedResponse<User>
-      users.value = paginatedResponse.data
-      pagination.value = paginatedResponse.pagination
+    if ("pagination" in response.data) {
+      const paginatedResponse = response.data as PaginatedResponse<User>;
+      users.value = paginatedResponse.data;
+      pagination.value = paginatedResponse.pagination;
     } else {
       // Fallback for non-paginated response
-      users.value = response.data as User[]
+      users.value = response.data as User[];
     }
   } catch (err: any) {
-    error.value = err.response?.data?.message || 'Failed to load users'
-    console.error('Failed to fetch users:', err)
+    error.value = err.response?.data?.message || "Failed to load users";
+    console.error("Failed to fetch users:", err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const goToPage = (page: number) => {
-  pagination.value.page = page
-  fetchUsers()
-}
+  pagination.value.page = page;
+  fetchUsers();
+};
 
 const viewUserDetails = (user: User) => {
-  selectedUser.value = user
-  showDetailsModal.value = true
-}
+  selectedUser.value = user;
+  showDetailsModal.value = true;
+};
 
-let searchTimeout: NodeJS.Timeout
+let searchTimeout: NodeJS.Timeout;
 const debouncedSearch = () => {
-  clearTimeout(searchTimeout)
+  clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
-    pagination.value.page = 1 // Reset to first page on search
-    fetchUsers()
-  }, 500)
-}
+    pagination.value.page = 1; // Reset to first page on search
+    fetchUsers();
+  }, 500);
+};
 
 onMounted(() => {
-  fetchUsers()
-})
+  fetchUsers();
+});
 </script>
