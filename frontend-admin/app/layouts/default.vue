@@ -1,10 +1,12 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <!-- Sidebar -->
-    <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+    <aside
+      class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+    >
       <div class="flex flex-col h-full">
-        <!-- Logo -->
-        <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
+        <div
+          class="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700"
+        >
           <h1 class="text-xl font-bold text-gray-900 dark:text-white">
             Admin Panel
           </h1>
@@ -42,10 +44,10 @@
       </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="pl-64">
-      <!-- Top Bar -->
-      <header class="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <header
+        class="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+      >
         <div class="flex items-center justify-between h-16 px-6">
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
             {{ pageTitle }}
@@ -54,7 +56,7 @@
           <div class="flex items-center space-x-4">
             <UButton
               icon="i-heroicons-bell"
-              color="gray"
+              color="neutral"
               variant="ghost"
               size="lg"
             />
@@ -72,79 +74,83 @@
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore()
-const router = useRouter()
-const route = useRoute()
+const authStore = useAuthStore();
+const router = useRouter();
+const route = useRoute();
 
 const navigation = [
   {
-    label: 'Dashboard',
-    to: '/dashboard',
-    icon: 'i-heroicons-home'
+    label: "Dashboard",
+    to: "/dashboard",
+    icon: "i-heroicons-home",
   },
   {
-    label: 'Transactions',
-    to: '/transactions',
-    icon: 'i-heroicons-credit-card'
+    label: "Transactions",
+    to: "/transactions",
+    icon: "i-heroicons-credit-card",
   },
   {
-    label: 'Disputes',
-    to: '/disputes',
-    icon: 'i-heroicons-exclamation-triangle'
+    label: "Disputes",
+    to: "/disputes",
+    icon: "i-heroicons-exclamation-triangle",
   },
   {
-    label: 'Users',
-    to: '/users',
-    icon: 'i-heroicons-users'
+    label: "Users",
+    to: "/users",
+    icon: "i-heroicons-users",
   },
   {
-    label: 'Reviews',
-    to: '/reviews',
-    icon: 'i-heroicons-star'
+    label: "Reviews",
+    to: "/reviews",
+    icon: "i-heroicons-star",
   },
   {
-    label: 'Settings',
-    to: '/settings',
-    icon: 'i-heroicons-cog-6-tooth'
+    label: "Settings",
+    to: "/settings",
+    icon: "i-heroicons-cog-6-tooth",
   },
   {
-    label: 'Admin Logs',
-    to: '/logs',
-    icon: 'i-heroicons-document-text'
-  }
-]
+    label: "Admin Logs",
+    to: "/logs",
+    icon: "i-heroicons-document-text",
+  },
+];
 
 const userMenuItems = [
-  [{
-    label: 'Profile',
-    icon: 'i-heroicons-user',
-    click: () => {
-      // Navigate to profile
-    }
-  }],
-  [{
-    label: 'Logout',
-    icon: 'i-heroicons-arrow-right-on-rectangle',
-    click: () => {
-      authStore.logout()
-      router.push('/login')
-    }
-  }]
-]
+  [
+    {
+      label: "Profile",
+      icon: "i-heroicons-user",
+      click: () => {
+        // Navigate to profile
+      },
+    },
+  ],
+  [
+    {
+      label: "Logout",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+      click: () => {
+        authStore.logout();
+        router.push("/login");
+      },
+    },
+  ],
+];
 
 const isActive = (path: string) => {
-  return route.path === path
-}
+  return route.path === path;
+};
 
 const pageTitle = computed(() => {
-  const currentNav = navigation.find(item => item.to === route.path)
-  return currentNav?.label || 'Admin Panel'
-})
+  const currentNav = navigation.find((item) => item.to === route.path);
+  return currentNav?.label || "Admin Panel";
+});
 
 // Auth check is now handled by middleware
 onMounted(() => {
   // Layout initialization if needed
-})
+});
 </script>
 
 <style scoped>
@@ -158,16 +164,16 @@ nav::-webkit-scrollbar-track {
 }
 
 nav::-webkit-scrollbar-thumb {
-  background: #CBD5E0;
+  background: #cbd5e0;
   border-radius: 3px;
 }
 
 nav::-webkit-scrollbar-thumb:hover {
-  background: #A0AEC0;
+  background: #a0aec0;
 }
 
 .dark nav::-webkit-scrollbar-thumb {
-  background: #4A5568;
+  background: #4a5568;
 }
 
 .dark nav::-webkit-scrollbar-thumb:hover {

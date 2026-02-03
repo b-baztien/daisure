@@ -2,6 +2,9 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
+  devServer: {
+    port: 3001,
+  },
 
   modules: [
     "@nuxt/a11y",
@@ -12,14 +15,18 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@pinia/nuxt",
     "@nuxtjs/i18n",
+    "@vueuse/nuxt",
   ],
 
-css: ["~/assets/css/main.css"],
+  css: ["~/assets/css/main.css"],
+
+  imports: {
+    dirs: ["composables/**", "types/**"],
+  },
 
   runtimeConfig: {
     public: {
-      apiBase:
-        process.env.NUXT_PUBLIC_API_BASE || "http://localhost:3000/api/v1",
+      baseURL: "",
     },
   },
 });

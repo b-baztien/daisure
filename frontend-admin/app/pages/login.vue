@@ -15,10 +15,10 @@
       </div>
 
       <UCard>
-        <UForm class="space-y-6" @submit.prevent="handleLogin">
+        <UForm :state="state" class="space-y-6" @submit.prevent="handleLogin">
           <UFormField label="Email" name="email" required>
             <UInput
-              v-model="email"
+              v-model="state.email"
               type="email"
               placeholder="admin@example.com"
               icon="i-heroicons-envelope"
@@ -28,7 +28,7 @@
 
           <UFormField label="Password" name="password" required>
             <UInput
-              v-model="password"
+              v-model="state.password"
               type="password"
               placeholder="Enter your password"
               icon="i-heroicons-lock-closed"
@@ -65,6 +65,8 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthService } from "~/composables/services/authService";
+
 definePageMeta({
   layout: false,
 });
@@ -72,31 +74,29 @@ definePageMeta({
 const authStore = useAuthStore();
 const router = useRouter();
 
-const email = ref("");
-const password = ref("");
-const loading = ref(false);
-const error = ref("");
+const state = reactive({
+  email: "",
+  password: "",
+});
 
 const handleLogin = async () => {
-  loading.value = true;
-  error.value = "";
+  const payload = {
+    email: state.email,
+    password: state.password,
+  };
 
-  try {
-    await authStore.login(email.value, password.value);
-    router.push("/dashboard");
-  } catch (err: any) {
-    useAlert().error(
-      err.response?.data?.message || "Invalid credentials. Please try again.",
-    );
-  } finally {
-    loading.value = false;
+  const { execute, error } = useAuthService().login({
+    body: payload,
+    immediate: false,
+  });
+
+  await execute();
+
+  if (error.value) {
+    useAlert(error.value);
+    return;
   }
+
+  return navigateTo("/");
 };
-
-// Redirect if already logged in
-onMounted(() => {
-  if (authStore.isAuthenticated) {
-    router.push("/dashboard");
-  }
-});
 </script>
