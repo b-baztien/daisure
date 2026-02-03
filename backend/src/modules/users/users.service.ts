@@ -64,6 +64,7 @@ export class UsersService {
       return this.userModel
         .find()
         .select('-auth.passwordHash -auth.salt')
+        .populate('bankAccounts.bank')
         .exec();
     }
 
@@ -83,6 +84,7 @@ export class UsersService {
       this.userModel
         .find()
         .select('-auth.passwordHash -auth.salt')
+        .populate('bankAccounts.bank')
         .sort(sort)
         .skip(skip)
         .limit(pageSize)
