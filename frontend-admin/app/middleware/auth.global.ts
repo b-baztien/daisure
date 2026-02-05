@@ -1,5 +1,13 @@
-export default defineNuxtRouteMiddleware(async (to, from) => {
-  const authStore = useAuthStore();
+const skipPaths = ["/login"];
 
-  return;
+export default defineNuxtRouteMiddleware(async (to, from) => {
+  if (skipPaths.includes(to.path)) {
+    return;
+  }
+
+  const authStore = useAuth();
+
+  if (!authStore.isAuthenticated) {
+    return navigateTo("/login");
+  }
 });

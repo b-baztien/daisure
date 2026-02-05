@@ -37,7 +37,6 @@
               class="w-full justify-start"
               icon="i-heroicons-user-circle"
             >
-              {{ authStore.user?.name || authStore.user?.email }}
             </UButton>
           </UDropdown>
         </div>
@@ -74,7 +73,6 @@
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
 
@@ -131,7 +129,6 @@ const userMenuItems = [
       label: "Logout",
       icon: "i-heroicons-arrow-right-on-rectangle",
       click: () => {
-        authStore.logout();
         router.push("/login");
       },
     },

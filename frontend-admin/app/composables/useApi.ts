@@ -20,7 +20,6 @@ import type {
 
 export const useApi = () => {
   const config = useRuntimeConfig();
-  const authStore = useAuthStore();
 
   // Create axios instance
   const api: AxiosInstance = axios.create({
@@ -29,32 +28,6 @@ export const useApi = () => {
       "Content-Type": "application/json",
     },
   });
-
-  // Add auth token to requests
-  api.interceptors.request.use((config) => {
-    const token = authStore.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
-
-  // Handle 401 and 403 responses
-  api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      if (error.response?.status === 401) {
-        authStore.logout();
-        navigateTo("/login");
-      } else if (error.response?.status === 403) {
-        // Forbidden - user doesn't have admin access
-        console.error("Access forbidden - admin privileges required");
-        authStore.logout();
-        navigateTo("/login");
-      }
-      return Promise.reject(error);
-    },
-  );
 
   return {
     // Auth

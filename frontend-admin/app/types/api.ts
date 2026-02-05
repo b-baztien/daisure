@@ -46,7 +46,7 @@ export interface User {
 }
 
 interface BankAccount {
-  bank: string;
+  bank: Bank;
   accountNumber: string;
   accountName: string;
   isDefault: boolean;

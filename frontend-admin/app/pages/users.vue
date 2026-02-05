@@ -54,6 +54,55 @@
             <p class="text-sm text-gray-500 dark:text-gray-400">Member Since</p>
             <p>{{ formatDate(selectedUser.createdAt) }}</p>
           </div>
+
+          <div class="col-span-full">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              Bank Accounts
+            </p>
+            <div
+              v-if="selectedUser.bankAccounts?.length"
+              class="grid gap-3 sm:grid-cols-2"
+            >
+              <UCard
+                v-for="(account, index) in selectedUser.bankAccounts"
+                :key="index"
+              >
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <p class="font-medium text-gray-900 dark:text-white">
+                      {{ account.bank.name }}
+                    </p>
+                    <div class="flex gap-1">
+                      <UBadge
+                        v-if="account.isDefault"
+                        color="primary"
+                        variant="subtle"
+                        size="xs"
+                      >
+                        Default
+                      </UBadge>
+                      <UBadge
+                        :color="account.isVerified ? 'success' : 'error'"
+                        variant="subtle"
+                        size="xs"
+                      >
+                        {{ account.isVerified ? "Verified" : "Not Verified" }}
+                      </UBadge>
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    {{ account.accountName }}
+                  </p>
+                  <p class="font-mono text-sm text-gray-500">
+                    {{ account.accountNumber }}
+                  </p>
+                </div>
+              </UCard>
+            </div>
+            <p v-else class="text-sm text-gray-400 italic">
+              No bank accounts linked
+            </p>
+          </div>
         </div>
       </div>
 
@@ -65,20 +114,6 @@
         </div>
       </template>
     </UCard>
-
-    <!-- Error Alert -->
-    <UAlert
-      v-if="error"
-      color="red"
-      variant="soft"
-      :title="error"
-      :close-button="{
-        icon: 'i-heroicons-x-mark-20-solid',
-        color: 'red',
-        variant: 'link',
-      }"
-      @close="error = ''"
-    />
   </div>
 </template>
 

@@ -15,7 +15,7 @@
       </div>
 
       <UCard>
-        <UForm :state="state" class="space-y-6" @submit.prevent="handleLogin">
+        <UForm :state="state" class="space-y-6" @submit="handleLogin()">
           <UFormField label="Email" name="email" required>
             <UInput
               v-model="state.email"
@@ -36,15 +36,7 @@
             />
           </UFormField>
 
-          <UButton
-            type="submit"
-            block
-            size="lg"
-            :loading="loading"
-            :disabled="loading"
-          >
-            Sign In
-          </UButton>
+          <UButton type="submit" block size="lg"> Sign In </UButton>
 
           <!-- <UAlert
             v-if="error"
@@ -70,9 +62,6 @@ import { useAuthService } from "~/composables/services/authService";
 definePageMeta({
   layout: false,
 });
-
-const authStore = useAuthStore();
-const router = useRouter();
 
 const state = reactive({
   email: "",
