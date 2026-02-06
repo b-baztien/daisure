@@ -43,7 +43,13 @@
             </div>
             <div>
               <p class="text-2xl font-bold text-green-600">
-                {{ (authStore.user?.rating?.asSeller?.average || authStore.user?.rating?.asBuyer?.average || 0).toFixed(1) }}
+                {{
+                  (
+                    authStore.user?.rating?.asSeller?.average ||
+                    authStore.user?.rating?.asBuyer?.average ||
+                    0
+                  ).toFixed(1)
+                }}
               </p>
               <p class="text-sm text-gray-600 dark:text-gray-400">คะแนน</p>
             </div>
@@ -155,10 +161,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: "auth",
-});
-
 const authStore = useAuthStore();
 const toast = useToast();
 
@@ -203,7 +205,7 @@ const onSubmit = async () => {
     // Call API to update profile
     await authStore.updateProfile({
       displayName: form.displayName,
-      phone: form.phone
+      phone: form.phone,
     });
 
     toast.add({
@@ -211,10 +213,10 @@ const onSubmit = async () => {
       color: "green",
     });
   } catch (error: any) {
-    console.error('Update profile error:', error);
+    console.error("Update profile error:", error);
     toast.add({
       title: "เกิดข้อผิดพลาด",
-      description: error.data?.message || 'ไม่สามารถอัพเดทข้อมูลได้',
+      description: error.data?.message || "ไม่สามารถอัพเดทข้อมูลได้",
       color: "red",
     });
   } finally {
@@ -245,12 +247,12 @@ const changePassword = async () => {
   try {
     // Call API to change password
     // Note: This endpoint needs to be added to backend if not exists
-    await apiFetch('/users/me/change-password', {
-      method: 'POST',
+    await apiFetch("/users/me/change-password", {
+      method: "POST",
       body: {
         currentPassword: passwordForm.currentPassword,
-        newPassword: passwordForm.newPassword
-      }
+        newPassword: passwordForm.newPassword,
+      },
     });
 
     toast.add({
@@ -263,10 +265,10 @@ const changePassword = async () => {
     passwordForm.newPassword = "";
     passwordForm.confirmPassword = "";
   } catch (error: any) {
-    console.error('Change password error:', error);
+    console.error("Change password error:", error);
     toast.add({
       title: "เกิดข้อผิดพลาด",
-      description: error.data?.message || 'ไม่สามารถเปลี่ยนรหัสผ่านได้',
+      description: error.data?.message || "ไม่สามารถเปลี่ยนรหัสผ่านได้",
       color: "red",
     });
   } finally {

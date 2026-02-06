@@ -1,20 +1,5 @@
 import { defineStore } from "pinia";
 
-interface Transaction {
-  id: string;
-  transactionNumber: string;
-  status: string;
-  product: {
-    name: string;
-    price: number;
-    images: string[];
-  };
-  payment: {
-    totalAmount: number;
-  };
-  createdAt: string;
-}
-
 export const useTransactionStore = defineStore("transaction", () => {
   // State
   const transactions = ref<Transaction[]>([]);
@@ -38,7 +23,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       result = result.filter(
         (t) =>
           t.transactionNumber.toLowerCase().includes(search) ||
-          t.product.name.toLowerCase().includes(search)
+          t.product.name.toLowerCase().includes(search),
       );
     }
 
@@ -48,28 +33,13 @@ export const useTransactionStore = defineStore("transaction", () => {
   const pendingTransactions = computed(() =>
     transactions.value.filter(
       (t) =>
-        t.status === "pending_payment" || t.status === "payment_verification"
-    )
+        t.status === "pending_payment" || t.status === "payment_verification",
+    ),
   );
 
   const completedTransactions = computed(() =>
-    transactions.value.filter((t) => t.status === "completed")
+    transactions.value.filter((t) => t.status === "completed"),
   );
-
-  // Actions
-  async function fetchTransactions() {
-    isLoading.value = true;
-    try {
-      const { apiFetch } = useApi();
-      const data = await apiFetch<Transaction[]>("/transactions");
-      transactions.value = data;
-    } catch (error) {
-      console.error("Fetch transactions error:", error);
-      throw error;
-    } finally {
-      isLoading.value = false;
-    }
-  }
 
   async function fetchTransaction(id: string) {
     isLoading.value = true;
@@ -113,7 +83,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         {
           method: "PATCH",
           body: { note },
-        }
+        },
       );
 
       // Update in list
@@ -186,8 +156,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     filteredTransactions,
     pendingTransactions,
     completedTransactions,
-    // Actions
-    fetchTransactions,
+
     fetchTransaction,
     createTransaction,
     confirmDelivery,

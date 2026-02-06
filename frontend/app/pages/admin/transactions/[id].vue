@@ -1,179 +1,184 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['auth', 'admin'],
-  layout: 'admin'
-})
+  layout: "admin",
+});
 
-const route = useRoute()
-const { apiFetch } = useApi()
-const toast = useToast()
-const modal = useModal()
+const route = useRoute();
+const { apiFetch } = useApi();
+const toast = useToast();
+const modal = useModal();
 
-const transactionId = route.params.id as string
-const transaction = ref<any>(null)
-const isLoading = ref(true)
-const isActionLoading = ref(false)
+const transactionId = route.params.id as string;
+const transaction = ref<any>(null);
+const isLoading = ref(true);
+const isActionLoading = ref(false);
 
 // Fetch transaction details
 async function fetchTransaction() {
-  isLoading.value = true
+  isLoading.value = true;
   try {
-    const data = await apiFetch<any>(`/transactions/${transactionId}`)
-    transaction.value = data
+    const data = await apiFetch<any>(`/transactions/${transactionId}`);
+    transaction.value = data;
   } catch (error) {
-    console.error('Failed to fetch transaction:', error)
+    console.error("Failed to fetch transaction:", error);
     toast.add({
-      title: 'เกิดข้อผิดพลาด',
-      description: 'ไม่สามารถโหลดข้อมูลธุรกรรมได้',
-      color: 'red'
-    })
+      title: "เกิดข้อผิดพลาด",
+      description: "ไม่สามารถโหลดข้อมูลธุรกรรมได้",
+      color: "red",
+    });
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 // Verify payment
 async function verifyPayment(approved: boolean) {
-  if (!confirm(approved ? 'ยืนยันการอนุมัติการชำระเงิน?' : 'ยืนยันการปฏิเสธการชำระเงิน?')) {
-    return
+  if (
+    !confirm(
+      approved ? "ยืนยันการอนุมัติการชำระเงิน?" : "ยืนยันการปฏิเสธการชำระเงิน?",
+    )
+  ) {
+    return;
   }
 
-  isActionLoading.value = true
+  isActionLoading.value = true;
   try {
     await apiFetch(`/admin/transactions/${transactionId}/verify-payment`, {
-      method: 'POST',
-      body: { approved }
-    })
+      method: "POST",
+      body: { approved },
+    });
 
     toast.add({
-      title: 'สำเร็จ',
-      description: approved ? 'อนุมัติการชำระเงินแล้ว' : 'ปฏิเสธการชำระเงินแล้ว',
-      color: 'green'
-    })
+      title: "สำเร็จ",
+      description: approved
+        ? "อนุมัติการชำระเงินแล้ว"
+        : "ปฏิเสธการชำระเงินแล้ว",
+      color: "green",
+    });
 
     // Refresh transaction
-    await fetchTransaction()
+    await fetchTransaction();
   } catch (error: any) {
-    console.error('Failed to verify payment:', error)
+    console.error("Failed to verify payment:", error);
     toast.add({
-      title: 'เกิดข้อผิดพลาด',
-      description: error.data?.message || 'ไม่สามารถดำเนินการได้',
-      color: 'red'
-    })
+      title: "เกิดข้อผิดพลาด",
+      description: error.data?.message || "ไม่สามารถดำเนินการได้",
+      color: "red",
+    });
   } finally {
-    isActionLoading.value = false
+    isActionLoading.value = false;
   }
 }
 
 // Resolve dispute
 const disputeResolution = ref({
-  resolution: '',
+  resolution: "",
   refundToBuyer: 0,
   payoutToSeller: 0,
-  notes: ''
-})
+  notes: "",
+});
 
 async function resolveDispute() {
   if (!disputeResolution.value.resolution) {
     toast.add({
-      title: 'กรุณากรอกข้อมูล',
-      description: 'กรุณาเลือกการแก้ไขข้อพิพาท',
-      color: 'red'
-    })
-    return
+      title: "กรุณากรอกข้อมูล",
+      description: "กรุณาเลือกการแก้ไขข้อพิพาท",
+      color: "red",
+    });
+    return;
   }
 
-  if (!confirm('ยืนยันการแก้ไขข้อพิพาท?')) {
-    return
+  if (!confirm("ยืนยันการแก้ไขข้อพิพาท?")) {
+    return;
   }
 
-  isActionLoading.value = true
+  isActionLoading.value = true;
   try {
     await apiFetch(`/admin/transactions/${transactionId}/resolve-dispute`, {
-      method: 'POST',
-      body: disputeResolution.value
-    })
+      method: "POST",
+      body: disputeResolution.value,
+    });
 
     toast.add({
-      title: 'สำเร็จ',
-      description: 'แก้ไขข้อพิพาทเรียบร้อยแล้ว',
-      color: 'green'
-    })
+      title: "สำเร็จ",
+      description: "แก้ไขข้อพิพาทเรียบร้อยแล้ว",
+      color: "green",
+    });
 
     // Reset form
     disputeResolution.value = {
-      resolution: '',
+      resolution: "",
       refundToBuyer: 0,
       payoutToSeller: 0,
-      notes: ''
-    }
+      notes: "",
+    };
 
     // Refresh transaction
-    await fetchTransaction()
+    await fetchTransaction();
   } catch (error: any) {
-    console.error('Failed to resolve dispute:', error)
+    console.error("Failed to resolve dispute:", error);
     toast.add({
-      title: 'เกิดข้อผิดพลาด',
-      description: error.data?.message || 'ไม่สามารถแก้ไขข้อพิพาทได้',
-      color: 'red'
-    })
+      title: "เกิดข้อผิดพลาด",
+      description: error.data?.message || "ไม่สามารถแก้ไขข้อพิพาทได้",
+      color: "red",
+    });
   } finally {
-    isActionLoading.value = false
+    isActionLoading.value = false;
   }
 }
 
 // Format currency
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('th-TH', {
-    style: 'currency',
-    currency: 'THB'
-  }).format(amount)
+  return new Intl.NumberFormat("th-TH", {
+    style: "currency",
+    currency: "THB",
+  }).format(amount);
 }
 
 // Format date
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString('th-TH', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return new Date(date).toLocaleDateString("th-TH", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 // Status badge color
 function getStatusColor(status: string) {
   const colorMap: Record<string, string> = {
-    pending_payment: 'yellow',
-    payment_verification: 'blue',
-    paid: 'green',
-    shipped: 'indigo',
-    delivered: 'purple',
-    completed: 'green',
-    cancelled: 'red',
-    disputed: 'orange'
-  }
-  return colorMap[status] || 'gray'
+    pending_payment: "yellow",
+    payment_verification: "blue",
+    paid: "green",
+    shipped: "indigo",
+    delivered: "purple",
+    completed: "green",
+    cancelled: "red",
+    disputed: "orange",
+  };
+  return colorMap[status] || "gray";
 }
 
 // Status label
 function getStatusLabel(status: string) {
   const labelMap: Record<string, string> = {
-    pending_payment: 'รอชำระเงิน',
-    payment_verification: 'ตรวจสอบการชำระเงิน',
-    paid: 'ชำระเงินแล้ว',
-    shipped: 'จัดส่งแล้ว',
-    delivered: 'ได้รับสินค้า',
-    completed: 'เสร็จสมบูรณ์',
-    cancelled: 'ยกเลิก',
-    disputed: 'มีข้อพิพาท'
-  }
-  return labelMap[status] || status
+    pending_payment: "รอชำระเงิน",
+    payment_verification: "ตรวจสอบการชำระเงิน",
+    paid: "ชำระเงินแล้ว",
+    shipped: "จัดส่งแล้ว",
+    delivered: "ได้รับสินค้า",
+    completed: "เสร็จสมบูรณ์",
+    cancelled: "ยกเลิก",
+    disputed: "มีข้อพิพาท",
+  };
+  return labelMap[status] || status;
 }
 
 onMounted(() => {
-  fetchTransaction()
-})
+  fetchTransaction();
+});
 </script>
 
 <template>
@@ -207,13 +212,19 @@ onMounted(() => {
 
     <!-- Loading State -->
     <div v-if="isLoading" class="flex justify-center items-center py-20">
-      <Icon name="i-heroicons-arrow-path" class="w-12 h-12 text-blue-600 animate-spin" />
+      <Icon
+        name="i-heroicons-arrow-path"
+        class="w-12 h-12 text-blue-600 animate-spin"
+      />
     </div>
 
     <!-- Transaction Details -->
     <div v-else-if="transaction" class="space-y-6">
       <!-- Admin Actions -->
-      <UCard v-if="transaction.status === 'payment_verification'" class="bg-blue-50 dark:bg-blue-950 border-2 border-blue-600">
+      <UCard
+        v-if="transaction.status === 'payment_verification'"
+        class="bg-blue-50 dark:bg-blue-950 border-2 border-blue-600"
+      >
         <template #header>
           <h2 class="text-xl font-bold text-gray-900 dark:text-white">
             การดำเนินการของผู้ดูแล - ตรวจสอบการชำระเงิน
@@ -260,7 +271,10 @@ onMounted(() => {
       </UCard>
 
       <!-- Dispute Resolution -->
-      <UCard v-if="transaction.status === 'disputed'" class="bg-orange-50 dark:bg-orange-950 border-2 border-orange-600">
+      <UCard
+        v-if="transaction.status === 'disputed'"
+        class="bg-orange-50 dark:bg-orange-950 border-2 border-orange-600"
+      >
         <template #header>
           <h2 class="text-xl font-bold text-gray-900 dark:text-white">
             การดำเนินการของผู้ดูแล - แก้ไขข้อพิพาท
@@ -269,7 +283,10 @@ onMounted(() => {
 
         <div class="space-y-4">
           <!-- Dispute Info -->
-          <div v-if="transaction.dispute" class="p-4 bg-white dark:bg-gray-800 rounded-lg">
+          <div
+            v-if="transaction.dispute"
+            class="p-4 bg-white dark:bg-gray-800 rounded-lg"
+          >
             <h3 class="font-semibold mb-2">รายละเอียดข้อพิพาท:</h3>
             <p class="text-gray-700 dark:text-gray-300 mb-2">
               <strong>เหตุผล:</strong> {{ transaction.dispute.reason }}
@@ -287,14 +304,17 @@ onMounted(() => {
                 :options="[
                   { label: 'คืนเงินให้ผู้ซื้อทั้งหมด', value: 'refund_buyer' },
                   { label: 'จ่ายเงินให้ผู้ขายทั้งหมด', value: 'payout_seller' },
-                  { label: 'แบ่งเงินตามสัดส่วน', value: 'partial' }
+                  { label: 'แบ่งเงินตามสัดส่วน', value: 'partial' },
                 ]"
                 placeholder="เลือกการแก้ไข"
                 value-attribute="value"
               />
             </UFormField>
 
-            <div v-if="disputeResolution.resolution === 'partial'" class="grid grid-cols-2 gap-4">
+            <div
+              v-if="disputeResolution.resolution === 'partial'"
+              class="grid grid-cols-2 gap-4"
+            >
               <UFormField label="คืนเงินให้ผู้ซื้อ">
                 <UInput
                   v-model.number="disputeResolution.refundToBuyer"
@@ -351,23 +371,35 @@ onMounted(() => {
               />
             </div>
             <div>
-              <h3 class="font-semibold text-lg">{{ transaction.product?.name }}</h3>
+              <h3 class="font-semibold text-lg">
+                {{ transaction.product?.name }}
+              </h3>
               <p class="text-gray-600 dark:text-gray-400 mt-2">
                 {{ transaction.product?.description }}
               </p>
             </div>
             <div class="pt-4 border-t">
               <div class="flex justify-between mb-2">
-                <span class="text-gray-600 dark:text-gray-400">ราคาสินค้า:</span>
-                <span class="font-semibold">{{ formatCurrency(transaction.product?.price || 0) }}</span>
+                <span class="text-gray-600 dark:text-gray-400"
+                  >ราคาสินค้า:</span
+                >
+                <span class="font-semibold">{{
+                  formatCurrency(transaction.product?.price || 0)
+                }}</span>
               </div>
               <div class="flex justify-between mb-2">
-                <span class="text-gray-600 dark:text-gray-400">ค่าธรรมเนียม:</span>
-                <span class="font-semibold">{{ formatCurrency(transaction.payment?.escrowFee || 0) }}</span>
+                <span class="text-gray-600 dark:text-gray-400"
+                  >ค่าธรรมเนียม:</span
+                >
+                <span class="font-semibold">{{
+                  formatCurrency(transaction.payment?.escrowFee || 0)
+                }}</span>
               </div>
               <div class="flex justify-between text-lg font-bold pt-2 border-t">
                 <span>รวมทั้งหมด:</span>
-                <span>{{ formatCurrency(transaction.payment?.totalAmount || 0) }}</span>
+                <span>{{
+                  formatCurrency(transaction.payment?.totalAmount || 0)
+                }}</span>
               </div>
             </div>
           </div>
@@ -389,9 +421,14 @@ onMounted(() => {
                 ผู้ซื้อ
               </h3>
               <div class="pl-7">
-                <p class="font-medium">{{ transaction.buyer?.profile?.displayName }}</p>
+                <p class="font-medium">
+                  {{ transaction.buyer?.profile?.displayName }}
+                </p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ transaction.buyer?.profile?.email || transaction.buyer?.auth?.email }}
+                  {{
+                    transaction.buyer?.profile?.email ||
+                    transaction.buyer?.auth?.email
+                  }}
                 </p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ transaction.buyer?.profile?.phone }}
@@ -406,9 +443,14 @@ onMounted(() => {
                 ผู้ขาย
               </h3>
               <div class="pl-7">
-                <p class="font-medium">{{ transaction.seller?.profile?.displayName }}</p>
+                <p class="font-medium">
+                  {{ transaction.seller?.profile?.displayName }}
+                </p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ transaction.seller?.profile?.email || transaction.seller?.auth?.email }}
+                  {{
+                    transaction.seller?.profile?.email ||
+                    transaction.seller?.auth?.email
+                  }}
                 </p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ transaction.seller?.profile?.phone }}
@@ -433,7 +475,9 @@ onMounted(() => {
             :key="index"
             class="flex items-start space-x-4"
           >
-            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+            <div
+              class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center"
+            >
               <Icon name="i-heroicons-clock" class="w-5 h-5 text-blue-600" />
             </div>
             <div class="flex-1">
@@ -441,7 +485,10 @@ onMounted(() => {
               <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ formatDate(event.timestamp) }}
               </p>
-              <p v-if="event.note" class="text-sm text-gray-700 dark:text-gray-300 mt-1">
+              <p
+                v-if="event.note"
+                class="text-sm text-gray-700 dark:text-gray-300 mt-1"
+              >
                 {{ event.note }}
               </p>
             </div>

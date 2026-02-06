@@ -644,10 +644,6 @@ File: pages/transactions/[id].vue (COMPLETE)
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: "auth",
-});
-
 const route = useRoute();
 const router = useRouter();
 const transactionStore = useTransactionStore();
@@ -698,11 +694,11 @@ const disputeReasons = [
 
 // Computed
 const isBuyer = computed(
-  () => transaction.value?.buyer.userId === authStore.user?.id
+  () => transaction.value?.buyer.userId === authStore.user?.id,
 );
 
 const isSeller = computed(
-  () => transaction.value?.seller.userId === authStore.user?.id
+  () => transaction.value?.seller.userId === authStore.user?.id,
 );
 
 const canDispute = computed(() => {
@@ -834,7 +830,7 @@ const confirmDelivery = async () => {
   try {
     await transactionStore.confirmDelivery(
       route.params.id as string,
-      "ยืนยันรับสินค้าแล้ว สภาพสมบูรณ์"
+      "ยืนยันรับสินค้าแล้ว สภาพสมบูรณ์",
     );
 
     toast.add({

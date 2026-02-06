@@ -1,116 +1,121 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['auth', 'admin'],
-  layout: 'admin'
-})
+  layout: "admin",
+});
 
-const { apiFetch } = useApi()
-const toast = useToast()
+const { apiFetch } = useApi();
+const toast = useToast();
 
-const isLoading = ref(true)
-const isSaving = ref(false)
+const isLoading = ref(true);
+const isSaving = ref(false);
 
 // Settings data
 const escrowFeeSettings = ref({
   percentage: 0,
   minimumFee: 0,
-  maximumFee: 0
-})
+  maximumFee: 0,
+});
 
 const autoCompleteSettings = ref({
   enabled: false,
-  daysAfterDelivery: 0
-})
+  daysAfterDelivery: 0,
+});
 
 // Fetch settings
 async function fetchSettings() {
-  isLoading.value = true
+  isLoading.value = true;
   try {
     const [escrowFee, autoComplete] = await Promise.all([
-      apiFetch<any>('/settings/escrow-fee'),
-      apiFetch<any>('/settings/auto-complete')
-    ])
+      apiFetch<any>("/settings/escrow-fee"),
+      apiFetch<any>("/settings/auto-complete"),
+    ]);
 
     escrowFeeSettings.value = {
       percentage: escrowFee.percentage || 0,
       minimumFee: escrowFee.minimumFee || 0,
-      maximumFee: escrowFee.maximumFee || 0
-    }
+      maximumFee: escrowFee.maximumFee || 0,
+    };
 
     autoCompleteSettings.value = {
       enabled: autoComplete.enabled || false,
-      daysAfterDelivery: autoComplete.daysAfterDelivery || 0
-    }
+      daysAfterDelivery: autoComplete.daysAfterDelivery || 0,
+    };
   } catch (error) {
-    console.error('Failed to fetch settings:', error)
+    console.error("Failed to fetch settings:", error);
     toast.add({
-      title: 'เกิดข้อผิดพลาด',
-      description: 'ไม่สามารถโหลดการตั้งค่าได้',
-      color: 'red'
-    })
+      title: "เกิดข้อผิดพลาด",
+      description: "ไม่สามารถโหลดการตั้งค่าได้",
+      color: "red",
+    });
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 // Save escrow fee settings
 async function saveEscrowFee() {
-  isSaving.value = true
+  isSaving.value = true;
   try {
-    await apiFetch('/settings/escrow-fee', {
-      method: 'PATCH',
-      body: escrowFeeSettings.value
-    })
+    await apiFetch("/settings/escrow-fee", {
+      method: "PATCH",
+      body: escrowFeeSettings.value,
+    });
 
     toast.add({
-      title: 'บันทึกสำเร็จ',
-      description: 'อัพเดทค่าธรรมเนียมเรียบร้อยแล้ว',
-      color: 'green'
-    })
+      title: "บันทึกสำเร็จ",
+      description: "อัพเดทค่าธรรมเนียมเรียบร้อยแล้ว",
+      color: "green",
+    });
   } catch (error: any) {
-    console.error('Failed to save escrow fee:', error)
+    console.error("Failed to save escrow fee:", error);
     toast.add({
-      title: 'เกิดข้อผิดพลาด',
-      description: error.data?.message || 'ไม่สามารถบันทึกการตั้งค่าได้',
-      color: 'red'
-    })
+      title: "เกิดข้อผิดพลาด",
+      description: error.data?.message || "ไม่สามารถบันทึกการตั้งค่าได้",
+      color: "red",
+    });
   } finally {
-    isSaving.value = false
+    isSaving.value = false;
   }
 }
 
 // Calculate example fee
 const exampleFee = computed(() => {
-  const amount = 10000 // Example amount
-  const fee = (amount * escrowFeeSettings.value.percentage) / 100
+  const amount = 10000; // Example amount
+  const fee = (amount * escrowFeeSettings.value.percentage) / 100;
 
-  let finalFee = fee
-  if (escrowFeeSettings.value.minimumFee && fee < escrowFeeSettings.value.minimumFee) {
-    finalFee = escrowFeeSettings.value.minimumFee
+  let finalFee = fee;
+  if (
+    escrowFeeSettings.value.minimumFee &&
+    fee < escrowFeeSettings.value.minimumFee
+  ) {
+    finalFee = escrowFeeSettings.value.minimumFee;
   }
-  if (escrowFeeSettings.value.maximumFee && fee > escrowFeeSettings.value.maximumFee) {
-    finalFee = escrowFeeSettings.value.maximumFee
+  if (
+    escrowFeeSettings.value.maximumFee &&
+    fee > escrowFeeSettings.value.maximumFee
+  ) {
+    finalFee = escrowFeeSettings.value.maximumFee;
   }
 
   return {
     amount,
     calculatedFee: fee,
     finalFee,
-    total: amount + finalFee
-  }
-})
+    total: amount + finalFee,
+  };
+});
 
 // Format currency
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('th-TH', {
-    style: 'currency',
-    currency: 'THB'
-  }).format(amount)
+  return new Intl.NumberFormat("th-TH", {
+    style: "currency",
+    currency: "THB",
+  }).format(amount);
 }
 
 onMounted(() => {
-  fetchSettings()
-})
+  fetchSettings();
+});
 </script>
 
 <template>
@@ -127,7 +132,10 @@ onMounted(() => {
 
     <!-- Loading State -->
     <div v-if="isLoading" class="flex justify-center items-center py-20">
-      <Icon name="i-heroicons-arrow-path" class="w-12 h-12 text-blue-600 animate-spin" />
+      <Icon
+        name="i-heroicons-arrow-path"
+        class="w-12 h-12 text-blue-600 animate-spin"
+      />
     </div>
 
     <!-- Settings -->
@@ -198,22 +206,37 @@ onMounted(() => {
             <h3 class="font-semibold mb-2">ตัวอย่างการคำนวณ</h3>
             <div class="space-y-2 text-sm">
               <div class="flex justify-between">
-                <span class="text-gray-600 dark:text-gray-400">มูลค่าธุรกรรม:</span>
-                <span class="font-semibold">{{ formatCurrency(exampleFee.amount) }}</span>
+                <span class="text-gray-600 dark:text-gray-400"
+                  >มูลค่าธุรกรรม:</span
+                >
+                <span class="font-semibold">{{
+                  formatCurrency(exampleFee.amount)
+                }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600 dark:text-gray-400">
                   ค่าธรรมเนียม ({{ escrowFeeSettings.percentage }}%):
                 </span>
-                <span class="font-semibold">{{ formatCurrency(exampleFee.calculatedFee) }}</span>
+                <span class="font-semibold">{{
+                  formatCurrency(exampleFee.calculatedFee)
+                }}</span>
               </div>
-              <div v-if="exampleFee.finalFee !== exampleFee.calculatedFee" class="flex justify-between text-blue-600">
+              <div
+                v-if="exampleFee.finalFee !== exampleFee.calculatedFee"
+                class="flex justify-between text-blue-600"
+              >
                 <span>ค่าธรรมเนียมจริง (หลังปรับ):</span>
-                <span class="font-semibold">{{ formatCurrency(exampleFee.finalFee) }}</span>
+                <span class="font-semibold">{{
+                  formatCurrency(exampleFee.finalFee)
+                }}</span>
               </div>
-              <div class="flex justify-between pt-2 border-t border-blue-200 dark:border-blue-800">
+              <div
+                class="flex justify-between pt-2 border-t border-blue-200 dark:border-blue-800"
+              >
                 <span class="font-semibold">ยอดรวมที่ผู้ซื้อจ่าย:</span>
-                <span class="font-bold text-lg">{{ formatCurrency(exampleFee.total) }}</span>
+                <span class="font-bold text-lg">{{
+                  formatCurrency(exampleFee.total)
+                }}</span>
               </div>
             </div>
           </div>
@@ -272,9 +295,14 @@ onMounted(() => {
 
           <div class="p-4 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
             <div class="flex items-start space-x-3">
-              <Icon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-yellow-600 mt-0.5" />
+              <Icon
+                name="i-heroicons-exclamation-triangle"
+                class="w-5 h-5 text-yellow-600 mt-0.5"
+              />
               <div class="text-sm">
-                <p class="font-semibold text-yellow-900 dark:text-yellow-100 mb-1">
+                <p
+                  class="font-semibold text-yellow-900 dark:text-yellow-100 mb-1"
+                >
                   คำเตือน
                 </p>
                 <p class="text-yellow-800 dark:text-yellow-200">

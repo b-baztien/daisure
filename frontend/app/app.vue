@@ -1,13 +1,22 @@
 <template>
   <UApp>
+    <NuxtRouteAnnouncer />
+    <ModalLoading />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-
-    <UNotifications />
   </UApp>
 </template>
 
 <script setup lang="ts">
-// Auth initialization is now handled by the auth.client.ts plugin
+const profileStore = useProfileStore();
+const { fetchProfile } = profileStore;
+const { profile } = storeToRefs(profileStore);
+const { isAuthenticated } = useAuth();
+
+onMounted(async () => {
+  if (!profile.value && isAuthenticated.value) {
+    await fetchProfile();
+  }
+});
 </script>

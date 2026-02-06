@@ -1,11 +1,9 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <!-- Blank layout - no header or navigation, but includes footer -->
     <main class="flex-1">
       <slot />
     </main>
 
-    <!-- Footer -->
     <AppFooter />
   </div>
 </template>

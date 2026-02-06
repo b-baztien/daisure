@@ -4,7 +4,7 @@
     <div class="mb-8">
       <UButton
         to="/transactions"
-        color="gray"
+        color="neutral"
         variant="ghost"
         icon="i-heroicons-arrow-left"
         class="mb-4"
@@ -20,45 +20,33 @@
       </p>
     </div>
 
-    <!-- Form -->
     <UForm :state="form" @submit="onSubmit" class="space-y-6">
-      <!-- Product Info -->
       <UCard>
         <template #header>
           <h2 class="text-xl font-semibold">ข้อมูลสินค้า</h2>
         </template>
 
-        <div class="space-y-4">
-          <!-- Product Name -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <UFormField label="ชื่อสินค้า" required>
             <UInput
+              class="w-full"
               v-model="form.product.name"
               placeholder="iPhone 15 Pro 256GB"
-              size="lg"
             />
           </UFormField>
 
-          <!-- Description -->
-          <UFormField label="รายละเอียด" required>
-            <UTextarea
-              v-model="form.product.description"
-              placeholder="อธิบายรายละเอียดสินค้า..."
-              :rows="4"
-            />
-          </UFormField>
-
-          <!-- Category -->
           <UFormField label="หมวดหมู่">
             <USelectMenu
+              class="w-full"
               v-model="form.product.category"
-              :options="categories"
+              :items="categories"
               placeholder="เลือกหมวดหมู่"
             />
           </UFormField>
 
-          <!-- Images -->
           <UFormField label="รูปภาพสินค้า" required>
             <UInput
+              class="w-full"
               v-model="imageUrl"
               placeholder="URL รูปภาพ"
               @keyup.enter="addImage"
@@ -84,13 +72,20 @@
             </div>
           </UFormField>
 
+          <UFormField class="col-span-full" label="รายละเอียด" required>
+            <UTextarea
+              v-model="form.product.description"
+              class="w-full"
+              placeholder="อธิบายรายละเอียดสินค้า..."
+            />
+          </UFormField>
+
           <!-- Price -->
           <UFormField label="ราคา (บาท)" required>
             <UInput
               v-model.number="form.product.price"
               type="number"
               placeholder="35000"
-              size="lg"
             >
               <template #leading>
                 <span class="text-gray-500">฿</span>
@@ -108,14 +103,12 @@
         </div>
       </UCard>
 
-      <!-- Seller Info -->
       <UCard>
         <template #header>
           <h2 class="text-xl font-semibold">ข้อมูลผู้ขาย</h2>
         </template>
 
         <div class="space-y-4">
-          <!-- Seller ID -->
           <UFormField label="ID ผู้ขาย" required>
             <UInput
               v-model="form.sellerId"
@@ -128,14 +121,12 @@
         </div>
       </UCard>
 
-      <!-- Shipping Address -->
       <UCard>
         <template #header>
           <h2 class="text-xl font-semibold">ที่อยู่จัดส่ง</h2>
         </template>
 
         <div class="space-y-4">
-          <!-- Recipient Name -->
           <UFormField label="ชื่อผู้รับ" required>
             <UInput
               v-model="form.shippingAddress.recipientName"
@@ -143,7 +134,6 @@
             />
           </UFormField>
 
-          <!-- Phone -->
           <UFormField label="เบอร์โทร" required>
             <UInput
               v-model="form.shippingAddress.phone"
@@ -151,7 +141,6 @@
             />
           </UFormField>
 
-          <!-- Address -->
           <UFormField label="ที่อยู่" required>
             <UTextarea
               v-model="form.shippingAddress.address"
@@ -160,7 +149,6 @@
             />
           </UFormField>
 
-          <!-- Grid: SubDistrict, District, Province -->
           <div class="grid md:grid-cols-3 gap-4">
             <UFormField label="ตำบล/แขวง" required>
               <UInput v-model="form.shippingAddress.subDistrict" />
@@ -237,10 +225,10 @@
 
       <!-- Submit -->
       <div class="flex gap-4">
-        <UButton type="submit" size="lg" block :loading="isLoading">
+        <UButton type="submit" block :loading="isLoading">
           สร้างรายการ
         </UButton>
-        <UButton to="/transactions" color="gray" variant="outline" size="lg">
+        <UButton to="/transactions" color="neutral" variant="outline">
           ยกเลิก
         </UButton>
       </div>
@@ -249,10 +237,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: "auth",
-});
-
 const transactionStore = useTransactionStore();
 const authStore = useAuthStore();
 const toast = useToast();

@@ -199,10 +199,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: "auth",
-});
-
 const authStore = useAuthStore();
 const toast = useToast();
 

@@ -182,7 +182,6 @@
 
 <script setup lang="ts">
 definePageMeta({
-  middleware: ["auth", "admin"],
   layout: "admin",
 });
 
@@ -224,7 +223,7 @@ const isLoading = ref(true);
 onMounted(async () => {
   try {
     // Fetch real dashboard data from API
-    const dashboardData = await apiFetch<any>('/admin/dashboard');
+    const dashboardData = await apiFetch<any>("/admin/dashboard");
     stats.value = {
       totalTransactions: dashboardData.totalTransactions || 0,
       pendingVerification: dashboardData.pendingVerification || 0,
@@ -233,14 +232,14 @@ onMounted(async () => {
     };
 
     // Fetch recent transactions
-    const transactions = await apiFetch<any[]>('/transactions?limit=5');
+    const transactions = await apiFetch<any[]>("/transactions?limit=5");
     recentTransactions.value = transactions || [];
   } catch (error) {
-    console.error('Failed to fetch dashboard data:', error);
+    console.error("Failed to fetch dashboard data:", error);
     toast.add({
-      title: 'เกิดข้อผิดพลาด',
-      description: 'ไม่สามารถโหลดข้อมูลแดชบอร์ดได้',
-      color: 'red'
+      title: "เกิดข้อผิดพลาด",
+      description: "ไม่สามารถโหลดข้อมูลแดชบอร์ดได้",
+      color: "red",
     });
   } finally {
     isLoading.value = false;

@@ -1,97 +1,93 @@
 <script setup lang="ts">
-definePageMeta({
-  middleware: ['auth']
-})
+const notificationStore = useNotificationStore();
 
-const notificationStore = useNotificationStore()
-
-const isLoading = ref(true)
+const isLoading = ref(true);
 
 // Fetch notifications
 onMounted(async () => {
   try {
-    await notificationStore.fetchNotifications()
+    await notificationStore.fetchNotifications();
   } catch (error) {
-    console.error('Failed to fetch notifications:', error)
+    console.error("Failed to fetch notifications:", error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-})
+});
 
 // Mark notification as read
 async function markAsRead(id: string) {
   try {
-    await notificationStore.markAsRead(id)
+    await notificationStore.markAsRead(id);
   } catch (error) {
-    console.error('Failed to mark notification as read:', error)
+    console.error("Failed to mark notification as read:", error);
   }
 }
 
 // Mark all as read
 async function markAllAsRead() {
   try {
-    await notificationStore.markAllAsRead()
+    await notificationStore.markAllAsRead();
   } catch (error) {
-    console.error('Failed to mark all as read:', error)
+    console.error("Failed to mark all as read:", error);
   }
 }
 
 // Delete notification
 async function deleteNotification(id: string) {
-  if (!confirm('ต้องการลบการแจ้งเตือนนี้?')) {
-    return
+  if (!confirm("ต้องการลบการแจ้งเตือนนี้?")) {
+    return;
   }
 
   try {
-    await notificationStore.deleteNotification(id)
+    await notificationStore.deleteNotification(id);
   } catch (error) {
-    console.error('Failed to delete notification:', error)
+    console.error("Failed to delete notification:", error);
   }
 }
 
 // Get notification icon
 function getNotificationIcon(type: string) {
   const iconMap: Record<string, string> = {
-    transaction: 'i-heroicons-shopping-bag',
-    payment: 'i-heroicons-banknotes',
-    review: 'i-heroicons-star',
-    system: 'i-heroicons-bell',
-    dispute: 'i-heroicons-exclamation-triangle'
-  }
-  return iconMap[type] || 'i-heroicons-bell'
+    transaction: "i-heroicons-shopping-bag",
+    payment: "i-heroicons-banknotes",
+    review: "i-heroicons-star",
+    system: "i-heroicons-bell",
+    dispute: "i-heroicons-exclamation-triangle",
+  };
+  return iconMap[type] || "i-heroicons-bell";
 }
 
 // Get notification color
 function getNotificationColor(type: string) {
   const colorMap: Record<string, string> = {
-    transaction: 'blue',
-    payment: 'green',
-    review: 'yellow',
-    system: 'gray',
-    dispute: 'red'
-  }
-  return colorMap[type] || 'gray'
+    transaction: "blue",
+    payment: "green",
+    review: "yellow",
+    system: "gray",
+    dispute: "red",
+  };
+  return colorMap[type] || "gray";
 }
 
 // Format date
 function formatDate(date: string) {
-  const d = new Date(date)
-  const now = new Date()
-  const diff = now.getTime() - d.getTime()
-  const minutes = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
+  const d = new Date(date);
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return 'เมื่อสักครู่'
-  if (minutes < 60) return `${minutes} นาทีที่แล้ว`
-  if (hours < 24) return `${hours} ชั่วโมงที่แล้ว`
-  if (days < 7) return `${days} วันที่แล้ว`
+  if (minutes < 1) return "เมื่อสักครู่";
+  if (minutes < 60) return `${minutes} นาทีที่แล้ว`;
+  if (hours < 24) return `${hours} ชั่วโมงที่แล้ว`;
+  if (days < 7) return `${days} วันที่แล้ว`;
 
-  return d.toLocaleDateString('th-TH', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
+  return d.toLocaleDateString("th-TH", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 </script>
 
@@ -119,15 +115,24 @@ function formatDate(date: string) {
 
     <!-- Loading State -->
     <div v-if="isLoading" class="flex justify-center items-center py-20">
-      <Icon name="i-heroicons-arrow-path" class="w-12 h-12 text-blue-600 animate-spin" />
+      <Icon
+        name="i-heroicons-arrow-path"
+        class="w-12 h-12 text-blue-600 animate-spin"
+      />
     </div>
 
     <!-- Notifications List -->
     <div v-else>
       <!-- Empty State -->
-      <div v-if="notificationStore.notifications.length === 0" class="text-center py-12">
+      <div
+        v-if="notificationStore.notifications.length === 0"
+        class="text-center py-12"
+      >
         <UCard>
-          <Icon name="i-heroicons-bell-slash" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <Icon
+            name="i-heroicons-bell-slash"
+            class="w-16 h-16 text-gray-400 mx-auto mb-4"
+          />
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             ไม่มีการแจ้งเตือน
           </h3>
@@ -142,14 +147,13 @@ function formatDate(date: string) {
         <UCard
           v-for="notification in notificationStore.notifications"
           :key="notification._id"
-          :class="[
-            'transition-all',
-            notification.isRead ? 'opacity-60' : ''
-          ]"
+          :class="['transition-all', notification.isRead ? 'opacity-60' : '']"
         >
           <div class="flex items-start space-x-4">
             <!-- Icon -->
-            <div :class="`bg-${getNotificationColor(notification.type)}-100 dark:bg-${getNotificationColor(notification.type)}-900 p-3 rounded-lg flex-shrink-0`">
+            <div
+              :class="`bg-${getNotificationColor(notification.type)}-100 dark:bg-${getNotificationColor(notification.type)}-900 p-3 rounded-lg flex-shrink-0`"
+            >
               <Icon
                 :name="getNotificationIcon(notification.type)"
                 :class="`w-6 h-6 text-${getNotificationColor(notification.type)}-600`"
@@ -186,7 +190,7 @@ function formatDate(date: string) {
                   size="sm"
                   @click="markAsRead(notification._id)"
                 >
-                  {{ notification.actionText || 'ดูรายละเอียด' }}
+                  {{ notification.actionText || "ดูรายละเอียด" }}
                 </UButton>
                 <UButton
                   v-if="!notification.isRead"

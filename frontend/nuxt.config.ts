@@ -3,8 +3,6 @@ export default defineNuxtConfig({
   modules: [
     "@nuxt/eslint",
     "@nuxt/ui",
-    "@nuxt/a11y",
-    "@nuxt/hints",
     "@nuxt/image",
     "@nuxt/scripts",
     "@pinia/nuxt",
@@ -37,8 +35,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase:
-        process.env.NUXT_PUBLIC_API_BASE || "http://localhost:3000/api/v1",
+      baseURL: "",
       lineClientId: process.env.NUXT_PUBLIC_LINE_CLIENT_ID || "",
       lineRedirectUri: process.env.NUXT_PUBLIC_LINE_REDIRECT_URI || "",
     },
@@ -66,6 +63,10 @@ export default defineNuxtConfig({
 
   routeRules: {
     "/": { prerender: true },
+  },
+
+  imports: {
+    dirs: ["types/**", "composables/**"],
   },
 
   compatibilityDate: "2025-01-15",

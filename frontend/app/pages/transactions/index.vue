@@ -127,10 +127,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: "auth",
-});
-
 const transactionStore = useTransactionStore();
 const { filteredTransactions, isLoading } = storeToRefs(transactionStore);
 

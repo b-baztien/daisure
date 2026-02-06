@@ -1,141 +1,3 @@
-<script setup lang="ts">
-definePageMeta({
-  middleware: ['auth']
-})
-
-const authStore = useAuthStore()
-const transactionStore = useTransactionStore()
-const router = useRouter()
-
-const isLoading = ref(true)
-
-// Fetch data
-onMounted(async () => {
-  try {
-    await Promise.all([
-      authStore.fetchUser(),
-      transactionStore.fetchTransactions()
-    ])
-  } catch (error) {
-    console.error('Failed to fetch dashboard data:', error)
-  } finally {
-    isLoading.value = false
-  }
-})
-
-// Recent transactions (last 5)
-const recentTransactions = computed(() =>
-  transactionStore.transactions.slice(0, 5)
-)
-
-// Statistics cards
-const statsCards = computed(() => [
-  {
-    label: 'ซื้อทั้งหมด',
-    value: authStore.user?.statistics?.totalBought || 0,
-    icon: 'i-heroicons-shopping-cart',
-    color: 'blue'
-  },
-  {
-    label: 'ขายทั้งหมด',
-    value: authStore.user?.statistics?.totalSold || 0,
-    icon: 'i-heroicons-banknotes',
-    color: 'green'
-  },
-  {
-    label: 'เสร็จสมบูรณ์',
-    value: authStore.user?.statistics?.totalCompleted || 0,
-    icon: 'i-heroicons-check-circle',
-    color: 'purple'
-  },
-  {
-    label: 'อัตราความสำเร็จ',
-    value: `${authStore.user?.statistics?.successRate || 0}%`,
-    icon: 'i-heroicons-chart-bar',
-    color: 'orange'
-  }
-])
-
-// Quick actions
-const quickActions = [
-  {
-    label: 'สร้างธุรกรรมใหม่',
-    description: 'เริ่มต้นการซื้อขายใหม่',
-    icon: 'i-heroicons-plus-circle',
-    color: 'blue',
-    to: '/transactions/create'
-  },
-  {
-    label: 'ดูธุรกรรมทั้งหมด',
-    description: 'จัดการธุรกรรมของคุณ',
-    icon: 'i-heroicons-list-bullet',
-    color: 'green',
-    to: '/transactions'
-  },
-  {
-    label: 'รีวิวของฉัน',
-    description: 'ดูและจัดการรีวิว',
-    icon: 'i-heroicons-star',
-    color: 'yellow',
-    to: '/reviews'
-  },
-  {
-    label: 'ตั้งค่าโปรไฟล์',
-    description: 'อัพเดทข้อมูลส่วนตัว',
-    icon: 'i-heroicons-user-circle',
-    color: 'purple',
-    to: '/profile'
-  }
-]
-
-// Transaction status badge color
-function getStatusColor(status: string) {
-  const colorMap: Record<string, string> = {
-    pending_payment: 'yellow',
-    payment_verification: 'blue',
-    paid: 'green',
-    shipped: 'indigo',
-    delivered: 'purple',
-    completed: 'green',
-    cancelled: 'red',
-    disputed: 'orange'
-  }
-  return colorMap[status] || 'gray'
-}
-
-// Transaction status label
-function getStatusLabel(status: string) {
-  const labelMap: Record<string, string> = {
-    pending_payment: 'รอชำระเงิน',
-    payment_verification: 'ตรวจสอบการชำระเงิน',
-    paid: 'ชำระเงินแล้ว',
-    shipped: 'จัดส่งแล้ว',
-    delivered: 'ได้รับสินค้า',
-    completed: 'เสร็จสมบูรณ์',
-    cancelled: 'ยกเลิก',
-    disputed: 'มีข้อพิพาท'
-  }
-  return labelMap[status] || status
-}
-
-// Format currency
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('th-TH', {
-    style: 'currency',
-    currency: 'THB'
-  }).format(amount)
-}
-
-// Format date
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString('th-TH', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
-}
-</script>
-
 <template>
   <div>
     <!-- Header -->
@@ -149,19 +11,21 @@ function formatDate(date: string) {
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex justify-center items-center py-20">
-      <Icon name="i-heroicons-arrow-path" class="w-12 h-12 text-blue-600 animate-spin" />
+    <div
+      v-if="transactionsPending"
+      class="flex justify-center items-center py-20"
+    >
+      <Icon
+        name="i-heroicons-arrow-path"
+        class="w-12 h-12 text-blue-600 animate-spin"
+      />
     </div>
 
     <!-- Dashboard Content -->
     <div v-else class="space-y-8">
       <!-- Statistics Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <UCard
-          v-for="stat in statsCards"
-          :key="stat.label"
-          :ui="{ body: { padding: 'p-6' } }"
-        >
+        <UCard v-for="stat in statsCards" :key="stat.label">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -171,8 +35,13 @@ function formatDate(date: string) {
                 {{ stat.value }}
               </p>
             </div>
-            <div :class="`bg-${stat.color}-100 dark:bg-${stat.color}-900 p-3 rounded-lg`">
-              <Icon :name="stat.icon" :class="`w-8 h-8 text-${stat.color}-600`" />
+            <div
+              :class="`bg-${stat.color}-100 dark:bg-${stat.color}-900 p-3 rounded-lg`"
+            >
+              <Icon
+                :name="stat.icon"
+                :class="`w-8 h-8 text-${stat.color}-600`"
+              />
             </div>
           </div>
         </UCard>
@@ -194,8 +63,13 @@ function formatDate(date: string) {
             class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-600 hover:shadow-md transition-all"
           >
             <div class="flex items-start space-x-3">
-              <div :class="`bg-${action.color}-100 dark:bg-${action.color}-900 p-2 rounded-lg`">
-                <Icon :name="action.icon" :class="`w-6 h-6 text-${action.color}-600`" />
+              <div
+                :class="`bg-${action.color}-100 dark:bg-${action.color}-900 p-2 rounded-lg`"
+              >
+                <Icon
+                  :name="action.icon"
+                  :class="`w-6 h-6 text-${action.color}-600`"
+                />
               </div>
               <div>
                 <h3 class="font-semibold text-gray-900 dark:text-white">
@@ -219,7 +93,7 @@ function formatDate(date: string) {
             </h2>
             <UButton
               to="/transactions"
-              color="gray"
+              color="neutral"
               variant="ghost"
               trailing-icon="i-heroicons-arrow-right"
             >
@@ -229,8 +103,14 @@ function formatDate(date: string) {
         </template>
 
         <!-- Empty State -->
-        <div v-if="recentTransactions.length === 0" class="text-center py-12">
-          <Icon name="i-heroicons-shopping-bag" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
+        <div
+          v-if="false && recentTransactions.length === 0"
+          class="text-center py-12"
+        >
+          <Icon
+            name="i-heroicons-shopping-bag"
+            class="w-16 h-16 text-gray-400 mx-auto mb-4"
+          />
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             ยังไม่มีธุรกรรม
           </h3>
@@ -263,7 +143,10 @@ function formatDate(date: string) {
                   v-else
                   class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
                 >
-                  <Icon name="i-heroicons-photo" class="w-8 h-8 text-gray-400" />
+                  <Icon
+                    name="i-heroicons-photo"
+                    class="w-8 h-8 text-gray-400"
+                  />
                 </div>
 
                 <!-- Transaction Info -->
@@ -291,7 +174,10 @@ function formatDate(date: string) {
               </div>
 
               <!-- Arrow -->
-              <Icon name="i-heroicons-chevron-right" class="w-5 h-5 text-gray-400 ml-4" />
+              <Icon
+                name="i-heroicons-chevron-right"
+                class="w-5 h-5 text-gray-400 ml-4"
+              />
             </div>
           </NuxtLink>
         </div>
@@ -309,9 +195,14 @@ function formatDate(date: string) {
 
           <div class="text-center py-6">
             <div class="flex items-center justify-center space-x-2 mb-2">
-              <Icon name="i-heroicons-star-solid" class="w-8 h-8 text-yellow-400" />
+              <Icon
+                name="i-heroicons-star-solid"
+                class="w-8 h-8 text-yellow-400"
+              />
               <span class="text-4xl font-bold text-gray-900 dark:text-white">
-                {{ authStore.user?.rating?.asSeller?.average?.toFixed(1) || '0.0' }}
+                {{
+                  authStore.user?.rating?.asSeller?.average?.toFixed(1) || "0.0"
+                }}
               </span>
             </div>
             <p class="text-gray-600 dark:text-gray-400">
@@ -330,9 +221,14 @@ function formatDate(date: string) {
 
           <div class="text-center py-6">
             <div class="flex items-center justify-center space-x-2 mb-2">
-              <Icon name="i-heroicons-star-solid" class="w-8 h-8 text-yellow-400" />
+              <Icon
+                name="i-heroicons-star-solid"
+                class="w-8 h-8 text-yellow-400"
+              />
               <span class="text-4xl font-bold text-gray-900 dark:text-white">
-                {{ authStore.user?.rating?.asBuyer?.average?.toFixed(1) || '0.0' }}
+                {{
+                  authStore.user?.rating?.asBuyer?.average?.toFixed(1) || "0.0"
+                }}
               </span>
             </div>
             <p class="text-gray-600 dark:text-gray-400">
@@ -344,3 +240,115 @@ function formatDate(date: string) {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+const authStore = useAuthStore();
+
+const { data: transactions, pending: transactionsPending } =
+  await useTransactionService().getTransactions();
+
+const recentTransactions = computed(
+  () => transactions.value?.slice?.(0, 5) || [],
+);
+
+const statsCards = computed(() => [
+  {
+    label: "ซื้อทั้งหมด",
+    value: authStore.user?.statistics?.totalBought || 0,
+    icon: "i-heroicons-shopping-cart",
+    color: "blue",
+  },
+  {
+    label: "ขายทั้งหมด",
+    value: authStore.user?.statistics?.totalSold || 0,
+    icon: "i-heroicons-banknotes",
+    color: "green",
+  },
+  {
+    label: "เสร็จสมบูรณ์",
+    value: authStore.user?.statistics?.totalCompleted || 0,
+    icon: "i-heroicons-check-circle",
+    color: "purple",
+  },
+  {
+    label: "อัตราความสำเร็จ",
+    value: `${authStore.user?.statistics?.successRate || 0}%`,
+    icon: "i-heroicons-chart-bar",
+    color: "orange",
+  },
+]);
+
+const quickActions = [
+  {
+    label: "สร้างธุรกรรมใหม่",
+    description: "เริ่มต้นการซื้อขายใหม่",
+    icon: "i-heroicons-plus-circle",
+    color: "blue",
+    to: "/transactions/create",
+  },
+  {
+    label: "ดูธุรกรรมทั้งหมด",
+    description: "จัดการธุรกรรมของคุณ",
+    icon: "i-heroicons-list-bullet",
+    color: "green",
+    to: "/transactions",
+  },
+  {
+    label: "รีวิวของฉัน",
+    description: "ดูและจัดการรีวิว",
+    icon: "i-heroicons-star",
+    color: "yellow",
+    to: "/reviews",
+  },
+  {
+    label: "ตั้งค่าโปรไฟล์",
+    description: "อัพเดทข้อมูลส่วนตัว",
+    icon: "i-heroicons-user-circle",
+    color: "purple",
+    to: "/profile",
+  },
+];
+
+function getStatusColor(status: string) {
+  const colorMap: Record<string, string> = {
+    pending_payment: "yellow",
+    payment_verification: "blue",
+    paid: "green",
+    shipped: "indigo",
+    delivered: "purple",
+    completed: "green",
+    cancelled: "red",
+    disputed: "orange",
+  };
+  return colorMap[status] || "gray";
+}
+
+function getStatusLabel(status: string) {
+  const labelMap: Record<string, string> = {
+    pending_payment: "รอชำระเงิน",
+    payment_verification: "ตรวจสอบการชำระเงิน",
+    paid: "ชำระเงินแล้ว",
+    shipped: "จัดส่งแล้ว",
+    delivered: "ได้รับสินค้า",
+    completed: "เสร็จสมบูรณ์",
+    cancelled: "ยกเลิก",
+    disputed: "มีข้อพิพาท",
+  };
+  return labelMap[status] || status;
+}
+
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat("th-TH", {
+    style: "currency",
+    currency: "THB",
+  }).format(amount);
+}
+
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString("th-TH", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+</script>
