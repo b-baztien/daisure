@@ -44,7 +44,34 @@
             />
           </UFormField>
 
-          <UFormField label="รูปภาพสินค้า" required>
+          <UFormField label="ราคา (บาท)" required>
+            <UInput
+              v-model.number="form.product.price"
+              type="number"
+              placeholder="35000"
+            >
+              <template #leading>
+                <span class="text-gray-500">฿</span>
+              </template>
+            </UInput>
+          </UFormField>
+
+          <UFormField label="ลิงค์ต้นทาง">
+            <UInput
+              v-model="form.product.sourceUrl"
+              placeholder="https://facebook.com/..."
+            />
+          </UFormField>
+
+          <UFormField class="col-span-full" label="รายละเอียด" required>
+            <UTextarea
+              v-model="form.product.description"
+              class="w-full"
+              placeholder="อธิบายรายละเอียดสินค้า..."
+            />
+          </UFormField>
+
+          <UFormField class="col-span-full" label="รูปภาพสินค้า" required>
             <UInput
               class="w-full"
               v-model="imageUrl"
@@ -70,35 +97,6 @@
                 />
               </div>
             </div>
-          </UFormField>
-
-          <UFormField class="col-span-full" label="รายละเอียด" required>
-            <UTextarea
-              v-model="form.product.description"
-              class="w-full"
-              placeholder="อธิบายรายละเอียดสินค้า..."
-            />
-          </UFormField>
-
-          <!-- Price -->
-          <UFormField label="ราคา (บาท)" required>
-            <UInput
-              v-model.number="form.product.price"
-              type="number"
-              placeholder="35000"
-            >
-              <template #leading>
-                <span class="text-gray-500">฿</span>
-              </template>
-            </UInput>
-          </UFormField>
-
-          <!-- Source URL -->
-          <UFormField label="ลิงค์ต้นทาง">
-            <UInput
-              v-model="form.product.sourceUrl"
-              placeholder="https://facebook.com/..."
-            />
           </UFormField>
         </div>
       </UCard>
