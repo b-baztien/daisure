@@ -2,7 +2,8 @@ export interface Transaction {
   _id: string;
   transactionNumber: string;
   product: Product;
-  buyer: Buyer;
+  seller: Seller;
+  buyer?: Buyer;
   payment: Payment;
   status: string;
   timeline: Timeline[];
@@ -31,6 +32,13 @@ interface Payment {
   escrowFee: number;
   shippingFee: number;
   totalAmount: number;
+}
+
+interface Seller {
+  userId: UserId;
+  displayName: string;
+  phone?: string;
+  lineUserId: string;
 }
 
 interface Buyer {

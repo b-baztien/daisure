@@ -36,16 +36,16 @@ export class TransactionsService {
 
   async create(
     createTransactionDto: CreateTransactionDto,
-    buyerId: string,
+    sellerId: string,
   ): Promise<Transaction> {
-    // ผู้ซื้อคือผู้ที่ login อยู่ (authenticated user)
-    const buyer = await this.usersService.findOne(buyerId);
+    // ผู้ขายคือผู้ที่ login อยู่ (authenticated user)
+    const seller = await this.usersService.findOne(sellerId);
 
     const productPrice = createTransactionDto.product.price;
 
-    // ตรวจสอบ KYC ของผู้ซื้อ
+    // ตรวจสอบ KYC ของผู้ขาย
     const kycCheck = await this.kycService.checkKycRequired(
-      buyerId,
+      sellerId,
       productPrice,
     );
 
@@ -69,11 +69,11 @@ export class TransactionsService {
     const transaction = new this.transactionModel({
       transactionNumber,
       product: createTransactionDto.product,
-      buyer: {
-        userId: buyer._id,
-        displayName: buyer.profile.displayName,
-        phone: buyer.profile.phone,
-        lineUserId: buyer.auth.lineUserId,
+      seller: {
+        userId: seller._id,
+        displayName: seller.profile.displayName,
+        phone: seller.profile.phone,
+        lineUserId: seller.auth.lineUserId,
       },
       payment: {
         productPrice,
@@ -90,8 +90,8 @@ export class TransactionsService {
         {
           status: TransactionStatus.INITIATED,
           action: 'created',
-          description: 'ผู้ซื้อสร้างรายการซื้อขาย',
-          actorId: buyerId as any,
+          description: 'ผู้ขายสร้างรายการซื้อขาย',
+          actorId: sellerId as any,
           platform: 'web',
           timestamp: new Date(),
         },

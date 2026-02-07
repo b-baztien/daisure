@@ -43,8 +43,8 @@ export interface ITransactionDocument {
   _id: Types.ObjectId;
   transactionNumber: string;
   product: IProduct;
-  seller?: IParticipant;
-  buyer: IParticipant;
+  seller: IParticipant;
+  buyer?: IParticipant;
   admin?: IParticipant;
   payment: IPayment;
   status: TransactionStatus;
