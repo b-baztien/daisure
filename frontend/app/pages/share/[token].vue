@@ -4,10 +4,13 @@
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
         {{ transaction.product.name }}
       </h1>
-      <p class="text-gray-600 dark:text-gray-400 mt-2">
+      <p class="text-gray-600 dark:text-gray-400">
         {{ transaction.transactionNumber }}
       </p>
-      <BadgeTransaction :status="transaction.status" class="mt-2" />
+      <BadgeTransaction
+        v-if="transaction.status !== TransactionStatus.INITIATED"
+        :status="transaction.status"
+      />
     </div>
 
     <div class="grid md:grid-cols-2 gap-6">
@@ -59,7 +62,9 @@
           <div class="space-y-3">
             <div class="flex justify-between">
               <span class="text-gray-600">ราคาสินค้า</span>
-              <span>{{ formatCurrency(transaction.payment.productPrice) }}</span>
+              <span>{{
+                formatCurrency(transaction.payment.productPrice)
+              }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">ค่าธรรมเนียม</span>
@@ -81,9 +86,17 @@
 
         <UCard>
           <div class="space-y-4">
-            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <UIcon name="i-heroicons-shield-check" class="w-5 h-5 text-blue-600" />
-              <span>ปลอดภัยด้วยระบบ Escrow ผู้ซื้อจะได้รับสินค้าก่อนจึงปล่อยเงินให้ผู้ขาย</span>
+            <div
+              class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+            >
+              <UIcon
+                name="i-heroicons-shield-check"
+                class="w-5 h-5 text-blue-600"
+              />
+              <span
+                >ปลอดภัยด้วยระบบ Escrow
+                ผู้ซื้อจะได้รับสินค้าก่อนจึงปล่อยเงินให้ผู้ขาย</span
+              >
             </div>
 
             <template v-if="isAuthenticated">
