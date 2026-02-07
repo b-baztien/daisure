@@ -1,5 +1,5 @@
 export interface ResponsePagination<T = any> {
-  items: T[];
+  data: T[];
   total: number;
   page: number;
   page_size: number;

@@ -304,7 +304,11 @@
         </UCard>
 
         <UCard
-          v-if="isSeller && transaction.shareToken && transaction.status === 'initiated'"
+          v-if="
+            isSeller &&
+            transaction.shareToken &&
+            transaction.status === 'initiated'
+          "
         >
           <template #header>
             <div class="flex items-center gap-2">
@@ -337,12 +341,35 @@
           </div>
         </UCard>
 
-        <UCard>
+        <UCard
+          v-if="
+            (isSeller &&
+              [TransactionStatus.AWAITING_SHIPMENT].includes(
+                transaction.status,
+              )) ||
+            (isBuyer &&
+              [
+                TransactionStatus.PENDING_PAYMENT,
+                TransactionStatus.PAYMENT_VERIFICATION,
+              ].includes(transaction.status))
+          "
+        >
           <template #header>
             <h2 class="text-lg font-semibold">การดำเนินการ</h2>
           </template>
 
           <div class="space-y-3">
+            <UButton
+              v-if="transaction.status === 'awaiting_shipment' && isSeller"
+              color="warning"
+              block
+              size="lg"
+              icon="i-heroicons-truck"
+              @click="showShippingModal = true"
+            >
+              จัดส่งสินค้า
+            </UButton>
+
             <UButton
               v-if="transaction.status === 'pending_payment' && isBuyer"
               :to="`/payments/${transaction._id}/instructions`"
@@ -362,17 +389,6 @@
               icon="i-heroicons-photo"
             >
               อัพโหลดสลิป
-            </UButton>
-
-            <UButton
-              v-if="transaction.status === 'awaiting_shipment' && isSeller"
-              color="warning"
-              block
-              size="lg"
-              icon="i-heroicons-truck"
-              @click="showShippingModal = true"
-            >
-              จัดส่งสินค้า
             </UButton>
 
             <UButton
@@ -423,28 +439,23 @@
 
         <UCard>
           <template #header>
-            <h2 class="text-lg font-semibold">ผู้เกี่ยวข้อง</h2>
+            <h2 class="text-lg font-semibold">ผู้ขาย</h2>
           </template>
 
           <div class="space-y-4">
-            <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                ผู้ขาย
-              </p>
-              <div class="flex items-center gap-3">
-                <UAvatar :alt="transaction.seller.displayName" size="md" />
-                <div class="flex-1 min-w-0">
-                  <p class="font-semibold truncate">
-                    {{ transaction.seller.displayName }}
-                  </p>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ transaction.seller.phone }}
-                  </p>
-                </div>
-                <UBadge v-if="isSeller" color="success" variant="soft">
-                  คุณ
-                </UBadge>
+            <div class="flex items-center gap-3">
+              <UAvatar :alt="transaction.seller.displayName" size="md" />
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold truncate">
+                  {{ transaction.seller.displayName }}
+                </p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ transaction.seller.phone }}
+                </p>
               </div>
+              <UBadge v-if="isSeller" color="success" variant="soft">
+                คุณ
+              </UBadge>
             </div>
 
             <template v-if="transaction.buyer">

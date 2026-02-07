@@ -5,11 +5,7 @@
         Transactions Management
       </h1>
 
-      <UButton
-        icon="i-heroicons-arrow-path"
-        @click="fetchTransactions"
-        :loading="loading"
-      >
+      <UButton icon="i-heroicons-arrow-path" @click="refresh()">
         Refresh
       </UButton>
     </div>
@@ -21,7 +17,7 @@
           <USelect
             v-model="filters.status"
             :options="statusOptions"
-            @change="fetchTransactions"
+            @change="refresh()"
           />
         </UFormField>
 
@@ -30,7 +26,7 @@
             v-model="filters.search"
             placeholder="Search transaction ID..."
             icon="i-heroicons-magnifying-glass"
-            @input="debouncedSearch"
+            @input="refresh()"
           />
         </UFormField>
       </div>
@@ -39,19 +35,23 @@
     <!-- Transactions Table -->
     <UCard>
       <UTable
-        :rows="transactions"
+        :data="transactions.data || []"
         :columns="columns"
-        :loading="loading"
-        :empty-state="{ icon: 'i-heroicons-inbox', label: 'No transactions found' }"
+        :empty-state="{
+          icon: 'i-heroicons-inbox',
+          label: 'No transactions found',
+        }"
       >
-        <template #status-data="{ row }">
+        <!-- <template #status-data="{ row }">
           <UBadge :color="getStatusColor(row.status)">
             {{ formatStatus(row.status) }}
           </UBadge>
         </template>
 
         <template #amount-data="{ row }">
-          <span class="font-semibold">฿{{ formatNumber(row.totalAmount) }}</span>
+          <span class="font-semibold"
+            >฿{{ formatNumber(row.totalAmount) }}</span
+          >
         </template>
 
         <template #createdAt-data="{ row }">
@@ -85,7 +85,7 @@
               View
             </UButton>
           </div>
-        </template>
+        </template> -->
       </UTable>
     </UCard>
 
@@ -94,17 +94,23 @@
       <UCard>
         <template #header>
           <h3 class="text-lg font-medium">
-            {{ verifyAction === 'approve' ? 'Approve' : 'Reject' }} Payment
+            {{ verifyAction === "approve" ? "Approve" : "Reject" }} Payment
           </h3>
         </template>
 
         <div class="space-y-4">
           <div>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              Transaction ID: <span class="font-mono">{{ selectedTransaction?._id }}</span>
+              Transaction ID:
+              <span class="font-mono">{{ selectedTransaction?._id }}</span>
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              Amount: <span class="font-semibold">฿{{ formatNumber(selectedTransaction?.totalAmount || 0) }}</span>
+              Amount:
+              <span class="font-semibold"
+                >฿{{
+                  formatNumber(selectedTransaction?.totalAmount || 0)
+                }}</span
+              >
             </p>
           </div>
 
@@ -127,11 +133,7 @@
 
         <template #footer>
           <div class="flex justify-end gap-2">
-            <UButton
-              color="gray"
-              variant="ghost"
-              @click="closeVerifyModal"
-            >
+            <UButton color="gray" variant="ghost" @click="closeVerifyModal">
               Cancel
             </UButton>
             <UButton
@@ -139,7 +141,7 @@
               @click="verifyPayment"
               :loading="verifying"
             >
-              {{ verifyAction === 'approve' ? 'Approve' : 'Reject' }}
+              {{ verifyAction === "approve" ? "Approve" : "Reject" }}
             </UButton>
           </div>
         </template>
@@ -156,7 +158,9 @@
         <div v-if="selectedTransaction" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Transaction ID</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Transaction ID
+              </p>
               <p class="font-mono text-sm">{{ selectedTransaction._id }}</p>
             </div>
             <div>
@@ -167,15 +171,23 @@
             </div>
             <div>
               <p class="text-sm text-gray-500 dark:text-gray-400">Amount</p>
-              <p class="font-semibold">฿{{ formatNumber(selectedTransaction.amount) }}</p>
+              <p class="font-semibold">
+                ฿{{ formatNumber(selectedTransaction.amount) }}
+              </p>
             </div>
             <div>
               <p class="text-sm text-gray-500 dark:text-gray-400">Escrow Fee</p>
-              <p class="font-semibold">฿{{ formatNumber(selectedTransaction.escrowFee) }}</p>
+              <p class="font-semibold">
+                ฿{{ formatNumber(selectedTransaction.escrowFee) }}
+              </p>
             </div>
             <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Total Amount</p>
-              <p class="font-semibold">฿{{ formatNumber(selectedTransaction.totalAmount) }}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Total Amount
+              </p>
+              <p class="font-semibold">
+                ฿{{ formatNumber(selectedTransaction.totalAmount) }}
+              </p>
             </div>
             <div>
               <p class="text-sm text-gray-500 dark:text-gray-400">Created At</p>
@@ -184,7 +196,9 @@
           </div>
 
           <div v-if="selectedTransaction.paymentSlipUrl">
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Payment Slip</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              Payment Slip
+            </p>
             <a
               :href="selectedTransaction.paymentSlipUrl"
               target="_blank"
@@ -213,166 +227,114 @@
         </template>
       </UCard>
     </UModal>
-
-    <!-- Error Alert -->
-    <UAlert
-      v-if="error"
-      color="red"
-      variant="soft"
-      :title="error"
-      :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link' }"
-      @close="error = ''"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Transaction } from '~/types/api'
-import dayjs from 'dayjs'
+import type { TableColumn } from "@nuxt/ui";
+import dayjs from "dayjs";
 
-const api = useApi()
+const api = useApi();
 
-const transactions = ref<Transaction[]>([])
-const loading = ref(false)
-const error = ref('')
+const alert = useAlert();
+
+const { data: transactions, refresh } =
+  await useTransactionService().getTransactions();
 
 const filters = ref({
-  status: '',
-  search: ''
-})
+  status: "",
+  search: "",
+});
 
 const statusOptions = [
-  { label: 'All', value: '' },
-  { label: 'Pending Payment', value: 'pending_payment' },
-  { label: 'Payment Submitted', value: 'payment_submitted' },
-  { label: 'Payment Verified', value: 'payment_verified' },
-  { label: 'In Escrow', value: 'in_escrow' },
-  { label: 'In Dispute', value: 'in_dispute' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'Cancelled', value: 'cancelled' },
-  { label: 'Refunded', value: 'refunded' }
-]
+  { label: "All", value: "" },
+  { label: "Pending Payment", value: "pending_payment" },
+  { label: "Payment Submitted", value: "payment_submitted" },
+  { label: "Payment Verified", value: "payment_verified" },
+  { label: "In Escrow", value: "in_escrow" },
+  { label: "In Dispute", value: "in_dispute" },
+  { label: "Completed", value: "completed" },
+  { label: "Cancelled", value: "cancelled" },
+  { label: "Refunded", value: "refunded" },
+];
 
-const columns = [
-  { key: '_id', label: 'ID', id: '_id' },
-  { key: 'status', label: 'Status', id: 'status' },
-  { key: 'amount', label: 'Amount', id: 'amount' },
-  { key: 'createdAt', label: 'Created', id: 'createdAt' },
-  { key: 'actions', label: 'Actions', id: 'actions' }
-]
+const columns = computed<TableColumn<Transaction>[]>(() => [
+  { accessorKey: "_id", header: "ID" },
+  { accessorKey: "status", header: "Status" },
+  { accessorKey: "amount", header: "Amount" },
+  { accessorKey: "createdAt", header: "Created" },
+  { accessorKey: "actions", header: "Actions" },
+]);
 
 // Verify modal state
-const showVerifyModal = ref(false)
-const selectedTransaction = ref<Transaction | null>(null)
-const verifyAction = ref<'approve' | 'reject'>('approve')
-const verifyNote = ref('')
-const verifying = ref(false)
+const showVerifyModal = ref(false);
+const selectedTransaction = ref<Transaction | null>(null);
+const verifyAction = ref<"approve" | "reject">("approve");
+const verifyNote = ref("");
+const verifying = ref(false);
 
 // Details modal state
-const showDetailsModal = ref(false)
+const showDetailsModal = ref(false);
 
 const formatNumber = (num: number) => {
-  return new Intl.NumberFormat('th-TH').format(num)
-}
+  return new Intl.NumberFormat("th-TH").format(num);
+};
 
 const formatDate = (date: string) => {
-  return dayjs(date).format('DD/MM/YYYY HH:mm')
-}
+  return dayjs(date).format("DD/MM/YYYY HH:mm");
+};
 
 const formatStatus = (status: string) => {
-  return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-}
+  return status.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+};
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
-    'pending_payment': 'gray',
-    'payment_submitted': 'yellow',
-    'payment_verified': 'blue',
-    'in_escrow': 'cyan',
-    'in_dispute': 'red',
-    'completed': 'green',
-    'cancelled': 'gray',
-    'refunded': 'orange'
-  }
-  return colors[status] || 'gray'
-}
-
-const fetchTransactions = async () => {
-  loading.value = true
-  error.value = ''
-
-  try {
-    const params: Record<string, any> = {}
-    if (filters.value.status) params.status = filters.value.status
-    if (filters.value.search) params.search = filters.value.search
-
-    const response = await api.getTransactions(params)
-    transactions.value = response.data
-  } catch (err: any) {
-    error.value = err.response?.data?.message || 'Failed to load transactions'
-    console.error('Failed to fetch transactions:', err)
-  } finally {
-    loading.value = false
-  }
-}
+    pending_payment: "gray",
+    payment_submitted: "yellow",
+    payment_verified: "blue",
+    in_escrow: "cyan",
+    in_dispute: "red",
+    completed: "green",
+    cancelled: "gray",
+    refunded: "orange",
+  };
+  return colors[status] || "gray";
+};
 
 const openVerifyModal = (transaction: Transaction, isApprove: boolean) => {
-  selectedTransaction.value = transaction
-  verifyAction.value = isApprove ? 'approve' : 'reject'
-  verifyNote.value = ''
-  showVerifyModal.value = true
-}
+  selectedTransaction.value = transaction;
+  verifyAction.value = isApprove ? "approve" : "reject";
+  verifyNote.value = "";
+  showVerifyModal.value = true;
+};
 
 const closeVerifyModal = () => {
-  showVerifyModal.value = false
-  selectedTransaction.value = null
-  verifyNote.value = ''
-}
+  showVerifyModal.value = false;
+  selectedTransaction.value = null;
+  verifyNote.value = "";
+};
 
 const verifyPayment = async () => {
-  if (!selectedTransaction.value) return
+  if (!selectedTransaction.value) return;
 
-  verifying.value = true
-  error.value = ''
+  verifying.value = true;
 
-  try {
-    await api.verifyPayment(selectedTransaction.value._id, {
-      isApproved: verifyAction.value === 'approve',
-      note: verifyNote.value || undefined
-    })
+  await api.verifyPayment(selectedTransaction.value._id, {
+    isApproved: verifyAction.value === "approve",
+    note: verifyNote.value || undefined,
+  });
 
-    closeVerifyModal()
-    await fetchTransactions()
+  closeVerifyModal();
 
-    // Show success notification
-    const toast = useToast()
-    toast.add({
-      title: 'Success',
-      description: `Payment ${verifyAction.value === 'approve' ? 'approved' : 'rejected'} successfully`,
-      color: 'green'
-    })
-  } catch (err: any) {
-    error.value = err.response?.data?.message || 'Failed to verify payment'
-    console.error('Failed to verify payment:', err)
-  } finally {
-    verifying.value = false
-  }
-}
+  alert.success(
+    `Payment ${verifyAction.value === "approve" ? "approved" : "rejected"} successfully`,
+  );
+  return;
+};
 
 const viewDetails = (transaction: Transaction) => {
-  selectedTransaction.value = transaction
-  showDetailsModal.value = true
-}
-
-let searchTimeout: NodeJS.Timeout
-const debouncedSearch = () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    fetchTransactions()
-  }, 500)
-}
-
-onMounted(() => {
-  fetchTransactions()
-})
+  selectedTransaction.value = transaction;
+  showDetailsModal.value = true;
+};
 </script>

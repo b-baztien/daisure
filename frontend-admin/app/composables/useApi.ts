@@ -35,12 +35,6 @@ export const useApi = () => {
 
     getCurrentUser: () => api.get<User>("/users/me"),
 
-    // Transactions
-    getTransactions: (params?: Record<string, any>) =>
-      api.get<Transaction[] | PaginatedResponse<Transaction>>("/transactions", {
-        params,
-      }),
-
     verifyPayment: (id: string, data: VerifyPaymentRequest) =>
       api.post<Transaction>(`/admin/transactions/${id}/verify-payment`, data),
 
