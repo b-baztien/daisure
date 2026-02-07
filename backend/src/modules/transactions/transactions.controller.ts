@@ -24,7 +24,7 @@ export class TransactionsController {
   create(@Body() createTransactionDto: CreateTransactionDto, @Request() req) {
     return this.transactionsService.create(
       createTransactionDto,
-      req.user.userId,
+      req.user.userId, // sellerId - ผู้ขายเป็นคนสร้าง transaction
     );
   }
 
