@@ -456,7 +456,7 @@ export class ReviewsService {
 
     // Check if user is part of transaction
     const isBuyer = transaction.buyer?.userId.toString() === userId;
-    const isSeller = transaction.seller.userId.toString() === userId;
+    const isSeller = transaction.seller?.userId.toString() === userId;
 
     if (!isBuyer && !isSeller) {
       return {

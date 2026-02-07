@@ -36,16 +36,16 @@ export class TransactionsService {
 
   async create(
     createTransactionDto: CreateTransactionDto,
-    sellerId: string,
+    buyerId: string,
   ): Promise<Transaction> {
-    // ผู้ขายคือผู้ที่ login อยู่ (authenticated user)
-    const seller = await this.usersService.findOne(sellerId);
+    // ผู้ซื้อคือผู้ที่ login อยู่ (authenticated user)
+    const buyer = await this.usersService.findOne(buyerId);
 
     const productPrice = createTransactionDto.product.price;
 
-    // ตรวจสอบ KYC ของผู้ขาย
+    // ตรวจสอบ KYC ของผู้ซื้อ
     const kycCheck = await this.kycService.checkKycRequired(
-      sellerId,
+      buyerId,
       productPrice,
     );
 
@@ -69,11 +69,11 @@ export class TransactionsService {
     const transaction = new this.transactionModel({
       transactionNumber,
       product: createTransactionDto.product,
-      seller: {
-        userId: seller._id,
-        displayName: seller.profile.displayName,
-        phone: seller.profile.phone,
-        lineUserId: seller.auth.lineUserId,
+      buyer: {
+        userId: buyer._id,
+        displayName: buyer.profile.displayName,
+        phone: buyer.profile.phone,
+        lineUserId: buyer.auth.lineUserId,
       },
       payment: {
         productPrice,
@@ -90,8 +90,8 @@ export class TransactionsService {
         {
           status: TransactionStatus.INITIATED,
           action: 'created',
-          description: 'ผู้ขายสร้างรายการซื้อขาย',
-          actorId: sellerId as any,
+          description: 'ผู้ซื้อสร้างรายการซื้อขาย',
+          actorId: buyerId as any,
           platform: 'web',
           timestamp: new Date(),
         },
@@ -410,7 +410,7 @@ export class TransactionsService {
       status: TransactionStatus.SHIPPED,
       action: 'shipment_updated',
       description: `Tracking number: ${shippingData.trackingNumber}`,
-      actorId: transaction.seller.userId as any,
+      actorId: transaction.seller?.userId as any,
       platform: 'web',
       timestamp: new Date(),
     } as any);

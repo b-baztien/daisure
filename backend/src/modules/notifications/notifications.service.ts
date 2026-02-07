@@ -26,23 +26,27 @@ export class NotificationsService {
   async sendTransactionCreated(
     transaction: ITransactionDocument,
   ): Promise<void> {
-    // Create notifications for buyer
-    await this.create({
-      userId: transaction.buyer.userId,
-      transactionId: transaction._id,
-      type: 'transaction_created',
-      title: 'สร้างรายการซื้อขายใหม่',
-      message: `รายการซื้อ ${transaction.product.name} ถูกสร้างแล้ว`,
-    });
+    // Create notifications for buyer (if exists)
+    if (transaction.buyer) {
+      await this.create({
+        userId: transaction.buyer.userId,
+        transactionId: transaction._id,
+        type: 'transaction_created',
+        title: 'สร้างรายการซื้อขายใหม่',
+        message: `รายการซื้อ ${transaction.product.name} ถูกสร้างแล้ว`,
+      });
+    }
 
-    // Create notifications for seller
-    await this.create({
-      userId: transaction.seller.userId,
-      transactionId: transaction._id,
-      type: 'transaction_created',
-      title: 'มีคนต้องการซื้อสินค้าของคุณ',
-      message: `${transaction.buyer.displayName} ต้องการซื้อ ${transaction.product.name}`,
-    });
+    // Create notifications for seller (if exists)
+    if (transaction.seller) {
+      await this.create({
+        userId: transaction.seller.userId,
+        transactionId: transaction._id,
+        type: 'transaction_created',
+        title: 'มีคนต้องการซื้อสินค้าของคุณ',
+        message: `${transaction.buyer?.displayName || 'ผู้ซื้อ'} ต้องการซื้อ ${transaction.product.name}`,
+      });
+    }
 
     // Send LINE notification
     await this.lineNotificationService.sendTransactionNotification(
@@ -65,33 +69,37 @@ export class NotificationsService {
 
     const message = statusMessages[status] || `สถานะเปลี่ยนเป็น ${status}`;
 
-    await this.create({
-      userId: transaction.buyer.userId,
-      transactionId: transaction._id,
-      type: 'status_update',
-      title: 'อัพเดทสถานะรายการ',
-      message: `${transaction.transactionNumber}: ${message}`,
-    });
+    if (transaction.buyer) {
+      await this.create({
+        userId: transaction.buyer.userId,
+        transactionId: transaction._id,
+        type: 'status_update',
+        title: 'อัพเดทสถานะรายการ',
+        message: `${transaction.transactionNumber}: ${message}`,
+      });
 
-    // Send LINE notification
-    if (transaction.buyer.lineUserId) {
-      await this.lineNotificationService.sendStatusUpdateNotification(
-        transaction.buyer.lineUserId,
-        transaction.transactionNumber,
-        message,
-      );
+      // Send LINE notification
+      if (transaction.buyer.lineUserId) {
+        await this.lineNotificationService.sendStatusUpdateNotification(
+          transaction.buyer.lineUserId,
+          transaction.transactionNumber,
+          message,
+        );
+      }
     }
   }
 
   async sendDisputeCreated(transaction: ITransactionDocument): Promise<void> {
-    await this.create({
-      userId: transaction.buyer.userId,
-      transactionId: transaction._id,
-      type: 'dispute_created',
-      title: 'มีข้อพิพาท',
-      message: 'มีการสร้างข้อพิพาทสำหรับรายการนี้',
-      priority: 'high',
-    });
+    if (transaction.buyer) {
+      await this.create({
+        userId: transaction.buyer.userId,
+        transactionId: transaction._id,
+        type: 'dispute_created',
+        title: 'มีข้อพิพาท',
+        message: 'มีการสร้างข้อพิพาทสำหรับรายการนี้',
+        priority: 'high',
+      });
+    }
   }
 
   private async create(

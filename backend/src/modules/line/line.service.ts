@@ -65,10 +65,10 @@ export class LineService {
     const message = this.buildTransactionFlexMessage(transaction);
 
     // Send to both buyer and seller
-    if (transaction.buyer.lineUserId) {
+    if (transaction.buyer?.lineUserId) {
       await this.client.pushMessage(transaction.buyer.lineUserId, message);
     }
-    if (transaction.seller.lineUserId) {
+    if (transaction.seller?.lineUserId) {
       await this.client.pushMessage(transaction.seller.lineUserId, message);
     }
   }
@@ -79,7 +79,7 @@ export class LineService {
       text: `💰 ได้รับการชำระเงินแล้ว!\n\nรายการ: ${transaction.transactionNumber}\nสินค้า: ${transaction.product.name}\n\nกรุณาจัดส่งสินค้าให้ผู้ซื้อ`,
     };
 
-    if (transaction.seller.lineUserId) {
+    if (transaction.seller?.lineUserId) {
       await this.client.pushMessage(
         transaction.seller.lineUserId,
         sellerMessage,

@@ -101,11 +101,11 @@ export class Transaction extends Document {
   @Prop({ type: Product, required: true })
   product: Product;
 
-  @Prop({ type: Participant, required: true })
-  seller: Participant;
-
   @Prop({ type: Participant })
-  buyer?: Participant;
+  seller?: Participant;
+
+  @Prop({ type: Participant, required: true })
+  buyer: Participant;
 
   @Prop({ type: Participant })
   admin?: Participant;

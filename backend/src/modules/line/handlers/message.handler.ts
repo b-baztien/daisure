@@ -202,8 +202,8 @@ export class MessageHandler {
           `สินค้า: ${transaction.product.name}\n` +
           `สถานะ: ${this.getStatusText(transaction.status)}\n` +
           `ราคา: ฿${transaction.payment.totalAmount.toLocaleString()}\n\n` +
-          `ผู้ขาย: ${transaction.seller.displayName}\n` +
-          `ผู้ซื้อ: ${transaction.buyer?.displayName}`,
+          `ผู้ขาย: ${transaction.seller?.displayName || '-'}\n` +
+          `ผู้ซื้อ: ${transaction.buyer?.displayName || '-'}`,
       };
 
       await client.replyMessage(replyToken, message);
