@@ -160,6 +160,9 @@ export class Transaction extends Document {
     source: string;
   };
 
+  @Prop({ unique: true, sparse: true })
+  shareToken?: string;
+
   @Prop()
   autoCompleteAt?: Date;
 
@@ -178,3 +181,4 @@ TransactionSchema.index({ transactionNumber: 1 });
 TransactionSchema.index({ 'buyer.userId': 1, status: 1 });
 TransactionSchema.index({ 'seller.userId': 1, status: 1 });
 TransactionSchema.index({ status: 1, createdAt: -1 });
+TransactionSchema.index({ shareToken: 1 });

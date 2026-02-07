@@ -21,5 +21,17 @@ export const useTransactionService = () => {
         ...options,
       });
     },
+    getTransactionByShareToken: (
+      shareToken: string,
+      options: CustomFetchOptions = {},
+    ) => {
+      return useCustomFetch<Transaction>(
+        `/transactions/share/${shareToken}`,
+        {
+          method: "GET",
+          ...options,
+        },
+      );
+    },
   };
 };

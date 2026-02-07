@@ -12,6 +12,7 @@ export interface Transaction {
   updatedAt: string;
   __v: number;
 
+  shareToken?: string;
   dispute?: any;
   admin?: any;
 }

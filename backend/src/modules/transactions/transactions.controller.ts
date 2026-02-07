@@ -16,11 +16,32 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionsService } from './transactions.service';
 
 @Controller('transactions')
-@UseGuards(JwtAuthGuard)
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
+  // === Public endpoints (no auth required) ===
+
+  @Get('share/:shareToken')
+  findByShareToken(@Param('shareToken') shareToken: string) {
+    return this.transactionsService.findByShareToken(shareToken);
+  }
+
+  @Post('share/:shareToken/join')
+  @UseGuards(JwtAuthGuard)
+  joinTransaction(
+    @Param('shareToken') shareToken: string,
+    @Request() req,
+  ) {
+    return this.transactionsService.joinTransaction(
+      shareToken,
+      req.user.userId,
+    );
+  }
+
+  // === Authenticated endpoints ===
+
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(@Body() createTransactionDto: CreateTransactionDto, @Request() req) {
     return this.transactionsService.create(
       createTransactionDto,
@@ -29,6 +50,7 @@ export class TransactionsController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   findAll(
     @Query('status') status?: TransactionStatus,
     @Query() paginationQuery?: PaginationQueryDto,
@@ -39,6 +61,7 @@ export class TransactionsController {
   }
 
   @Get('my-purchases')
+  @UseGuards(JwtAuthGuard)
   getMyPurchases(@Request() req, @Query() paginationQuery?: PaginationQueryDto) {
     return this.transactionsService.findByUser(
       req.user.userId,
@@ -48,6 +71,7 @@ export class TransactionsController {
   }
 
   @Get('my-sales')
+  @UseGuards(JwtAuthGuard)
   getMySales(@Request() req, @Query() paginationQuery?: PaginationQueryDto) {
     return this.transactionsService.findByUser(
       req.user.userId,
@@ -57,11 +81,13 @@ export class TransactionsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string) {
     return this.transactionsService.findOne(id);
   }
 
   @Patch(':id/confirm-delivery')
+  @UseGuards(JwtAuthGuard)
   confirmDelivery(@Param('id') id: string, @Request() req, @Body() body: any) {
     return this.transactionsService.confirmDelivery(
       id,
@@ -71,6 +97,7 @@ export class TransactionsController {
   }
 
   @Patch(':id/dispute')
+  @UseGuards(JwtAuthGuard)
   createDispute(
     @Param('id') id: string,
     @Request() req,

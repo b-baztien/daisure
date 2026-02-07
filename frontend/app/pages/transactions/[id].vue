@@ -303,6 +303,40 @@
           </div> -->
         </UCard>
 
+        <UCard
+          v-if="isSeller && transaction.shareToken && transaction.status === 'initiated'"
+        >
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-share" class="w-5 h-5 text-blue-600" />
+              <h2 class="text-lg font-semibold">ลิงก์สำหรับแชร์</h2>
+            </div>
+          </template>
+
+          <div class="space-y-3">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              ส่งลิงก์นี้ให้ผู้ซื้อเพื่อเข้าดูรายละเอียดและทำการซื้อ
+            </p>
+
+            <div
+              class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            >
+              <p class="flex-1 text-sm font-mono truncate">
+                {{ shareLink }}
+              </p>
+              <UButton
+                color="primary"
+                variant="soft"
+                icon="i-heroicons-clipboard-document"
+                size="sm"
+                @click="copyShareLink"
+              >
+                คัดลอก
+              </UButton>
+            </div>
+          </div>
+        </UCard>
+
         <UCard>
           <template #header>
             <h2 class="text-lg font-semibold">การดำเนินการ</h2>
@@ -540,6 +574,21 @@ const canDispute = computed(() => {
     isBuyer.value
   );
 });
+
+const shareLink = computed(() => {
+  if (!transaction.value?.shareToken) return "";
+  const origin = window.location.origin;
+  return `${origin}/share/${transaction.value.shareToken}`;
+});
+
+const copyShareLink = async () => {
+  try {
+    await navigator.clipboard.writeText(shareLink.value);
+    alert.success("คัดลอกลิงก์แล้ว");
+  } catch {
+    alert.error("ไม่สามารถคัดลอกลิงก์ได้");
+  }
+};
 
 const canCancel = computed(() => {
   if (!transaction.value) return false;

@@ -8,6 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { randomBytes } from 'crypto';
 import { Model, Types } from 'mongoose';
 import {
   PaginatedResponse,
@@ -66,6 +67,9 @@ export class TransactionsService {
     // Generate transaction number
     const transactionNumber = await this.generateTransactionNumber();
 
+    // Generate share token for buyer link
+    const shareToken = randomBytes(16).toString('hex');
+
     const transaction = new this.transactionModel({
       transactionNumber,
       product: createTransactionDto.product,
@@ -81,6 +85,7 @@ export class TransactionsService {
         shippingFee,
         totalAmount,
       },
+      shareToken,
       status: TransactionStatus.INITIATED,
       metadata: {
         createdFrom: 'web',
@@ -507,6 +512,77 @@ export class TransactionsService {
       byStatus,
       totalVolume,
     };
+  }
+
+  async findByShareToken(shareToken: string): Promise<Transaction> {
+    const transaction = await this.transactionModel
+      .findOne({ shareToken })
+      .select(
+        'transactionNumber product payment.productPrice payment.escrowFee payment.shippingFee payment.totalAmount status seller.displayName shareToken createdAt',
+      )
+      .exec();
+
+    if (!transaction) {
+      throw new NotFoundException('ไม่พบรายการซื้อขาย');
+    }
+
+    return transaction;
+  }
+
+  async joinTransaction(
+    shareToken: string,
+    buyerId: string,
+  ): Promise<Transaction> {
+    const transaction = await this.transactionModel
+      .findOne({ shareToken })
+      .exec();
+
+    if (!transaction) {
+      throw new NotFoundException('ไม่พบรายการซื้อขาย');
+    }
+
+    if (transaction.seller.userId.toString() === buyerId) {
+      throw new BadRequestException('ผู้ขายไม่สามารถซื้อสินค้าของตัวเองได้');
+    }
+
+    if (transaction.buyer) {
+      throw new BadRequestException('รายการนี้มีผู้ซื้อแล้ว');
+    }
+
+    if (transaction.status !== TransactionStatus.INITIATED) {
+      throw new BadRequestException(
+        'รายการนี้ไม่อยู่ในสถานะที่สามารถเข้าร่วมได้',
+      );
+    }
+
+    const buyer = await this.usersService.findOne(buyerId);
+
+    transaction.buyer = {
+      userId: buyer._id as any,
+      displayName: buyer.profile.displayName,
+      phone: buyer.profile.phone,
+      lineUserId: buyer.auth.lineUserId,
+    } as any;
+
+    transaction.status = TransactionStatus.PENDING_PAYMENT;
+
+    transaction.timeline.push({
+      status: TransactionStatus.PENDING_PAYMENT,
+      action: 'buyer_joined',
+      description: 'ผู้ซื้อเข้าร่วมรายการผ่านลิงก์แชร์',
+      actorId: buyerId as any,
+      platform: 'web',
+      timestamp: new Date(),
+    } as any);
+
+    const saved = await transaction.save();
+
+    await this.notificationsService.sendStatusUpdate(
+      saved as unknown as ITransactionDocument,
+      TransactionStatus.PENDING_PAYMENT,
+    );
+
+    return saved;
   }
 
   private calculateEscrowFee(amount: number, settings: any): number {
