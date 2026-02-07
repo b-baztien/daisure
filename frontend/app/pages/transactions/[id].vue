@@ -427,29 +427,6 @@ File: pages/transactions/[id].vue (COMPLETE)
           </template>
 
           <div class="space-y-4">
-            <!-- Buyer -->
-            <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                ผู้ซื้อ
-              </p>
-              <div class="flex items-center gap-3">
-                <UAvatar :alt="transaction.buyer.displayName" size="md" />
-                <div class="flex-1 min-w-0">
-                  <p class="font-semibold truncate">
-                    {{ transaction.buyer.displayName }}
-                  </p>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ transaction.buyer.phone }}
-                  </p>
-                </div>
-                <UBadge v-if="isBuyer" color="info" variant="soft">
-                  คุณ
-                </UBadge>
-              </div>
-            </div>
-
-            <UDivider />
-
             <!-- Seller -->
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
@@ -470,6 +447,31 @@ File: pages/transactions/[id].vue (COMPLETE)
                 </UBadge>
               </div>
             </div>
+
+            <template v-if="transaction.buyer">
+              <UDivider />
+
+              <!-- Buyer -->
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  ผู้ซื้อ
+                </p>
+                <div class="flex items-center gap-3">
+                  <UAvatar :alt="transaction.buyer.displayName" size="md" />
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold truncate">
+                      {{ transaction.buyer.displayName }}
+                    </p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ transaction.buyer.phone }}
+                    </p>
+                  </div>
+                  <UBadge v-if="isBuyer" color="info" variant="soft">
+                    คุณ
+                  </UBadge>
+                </div>
+              </div>
+            </template>
 
             <!-- Admin (if assigned) -->
             <template v-if="transaction.admin">
@@ -495,7 +497,7 @@ File: pages/transactions/[id].vue (COMPLETE)
         </UCard>
 
         <!-- Shipping Address -->
-        <UCard>
+        <UCard v-if="transaction.buyer?.shippingAddress">
           <template #header>
             <h2 class="text-lg font-semibold">ที่อยู่จัดส่ง</h2>
           </template>
@@ -694,11 +696,11 @@ const disputeReasons = [
 
 // Computed
 const isBuyer = computed(
-  () => transaction.value?.buyer.userId === authStore.user?.id,
+  () => transaction.value?.buyer?.userId === authStore.user?.id,
 );
 
 const isSeller = computed(
-  () => transaction.value?.seller.userId === authStore.user?.id,
+  () => transaction.value?.seller?.userId === authStore.user?.id,
 );
 
 const canDispute = computed(() => {

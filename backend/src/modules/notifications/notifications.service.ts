@@ -43,8 +43,8 @@ export class NotificationsService {
         userId: transaction.seller.userId,
         transactionId: transaction._id,
         type: 'transaction_created',
-        title: 'มีคนต้องการซื้อสินค้าของคุณ',
-        message: `${transaction.buyer?.displayName || 'ผู้ซื้อ'} ต้องการซื้อ ${transaction.product.name}`,
+        title: 'สร้างรายการขายสินค้าใหม่',
+        message: `รายการขาย ${transaction.product.name} ถูกสร้างแล้ว`,
       });
     }
 
