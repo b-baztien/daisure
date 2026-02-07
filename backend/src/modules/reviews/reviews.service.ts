@@ -6,14 +6,14 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { TransactionStatus } from '../../common/enums/transaction-status.enum';
 import {
-  PaginationQueryDto,
   PaginatedResponse,
+  PaginationQueryDto,
   createPaginatedResponse,
 } from '../../common/dto/pagination.dto';
-import { TransactionsService } from '../transactions/transactions.service';
+import { TransactionStatus } from '../../common/enums/transaction-status.enum';
 import { Transaction } from '../transactions/schemas/transaction.schema';
+import { TransactionsService } from '../transactions/transactions.service';
 import { UsersService } from '../users/users.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { CanReviewResult } from './interfaces/can-review-result.interface';
@@ -51,12 +51,12 @@ export class ReviewsService {
     let reviewType: 'buyer_to_seller' | 'seller_to_buyer';
     let revieweeId: string;
 
-    if (transaction.buyer.userId.toString() === userId) {
+    if (transaction.buyer?.userId.toString() === userId) {
       reviewType = 'buyer_to_seller';
-      revieweeId = transaction.seller.userId.toString();
-    } else if (transaction.seller.userId.toString() === userId) {
+      revieweeId = transaction.seller?.userId.toString();
+    } else if (transaction.seller?.userId.toString() === userId) {
       reviewType = 'seller_to_buyer';
-      revieweeId = transaction.buyer.userId.toString();
+      revieweeId = transaction.buyer?.userId.toString() as string;
     } else {
       throw new ForbiddenException('You are not part of this transaction');
     }
@@ -121,7 +121,12 @@ export class ReviewsService {
         .exec();
     }
 
-    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const {
+      page = 1,
+      pageSize = 20,
+      sortBy,
+      sortOrder = 'desc',
+    } = paginationQuery;
     const skip = (page - 1) * pageSize;
 
     // Build sort object
@@ -169,7 +174,12 @@ export class ReviewsService {
         .exec();
     }
 
-    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const {
+      page = 1,
+      pageSize = 20,
+      sortBy,
+      sortOrder = 'desc',
+    } = paginationQuery;
     const skip = (page - 1) * pageSize;
 
     // Build sort object
@@ -226,7 +236,12 @@ export class ReviewsService {
         .exec();
     }
 
-    const { page = 1, pageSize = 20, sortBy, sortOrder = 'desc' } = paginationQuery;
+    const {
+      page = 1,
+      pageSize = 20,
+      sortBy,
+      sortOrder = 'desc',
+    } = paginationQuery;
     const skip = (page - 1) * pageSize;
 
     // Build sort object
@@ -440,7 +455,7 @@ export class ReviewsService {
     }
 
     // Check if user is part of transaction
-    const isBuyer = transaction.buyer.userId.toString() === userId;
+    const isBuyer = transaction.buyer?.userId.toString() === userId;
     const isSeller = transaction.seller.userId.toString() === userId;
 
     if (!isBuyer && !isSeller) {
@@ -495,9 +510,9 @@ export class ReviewsService {
           transactionNumber: transaction.transactionNumber,
           productName: transaction.product.name,
           otherParty:
-            transaction.buyer.userId.toString() === userId
-              ? transaction.seller.displayName
-              : transaction.buyer.displayName,
+            (transaction.buyer?.userId.toString() === userId
+              ? transaction.seller?.displayName
+              : transaction.buyer?.displayName) || 'N/A',
           completedAt: transaction.completedAt!,
         });
       }

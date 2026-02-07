@@ -89,7 +89,7 @@
               >
                 <img :src="img" class="w-full h-24 object-cover rounded-lg" />
                 <UButton
-                  color="red"
+                  color="error"
                   size="xs"
                   icon="i-heroicons-x-mark"
                   class="absolute top-1 right-1 opacity-0 group-hover:opacity-100"
@@ -109,17 +109,22 @@
 
         <div class="space-y-4">
           <div class="flex items-center gap-4">
+            {{ authStore }}
             <UAvatar
-              :src="authStore.user?.profile?.pictureUrl"
-              :alt="authStore.user?.profile?.displayName"
+              :src="authStore?.user?.profile?.pictureUrl"
+              :alt="authStore?.user?.profile?.displayName"
               size="lg"
             />
             <div>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ authStore.user?.profile?.displayName || '-' }}
+                {{ authStore?.user?.profile?.displayName || "-" }}
               </p>
               <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ authStore.user?.auth?.email || authStore.user?.profile?.email || '-' }}
+                {{
+                  authStore?.user?.auth?.email ||
+                  authStore?.user?.profile?.email ||
+                  "-"
+                }}
               </p>
             </div>
           </div>
@@ -128,19 +133,21 @@
             <div>
               <p class="text-sm text-gray-500 dark:text-gray-400">เบอร์โทร</p>
               <p class="font-medium text-gray-900 dark:text-white">
-                {{ authStore.user?.profile?.phone || 'ยังไม่ได้ระบุ' }}
+                {{ authStore?.user?.profile?.phone || "ยังไม่ได้ระบุ" }}
               </p>
             </div>
             <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">คะแนนผู้ขาย</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                คะแนนผู้ขาย
+              </p>
               <p class="font-medium text-gray-900 dark:text-white">
-                <template v-if="authStore.user?.rating?.asSeller?.count > 0">
-                  {{ authStore.user.rating.asSeller.average.toFixed(1) }} / 5
-                  ({{ authStore.user.rating.asSeller.count }} รีวิว)
+                <template
+                  v-if="authStore?.user?.rating?.asSeller?.count || 0 > 0"
+                >
+                  {{ authStore?.user?.rating?.asSeller?.average.toFixed(1) }} /
+                  5 ({{ authStore?.user?.rating?.asSeller?.count }} รีวิว)
                 </template>
-                <template v-else>
-                  ยังไม่มีรีวิว
-                </template>
+                <template v-else> ยังไม่มีรีวิว </template>
               </p>
             </div>
           </div>
@@ -215,8 +222,7 @@
 <script setup lang="ts">
 const transactionStore = useTransactionStore();
 const authStore = useAuthStore();
-const toast = useToast();
-const router = useRouter();
+const alert = useAlert();
 
 const form = reactive({
   product: {
@@ -270,18 +276,12 @@ const formatNumber = (num: number) => {
 const onSubmit = async () => {
   // Validation
   if (!form.product.name || !form.product.description || !form.product.price) {
-    toast.add({
-      title: "กรุณากรอกข้อมูลให้ครบถ้วน",
-      color: "red",
-    });
+    alert.error("กรุณากรอกข้อมูลให้ครบถ้วน");
     return;
   }
 
   if (form.product.images.length === 0) {
-    toast.add({
-      title: "กรุณาเพิ่มรูปภาพสินค้าอย่างน้อย 1 รูป",
-      color: "red",
-    });
+    alert.error("กรุณาเพิ่มรูปภาพสินค้าอย่างน้อย 1 รูป");
     return;
   }
 
@@ -294,19 +294,13 @@ const onSubmit = async () => {
 
     const transaction = await transactionStore.createTransaction(payload);
 
-    toast.add({
-      title: "สร้างรายการสำเร็จ",
-      description: `เลขที่รายการ: ${transaction.transactionNumber}`,
-      color: "green",
-    });
+    alert.success(
+      `สร้างรายการสำเร็จ! เลขที่รายการ: ${transaction.transactionNumber}`,
+    );
 
     router.push(`/transactions/${transaction.id}`);
   } catch (error: any) {
-    toast.add({
-      title: "เกิดข้อผิดพลาด",
-      description: error.data?.message || "ไม่สามารถสร้างรายการได้",
-      color: "red",
-    });
+    alert.error(error.data?.message || "ไม่สามารถสร้างรายการได้");
   } finally {
     isLoading.value = false;
   }

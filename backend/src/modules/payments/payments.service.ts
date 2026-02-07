@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  PaginatedResponse,
+  PaginationQueryDto,
+} from '../../common/dto/pagination.dto';
 import { TransactionStatus } from '../../common/enums/transaction-status.enum';
 import { ITransactionDocument } from '../../common/interfaces/transaction.interface';
-import {
-  PaginationQueryDto,
-  PaginatedResponse,
-} from '../../common/dto/pagination.dto';
 import { NotificationsService } from '../notifications/notifications.service';
-import { TransactionsService } from '../transactions/transactions.service';
 import { Transaction } from '../transactions/schemas/transaction.schema';
+import { TransactionsService } from '../transactions/transactions.service';
 import { SubmitPaymentDto } from './dto/submit-payment.dto';
 import { PaymentDeadline } from './interfaces/payment-deadline.interface';
 import { PaymentDetails } from './interfaces/payment-details.interface';
@@ -34,7 +34,7 @@ export class PaymentsService {
     );
 
     // Verify user is the buyer
-    if (transaction.buyer.userId.toString() !== userId) {
+    if (transaction.buyer?.userId.toString() !== userId) {
       throw new BadRequestException('Only buyer can submit payment');
     }
 
@@ -98,8 +98,8 @@ export class PaymentsService {
     const transaction = await this.transactionsService.findOne(transactionId);
 
     // Verify user is part of transaction
-    const isBuyer = transaction.buyer.userId.toString() === userId;
-    const isSeller = transaction.seller.userId.toString() === userId;
+    const isBuyer = transaction.buyer?.userId.toString() === userId;
+    const isSeller = transaction.seller?.userId.toString() === userId;
 
     if (!isBuyer && !isSeller) {
       throw new BadRequestException(
@@ -162,7 +162,7 @@ export class PaymentsService {
     const transaction = await this.transactionsService.findOne(transactionId);
 
     // Verify user is the buyer
-    if (transaction.buyer.userId.toString() !== userId) {
+    if (transaction.buyer?.userId.toString() !== userId) {
       throw new BadRequestException('Only buyer can cancel payment');
     }
 
@@ -193,7 +193,7 @@ export class PaymentsService {
     const transaction = await this.transactionsService.findOne(transactionId);
 
     // Verify user is the buyer
-    if (transaction.buyer.userId.toString() !== userId) {
+    if (transaction.buyer?.userId.toString() !== userId) {
       throw new BadRequestException('Only buyer can request refund');
     }
 
@@ -411,7 +411,7 @@ export class PaymentsService {
     const transaction = await this.transactionsService.findOne(transactionId);
 
     // Verify user is the buyer
-    if (transaction.buyer.userId.toString() !== userId) {
+    if (transaction.buyer?.userId.toString() !== userId) {
       throw new BadRequestException('Only buyer can resubmit payment');
     }
 

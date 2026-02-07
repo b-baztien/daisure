@@ -1,7 +1,7 @@
 import { Client, TextMessage } from '@line/bot-sdk';
 import { Injectable } from '@nestjs/common';
-import { TransactionsService } from '../../transactions/transactions.service';
 import { Transaction } from '../../transactions/schemas/transaction.schema';
+import { TransactionsService } from '../../transactions/transactions.service';
 import { UsersService } from '../../users/users.service';
 
 @Injectable()
@@ -203,7 +203,7 @@ export class MessageHandler {
           `สถานะ: ${this.getStatusText(transaction.status)}\n` +
           `ราคา: ฿${transaction.payment.totalAmount.toLocaleString()}\n\n` +
           `ผู้ขาย: ${transaction.seller.displayName}\n` +
-          `ผู้ซื้อ: ${transaction.buyer.displayName}`,
+          `ผู้ซื้อ: ${transaction.buyer?.displayName}`,
       };
 
       await client.replyMessage(replyToken, message);

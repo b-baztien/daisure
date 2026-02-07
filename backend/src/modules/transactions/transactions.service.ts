@@ -290,7 +290,7 @@ export class TransactionsService {
     const transaction = await this.findOne(id);
 
     // Verify user is the buyer
-    if (transaction.buyer.userId.toString() !== userId) {
+    if (transaction.buyer?.userId.toString() !== userId) {
       throw new BadRequestException('Only buyer can confirm delivery');
     }
 
@@ -318,9 +318,9 @@ export class TransactionsService {
 
     // Determine who initiated
     let initiatedBy: 'buyer' | 'seller';
-    if (transaction.buyer.userId.toString() === userId) {
+    if (transaction.buyer?.userId.toString() === userId) {
       initiatedBy = 'buyer';
-    } else if (transaction.seller.userId.toString() === userId) {
+    } else if (transaction.seller?.userId.toString() === userId) {
       initiatedBy = 'seller';
     } else {
       throw new BadRequestException('User not part of this transaction');
@@ -453,8 +453,8 @@ export class TransactionsService {
     const transaction = await this.findOne(transactionId);
 
     // Check if user can cancel
-    const isBuyer = transaction.buyer.userId.toString() === userId;
-    const isSeller = transaction.seller.userId.toString() === userId;
+    const isBuyer = transaction.buyer?.userId.toString() === userId;
+    const isSeller = transaction.seller?.userId.toString() === userId;
 
     if (!isBuyer && !isSeller) {
       throw new BadRequestException(
