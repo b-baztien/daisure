@@ -16,7 +16,7 @@
         สร้างรายการซื้อขาย
       </h1>
       <p class="text-gray-600 dark:text-gray-400 mt-1">
-        กรอกข้อมูลสินค้าและผู้ขายที่ต้องการซื้อ
+        กรอกข้อมูลสินค้าที่ต้องการขาย
       </p>
     </div>
 
@@ -101,71 +101,49 @@
         </div>
       </UCard>
 
+      <!-- Seller Info (auto-populated from logged-in user) -->
       <UCard>
         <template #header>
           <h2 class="text-xl font-semibold">ข้อมูลผู้ขาย</h2>
         </template>
 
         <div class="space-y-4">
-          <UFormField label="ID ผู้ขาย" required>
-            <UInput
-              v-model="form.sellerId"
-              placeholder="65a1b2c3d4e5f6g7h8i9j0k1"
+          <div class="flex items-center gap-4">
+            <UAvatar
+              :src="authStore.user?.profile?.pictureUrl"
+              :alt="authStore.user?.profile?.displayName"
+              size="lg"
             />
-            <template #hint>
-              <span class="text-sm">หา ID จากโปรไฟล์ผู้ขาย</span>
-            </template>
-          </UFormField>
-        </div>
-      </UCard>
-
-      <UCard>
-        <template #header>
-          <h2 class="text-xl font-semibold">ที่อยู่จัดส่ง</h2>
-        </template>
-
-        <div class="space-y-4">
-          <UFormField label="ชื่อผู้รับ" required>
-            <UInput
-              v-model="form.shippingAddress.recipientName"
-              placeholder="สมชาย ใจดี"
-            />
-          </UFormField>
-
-          <UFormField label="เบอร์โทร" required>
-            <UInput
-              v-model="form.shippingAddress.phone"
-              placeholder="08X-XXX-XXXX"
-            />
-          </UFormField>
-
-          <UFormField label="ที่อยู่" required>
-            <UTextarea
-              v-model="form.shippingAddress.address"
-              placeholder="123 ถนนสุขุมวิท"
-              :rows="3"
-            />
-          </UFormField>
-
-          <div class="grid md:grid-cols-3 gap-4">
-            <UFormField label="ตำบล/แขวง" required>
-              <UInput v-model="form.shippingAddress.subDistrict" />
-            </UFormField>
-            <UFormField label="อำเภอ/เขต" required>
-              <UInput v-model="form.shippingAddress.district" />
-            </UFormField>
-            <UFormField label="จังหวัด" required>
-              <UInput v-model="form.shippingAddress.province" />
-            </UFormField>
+            <div>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ authStore.user?.profile?.displayName || '-' }}
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                {{ authStore.user?.auth?.email || authStore.user?.profile?.email || '-' }}
+              </p>
+            </div>
           </div>
 
-          <!-- Postal Code -->
-          <UFormField label="รหัสไปรษณีย์" required>
-            <UInput
-              v-model="form.shippingAddress.postalCode"
-              placeholder="10110"
-            />
-          </UFormField>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div>
+              <p class="text-sm text-gray-500 dark:text-gray-400">เบอร์โทร</p>
+              <p class="font-medium text-gray-900 dark:text-white">
+                {{ authStore.user?.profile?.phone || 'ยังไม่ได้ระบุ' }}
+              </p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 dark:text-gray-400">คะแนนผู้ขาย</p>
+              <p class="font-medium text-gray-900 dark:text-white">
+                <template v-if="authStore.user?.rating?.asSeller?.count > 0">
+                  {{ authStore.user.rating.asSeller.average.toFixed(1) }} / 5
+                  ({{ authStore.user.rating.asSeller.count }} รีวิว)
+                </template>
+                <template v-else>
+                  ยังไม่มีรีวิว
+                </template>
+              </p>
+            </div>
+          </div>
         </div>
       </UCard>
 
@@ -249,16 +227,6 @@ const form = reactive({
     price: null as number | null,
     sourceUrl: "",
   },
-  sellerId: "",
-  shippingAddress: {
-    recipientName: "",
-    phone: "",
-    address: "",
-    subDistrict: "",
-    district: "",
-    province: "",
-    postalCode: "",
-  },
   shippingFee: 0,
 });
 
@@ -320,8 +288,8 @@ const onSubmit = async () => {
   isLoading.value = true;
   try {
     const payload = {
-      ...form,
-      buyerId: authStore.user?.id,
+      product: form.product,
+      shippingFee: form.shippingFee,
     };
 
     const transaction = await transactionStore.createTransaction(payload);
