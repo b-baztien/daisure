@@ -49,10 +49,10 @@ export class LineNotificationService {
     }
 
     const recipients: string[] = [];
-    if (transaction.buyer.lineUserId) {
+    if (transaction.buyer?.lineUserId) {
       recipients.push(transaction.buyer.lineUserId);
     }
-    if (transaction.seller.lineUserId) {
+    if (transaction.seller?.lineUserId) {
       recipients.push(transaction.seller.lineUserId);
     }
 
