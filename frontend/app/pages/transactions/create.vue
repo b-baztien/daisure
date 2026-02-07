@@ -56,7 +56,7 @@
             </UInput>
           </UFormField>
 
-          <UFormField label="ลิงค์ต้นทาง">
+          <UFormField label="ลิงค์ต้นทาง (ถ้ามี)">
             <UInput
               v-model="form.product.sourceUrl"
               placeholder="https://facebook.com/..."
@@ -256,6 +256,6 @@ async function onSubmit() {
     `สร้างรายการสำเร็จ! เลขที่รายการ: ${data.value.transactionNumber}`,
   );
 
-  return navigateTo(`/transactions/${data.value.id}`);
+  return navigateTo(`/transactions/${data.value._id}`);
 }
 </script>

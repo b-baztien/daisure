@@ -3,14 +3,17 @@ export interface Transaction {
   transactionNumber: string;
   product: Product;
   seller: Seller;
-  buyer?: Buyer;
+  buyer: Seller;
   payment: Payment;
-  status: string;
+  status: TransactionStatus;
   timeline: Timeline[];
   metadata: Metadata;
   createdAt: string;
   updatedAt: string;
   __v: number;
+
+  dispute?: any;
+  admin?: any;
 }
 
 interface Metadata {
@@ -25,6 +28,7 @@ interface Timeline {
   actorId: string;
   platform: string;
   timestamp: string;
+  note?: string;
 }
 
 interface Payment {
@@ -37,14 +41,8 @@ interface Payment {
 interface Seller {
   userId: UserId;
   displayName: string;
+  lineUserId: string;
   phone?: string;
-  lineUserId: string;
-}
-
-interface Buyer {
-  userId: UserId;
-  displayName: string;
-  lineUserId: string;
 }
 
 interface UserId {

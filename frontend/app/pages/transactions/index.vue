@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
@@ -16,58 +15,48 @@
       </UButton>
     </div>
 
-    <!-- Filters -->
     <UCard class="mb-6">
       <div class="grid md:grid-cols-4 gap-4">
-        <!-- Search -->
         <UInput
           v-model="search"
           placeholder="ค้นหารายการ..."
           icon="i-heroicons-magnifying-glass"
         />
 
-        <!-- Status Filter -->
         <USelectMenu
           v-model="statusFilter"
           :options="statusOptions"
           placeholder="สถานะทั้งหมด"
         />
 
-        <!-- Role Filter -->
         <USelectMenu
           v-model="roleFilter"
           :options="roleOptions"
           placeholder="ทั้งหมด"
         />
 
-        <!-- Reset -->
-        <UButton color="gray" variant="outline" @click="resetFilters">
-          รีเซ็ตตัวกรอง
-        </UButton>
+        <UButton color="neutral" variant="outline"> รีเซ็ตตัวกรอง </UButton>
       </div>
     </UCard>
 
-    <!-- Transactions List -->
-    <div v-if="isLoading" class="space-y-4">
+    <div v-if="pending" class="space-y-4">
       <USkeleton class="h-32" v-for="i in 3" :key="i" />
     </div>
 
-    <div v-else-if="filteredTransactions.length > 0" class="space-y-4">
+    <div v-else-if="transactions?.data?.length > 0" class="space-y-4">
       <UCard
-        v-for="transaction in filteredTransactions"
-        :key="transaction.id"
+        v-for="(transaction, index) in transactions?.data || []"
+        :key="index"
         class="hover:shadow-lg transition-shadow cursor-pointer"
-        @click="navigateTo(`/transactions/${transaction.id}`)"
+        @click="navigateTo(`/transactions/${transaction._id}`)"
       >
         <div class="flex items-center gap-4">
-          <!-- Image -->
           <img
             :src="transaction.product.images[0]"
             :alt="transaction.product.name"
             class="w-20 h-20 object-cover rounded-lg"
           />
 
-          <!-- Info -->
           <div class="flex-1 min-w-0">
             <div class="flex items-start justify-between mb-2">
               <div class="flex-1 min-w-0">
@@ -80,12 +69,7 @@
                   {{ transaction.transactionNumber }}
                 </p>
               </div>
-              <UBadge
-                :color="getStatusColor(transaction.status)"
-                variant="soft"
-              >
-                {{ getStatusText(transaction.status) }}
-              </UBadge>
+              <BadgeTransaction :status="transaction.status" />
             </div>
 
             <div class="flex items-center justify-between">
@@ -98,7 +82,6 @@
             </div>
           </div>
 
-          <!-- Arrow -->
           <UIcon
             name="i-heroicons-chevron-right"
             class="w-5 h-5 text-gray-400"
@@ -107,7 +90,6 @@
       </UCard>
     </div>
 
-    <!-- Empty State -->
     <UCard v-else>
       <div class="text-center py-12">
         <UIcon
@@ -127,12 +109,12 @@
 </template>
 
 <script setup lang="ts">
-const transactionStore = useTransactionStore();
-const { filteredTransactions, isLoading } = storeToRefs(transactionStore);
-
 const search = ref("");
 const statusFilter = ref(null);
 const roleFilter = ref(null);
+
+const { data: transactions, pending } =
+  await useTransactionService().getTransactions();
 
 const statusOptions = [
   { label: "ทั้งหมด", value: null },
@@ -149,30 +131,6 @@ const roleOptions = [
   { label: "ฉันเป็นผู้ขาย", value: "seller" },
 ];
 
-const getStatusColor = (status: string) => {
-  const colors = {
-    pending_payment: "yellow",
-    payment_verification: "blue",
-    awaiting_shipment: "orange",
-    shipped: "purple",
-    completed: "green",
-    disputed: "red",
-  };
-  return colors[status] || "gray";
-};
-
-const getStatusText = (status: string) => {
-  const texts = {
-    pending_payment: "รอชำระเงิน",
-    payment_verification: "รอตรวจสอบ",
-    awaiting_shipment: "รอจัดส่ง",
-    shipped: "จัดส่งแล้ว",
-    completed: "สำเร็จ",
-    disputed: "มีข้อพิพาท",
-  };
-  return texts[status] || status;
-};
-
 const formatNumber = (num: number) => {
   return new Intl.NumberFormat("th-TH").format(num);
 };
@@ -184,23 +142,4 @@ const formatDate = (date: string) => {
     day: "numeric",
   });
 };
-
-const resetFilters = () => {
-  search.value = "";
-  statusFilter.value = null;
-  roleFilter.value = null;
-  transactionStore.resetFilters();
-};
-
-// Watch filters
-watch([search, statusFilter, roleFilter], () => {
-  transactionStore.setFilter("search", search.value);
-  transactionStore.setFilter("status", statusFilter.value);
-  transactionStore.setFilter("role", roleFilter.value);
-});
-
-// Fetch on mount
-onMounted(() => {
-  transactionStore.fetchTransactions();
-});
 </script>

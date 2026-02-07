@@ -180,17 +180,6 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  // Check if user needs to verify (for protected routes)
-  function requireAuth() {
-    if (!isAuthenticated.value) {
-      if (import.meta.client) {
-        router.push("/auth/login");
-      }
-      return false;
-    }
-    return true;
-  }
-
   // Check if user is admin (for admin routes)
   function requireAdmin() {
     if (!isAdmin.value) {
@@ -219,7 +208,6 @@ export const useAuthStore = defineStore("auth", () => {
     updateProfile,
     addBankAccount,
     fetchBankAccounts,
-    requireAuth,
     requireAdmin,
   };
 });

@@ -1,9 +1,5 @@
-<!-- ========================================
-File: pages/transactions/[id].vue (COMPLETE)
-======================================== -->
 <template>
   <div v-if="transaction" class="max-w-6xl mx-auto">
-    <!-- Header -->
     <div class="mb-6">
       <UButton
         to="/transactions"
@@ -25,20 +21,12 @@ File: pages/transactions/[id].vue (COMPLETE)
           </p>
         </div>
 
-        <UBadge
-          :color="getStatusColor(transaction.status)"
-          variant="soft"
-          size="lg"
-        >
-          {{ getStatusText(transaction.status) }}
-        </UBadge>
+        <BadgeTransaction :status="transaction.status" />
       </div>
     </div>
 
     <div class="grid lg:grid-cols-3 gap-6">
-      <!-- Left Column (2/3) -->
       <div class="lg:col-span-2 space-y-6">
-        <!-- Product Images -->
         <UCard>
           <div class="grid grid-cols-2 gap-4">
             <img
@@ -52,7 +40,6 @@ File: pages/transactions/[id].vue (COMPLETE)
           </div>
         </UCard>
 
-        <!-- Product Details -->
         <UCard>
           <template #header>
             <h2 class="text-xl font-semibold">รายละเอียดสินค้า</h2>
@@ -101,8 +88,7 @@ File: pages/transactions/[id].vue (COMPLETE)
           </div>
         </UCard>
 
-        <!-- Shipping Info (if shipped) -->
-        <UCard v-if="transaction.shipping?.trackingNumber">
+        <!-- <UCard v-if="transaction.shipping?.trackingNumber">
           <template #header>
             <div class="flex items-center justify-between">
               <h2 class="text-xl font-semibold">ข้อมูลการจัดส่ง</h2>
@@ -113,7 +99,6 @@ File: pages/transactions/[id].vue (COMPLETE)
           </template>
 
           <div class="space-y-4">
-            <!-- Tracking Number -->
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
                 หมายเลขพัสดุ
@@ -132,7 +117,6 @@ File: pages/transactions/[id].vue (COMPLETE)
               </div>
             </div>
 
-            <!-- Track Button -->
             <UButton
               v-if="transaction.shipping.trackingUrl"
               :to="transaction.shipping.trackingUrl"
@@ -144,7 +128,6 @@ File: pages/transactions/[id].vue (COMPLETE)
               ติดตามพัสดุ
             </UButton>
 
-            <!-- Dates -->
             <div class="grid grid-cols-2 gap-4 pt-4">
               <div>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -164,9 +147,8 @@ File: pages/transactions/[id].vue (COMPLETE)
               </div>
             </div>
           </div>
-        </UCard>
+        </UCard> -->
 
-        <!-- Timeline -->
         <UCard>
           <template #header>
             <h2 class="text-xl font-semibold">ประวัติการทำรายการ</h2>
@@ -178,7 +160,6 @@ File: pages/transactions/[id].vue (COMPLETE)
               :key="index"
               class="flex gap-4"
             >
-              <!-- Icon -->
               <div class="flex flex-col items-center">
                 <div
                   class="w-10 h-10 rounded-full flex items-center justify-center"
@@ -192,7 +173,6 @@ File: pages/transactions/[id].vue (COMPLETE)
                 />
               </div>
 
-              <!-- Content -->
               <div class="flex-1 pb-8">
                 <p class="font-semibold text-gray-900 dark:text-white">
                   {{ item.description }}
@@ -211,8 +191,7 @@ File: pages/transactions/[id].vue (COMPLETE)
           </div>
         </UCard>
 
-        <!-- Dispute Info (if disputed) -->
-        <UCard v-if="transaction.dispute?.isDisputed" color="red">
+        <!-- <UCard v-if="transaction.dispute?.isDisputed" color="red">
           <template #header>
             <div class="flex items-center gap-2">
               <UIcon
@@ -273,12 +252,10 @@ File: pages/transactions/[id].vue (COMPLETE)
               </UAlert>
             </div>
           </div>
-        </UCard>
+        </UCard> -->
       </div>
 
-      <!-- Right Column (1/3) -->
       <div class="space-y-6">
-        <!-- Payment Summary -->
         <UCard>
           <template #header>
             <h2 class="text-lg font-semibold">สรุปยอดชำระ</h2>
@@ -306,8 +283,7 @@ File: pages/transactions/[id].vue (COMPLETE)
             </div>
           </div>
 
-          <!-- Payment Status -->
-          <div
+          <!-- <div
             v-if="transaction.payment.buyerPayment"
             class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
           >
@@ -324,20 +300,18 @@ File: pages/transactions/[id].vue (COMPLETE)
               ชำระเมื่อ:
               {{ formatDateTime(transaction.payment.buyerPayment.paidAt) }}
             </p>
-          </div>
+          </div> -->
         </UCard>
 
-        <!-- Actions -->
         <UCard>
           <template #header>
             <h2 class="text-lg font-semibold">การดำเนินการ</h2>
           </template>
 
           <div class="space-y-3">
-            <!-- Pay Button -->
             <UButton
               v-if="transaction.status === 'pending_payment' && isBuyer"
-              :to="`/payments/${transaction.id}/instructions`"
+              :to="`/payments/${transaction._id}/instructions`"
               block
               size="lg"
               icon="i-heroicons-banknotes"
@@ -345,11 +319,10 @@ File: pages/transactions/[id].vue (COMPLETE)
               ชำระเงิน
             </UButton>
 
-            <!-- Upload Slip Button -->
             <UButton
               v-if="transaction.status === 'pending_payment' && isBuyer"
-              :to="`/payments/${transaction.id}/submit`"
-              color="green"
+              :to="`/payments/${transaction._id}/submit`"
+              color="success"
               variant="outline"
               block
               icon="i-heroicons-photo"
@@ -357,10 +330,9 @@ File: pages/transactions/[id].vue (COMPLETE)
               อัพโหลดสลิป
             </UButton>
 
-            <!-- Ship Button -->
             <UButton
               v-if="transaction.status === 'awaiting_shipment' && isSeller"
-              color="purple"
+              color="warning"
               block
               size="lg"
               icon="i-heroicons-truck"
@@ -369,24 +341,21 @@ File: pages/transactions/[id].vue (COMPLETE)
               จัดส่งสินค้า
             </UButton>
 
-            <!-- Confirm Delivery -->
             <UButton
               v-if="transaction.status === 'delivered' && isBuyer"
-              color="green"
+              color="success"
               block
               size="lg"
               icon="i-heroicons-check-circle"
               @click="confirmDelivery"
-              :loading="isConfirming"
             >
               ยืนยันรับสินค้า
             </UButton>
 
-            <!-- Review Button -->
             <UButton
               v-if="transaction.status === 'completed' && !hasReviewed"
-              :to="`/reviews/create/${transaction.id}`"
-              color="yellow"
+              :to="`/reviews/create/${transaction._id}`"
+              color="success"
               variant="outline"
               block
               icon="i-heroicons-star"
@@ -394,10 +363,9 @@ File: pages/transactions/[id].vue (COMPLETE)
               เขียนรีวิว
             </UButton>
 
-            <!-- Dispute Button -->
             <UButton
               v-if="canDispute"
-              color="red"
+              color="error"
               variant="outline"
               block
               icon="i-heroicons-exclamation-triangle"
@@ -406,7 +374,6 @@ File: pages/transactions/[id].vue (COMPLETE)
               แจ้งปัญหา
             </UButton>
 
-            <!-- Cancel Button -->
             <UButton
               v-if="canCancel"
               color="neutral"
@@ -420,14 +387,12 @@ File: pages/transactions/[id].vue (COMPLETE)
           </div>
         </UCard>
 
-        <!-- Participants -->
         <UCard>
           <template #header>
             <h2 class="text-lg font-semibold">ผู้เกี่ยวข้อง</h2>
           </template>
 
           <div class="space-y-4">
-            <!-- Seller -->
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
                 ผู้ขาย
@@ -442,7 +407,7 @@ File: pages/transactions/[id].vue (COMPLETE)
                     {{ transaction.seller.phone }}
                   </p>
                 </div>
-                <UBadge v-if="isSeller" color="green" variant="soft">
+                <UBadge v-if="isSeller" color="success" variant="soft">
                   คุณ
                 </UBadge>
               </div>
@@ -451,7 +416,6 @@ File: pages/transactions/[id].vue (COMPLETE)
             <template v-if="transaction.buyer">
               <UDivider />
 
-              <!-- Buyer -->
               <div>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
                   ผู้ซื้อ
@@ -473,7 +437,6 @@ File: pages/transactions/[id].vue (COMPLETE)
               </div>
             </template>
 
-            <!-- Admin (if assigned) -->
             <template v-if="transaction.admin">
               <UDivider />
               <div>
@@ -486,7 +449,7 @@ File: pages/transactions/[id].vue (COMPLETE)
                     <p class="font-semibold">
                       {{ transaction.admin.displayName }}
                     </p>
-                    <UBadge color="purple" variant="soft" size="xs">
+                    <UBadge color="secondary" variant="soft" size="xs">
                       Admin
                     </UBadge>
                   </div>
@@ -495,127 +458,11 @@ File: pages/transactions/[id].vue (COMPLETE)
             </template>
           </div>
         </UCard>
-
-        <!-- Shipping Address -->
-        <UCard v-if="transaction.buyer?.shippingAddress">
-          <template #header>
-            <h2 class="text-lg font-semibold">ที่อยู่จัดส่ง</h2>
-          </template>
-
-          <div class="text-sm space-y-2">
-            <p class="font-semibold">
-              {{ transaction.buyer.shippingAddress.recipientName }}
-            </p>
-            <p class="text-gray-600 dark:text-gray-400">
-              {{ transaction.buyer.shippingAddress.phone }}
-            </p>
-            <p class="text-gray-600 dark:text-gray-400">
-              {{ transaction.buyer.shippingAddress.address }}<br />
-              {{ transaction.buyer.shippingAddress.subDistrict }}
-              {{ transaction.buyer.shippingAddress.district }}<br />
-              {{ transaction.buyer.shippingAddress.province }}
-              {{ transaction.buyer.shippingAddress.postalCode }}
-            </p>
-          </div>
-        </UCard>
       </div>
     </div>
-
-    <!-- Modals -->
-    <!-- Shipping Modal -->
-    <UModal v-model="showShippingModal">
-      <UCard>
-        <template #header>
-          <h3 class="text-lg font-semibold">บันทึกข้อมูลการจัดส่ง</h3>
-        </template>
-
-        <UForm :state="shippingForm" @submit="submitShipping" class="space-y-4">
-          <UFormField label="วิธีการจัดส่ง" required>
-            <USelectMenu
-              v-model="shippingForm.method"
-              :options="shippingMethods"
-              placeholder="เลือกบริษัทขนส่ง"
-            />
-          </UFormField>
-
-          <UFormField label="หมายเลขพัสดุ" required>
-            <UInput
-              v-model="shippingForm.trackingNumber"
-              placeholder="KRYTH123456789"
-            />
-          </UFormField>
-
-          <UFormField label="ลิงค์ติดตามพัสดุ">
-            <UInput
-              v-model="shippingForm.trackingUrl"
-              placeholder="https://track.kerryexpress.com/..."
-            />
-          </UFormField>
-
-          <div class="flex gap-2 justify-end">
-            <UButton
-              color="neutral"
-              variant="outline"
-              @click="showShippingModal = false"
-            >
-              ยกเลิก
-            </UButton>
-            <UButton type="submit" :loading="isShipping"> บันทึก </UButton>
-          </div>
-        </UForm>
-      </UCard>
-    </UModal>
-
-    <!-- Dispute Modal -->
-    <UModal v-model="showDisputeModal">
-      <UCard>
-        <template #header>
-          <h3 class="text-lg font-semibold text-red-600">แจ้งปัญหา</h3>
-        </template>
-
-        <UForm :state="disputeForm" @submit="submitDispute" class="space-y-4">
-          <UFormField label="เหตุผล" required>
-            <USelectMenu
-              v-model="disputeForm.reason"
-              :options="disputeReasons"
-              placeholder="เลือกเหตุผล"
-            />
-          </UFormField>
-
-          <UFormField label="รายละเอียด" required>
-            <UTextarea
-              v-model="disputeForm.description"
-              placeholder="อธิบายปัญหาที่พบ..."
-              :rows="4"
-            />
-          </UFormField>
-
-          <div class="flex gap-2 justify-end">
-            <UButton
-              color="neutral"
-              variant="outline"
-              @click="showDisputeModal = false"
-            >
-              ยกเลิก
-            </UButton>
-            <UButton type="submit" color="red" :loading="isDisputing">
-              ส่งเรื่อง
-            </UButton>
-          </div>
-        </UForm>
-      </UCard>
-    </UModal>
-
-    <!-- Image Modal -->
-    <UModal v-model="showImageModal" :ui="{ width: 'max-w-4xl' }">
-      <div class="p-4">
-        <img :src="selectedImage" class="w-full h-auto rounded-lg" />
-      </div>
-    </UModal>
   </div>
 
-  <!-- Loading State -->
-  <div v-else-if="isLoading" class="max-w-6xl mx-auto">
+  <div v-else-if="pending" class="max-w-6xl mx-auto">
     <USkeleton class="h-96 mb-6" />
     <div class="grid lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 space-y-6">
@@ -629,7 +476,6 @@ File: pages/transactions/[id].vue (COMPLETE)
     </div>
   </div>
 
-  <!-- Error State -->
   <UCard v-else>
     <div class="text-center py-12">
       <UIcon
@@ -647,13 +493,17 @@ File: pages/transactions/[id].vue (COMPLETE)
 
 <script setup lang="ts">
 const route = useRoute();
-const router = useRouter();
 const transactionStore = useTransactionStore();
-const authStore = useAuthStore();
-const toast = useToast();
+
+const alert = useAlert();
+
+const profileStore = useProfileStore();
+const { profile } = storeToRefs(profileStore);
 
 const id = useRouteParams<string>("id");
-const { data: transaction } = useTransactionService().getTransaction(id.value);
+const { data: transaction, pending } = useTransactionService().getTransaction(
+  id.value,
+);
 
 // States
 const showShippingModal = ref(false);
@@ -661,30 +511,12 @@ const showDisputeModal = ref(false);
 const showImageModal = ref(false);
 const showCancelModal = ref(false);
 const selectedImage = ref("");
-const isConfirming = ref(false);
-const isShipping = ref(false);
-const isDisputing = ref(false);
 const hasReviewed = ref(false);
-
-// Forms
-const shippingForm = reactive({
-  method: "",
-  trackingNumber: "",
-  trackingUrl: "",
-});
 
 const disputeForm = reactive({
   reason: "",
   description: "",
 });
-
-const shippingMethods = [
-  "Kerry Express",
-  "Flash Express",
-  "Thailand Post",
-  "J&T Express",
-  "Lalamove",
-];
 
 const disputeReasons = [
   "สินค้าไม่ตรงตามรูป",
@@ -694,14 +526,10 @@ const disputeReasons = [
   "อื่นๆ",
 ];
 
-// Computed
-const isBuyer = computed(
-  () => transaction.value?.buyer?.userId === authStore.user?.id,
-);
-
 const isSeller = computed(
-  () => transaction.value?.seller?.userId === authStore.user?.id,
+  () => transaction.value?.seller?.userId._id === profile.value?._id,
 );
+const isBuyer = computed(() => !isSeller.value);
 
 const canDispute = computed(() => {
   if (!transaction.value) return false;
@@ -742,36 +570,8 @@ const formatDateTime = (date: string | Date) => {
   });
 };
 
-const getStatusColor = (status: string) => {
-  const colors = {
-    pending_payment: "yellow",
-    payment_verification: "blue",
-    awaiting_shipment: "orange",
-    shipped: "purple",
-    delivered: "cyan",
-    completed: "green",
-    disputed: "red",
-    cancelled: "gray",
-  };
-  return colors[status] || "gray";
-};
-
-const getStatusText = (status: string) => {
-  const texts = {
-    pending_payment: "รอชำระเงิน",
-    payment_verification: "รอตรวจสอบ",
-    awaiting_shipment: "รอจัดส่ง",
-    shipped: "จัดส่งแล้ว",
-    delivered: "ส่งถึงแล้ว",
-    completed: "สำเร็จ",
-    disputed: "มีข้อพิพาท",
-    cancelled: "ยกเลิก",
-  };
-  return texts[status] || status;
-};
-
 const getTimelineColor = (status: string) => {
-  const colors = {
+  const colors: Record<string, string> = {
     initiated: "bg-blue-100 text-blue-600",
     pending_payment: "bg-yellow-100 text-yellow-600",
     payment_verification: "bg-blue-100 text-blue-600",
@@ -785,7 +585,7 @@ const getTimelineColor = (status: string) => {
 };
 
 const getTimelineIcon = (status: string) => {
-  const icons = {
+  const icons: Record<string, string> = {
     initiated: "i-heroicons-plus-circle",
     pending_payment: "i-heroicons-banknotes",
     payment_verification: "i-heroicons-magnifying-glass",
@@ -799,27 +599,12 @@ const getTimelineIcon = (status: string) => {
 };
 
 const getResolutionText = (decision: string) => {
-  const texts = {
+  const texts: Record<string, string> = {
     refund_buyer: "คืนเงินให้ผู้ซื้อ",
     release_to_seller: "โอนเงินให้ผู้ขาย",
     partial_refund: "คืนเงินบางส่วน",
   };
   return texts[decision] || decision;
-};
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await navigator.clipboard.writeText(text);
-    toast.add({
-      title: "คัดลอกแล้ว",
-      color: "green",
-    });
-  } catch (error) {
-    toast.add({
-      title: "ไม่สามารถคัดลอกได้",
-      color: "red",
-    });
-  }
 };
 
 const openImageModal = (imageUrl: string) => {
@@ -828,74 +613,28 @@ const openImageModal = (imageUrl: string) => {
 };
 
 const confirmDelivery = async () => {
-  isConfirming.value = true;
   try {
     await transactionStore.confirmDelivery(
       route.params.id as string,
       "ยืนยันรับสินค้าแล้ว สภาพสมบูรณ์",
     );
 
-    toast.add({
-      title: "ยืนยันรับสินค้าสำเร็จ",
-      description: "ระบบจะโอนเงินให้ผู้ขายภายใน 24 ชั่วโมง",
-      color: "green",
-    });
+    alert.success(
+      "ยืนยันรับสินค้าสำเร็จ ระบบจะโอนเงินให้ผู้ขายภายใน 24 ชั่วโมง",
+    );
   } catch (error: any) {
-    toast.add({
-      title: "เกิดข้อผิดพลาด",
-      description: error.data?.message || "ไม่สามารถยืนยันได้",
-      color: "red",
-    });
-  } finally {
-    isConfirming.value = false;
-  }
-};
-
-const submitShipping = async () => {
-  if (!shippingForm.method || !shippingForm.trackingNumber) {
-    toast.add({
-      title: "กรุณากรอกข้อมูลให้ครบถ้วน",
-      color: "red",
-    });
-    return;
-  }
-
-  isShipping.value = true;
-  try {
-    // TODO: Call API to update shipping info
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    toast.add({
-      title: "บันทึกข้อมูลสำเร็จ",
-      description: "ข้อมูลการจัดส่งถูกบันทึกแล้ว",
-      color: "green",
-    });
-
-    showShippingModal.value = false;
-
-    // Refresh transaction
-    await transactionStore.fetchTransaction(route.params.id as string);
-  } catch (error: any) {
-    toast.add({
-      title: "เกิดข้อผิดพลาด",
-      description: error.data?.message || "ไม่สามารถบันทึกได้",
-      color: "red",
-    });
-  } finally {
-    isShipping.value = false;
+    alert.error(
+      error.data?.message || "เกิดข้อผิดพลาด ไม่สามารถยืนยันรับสินค้าได้",
+    );
   }
 };
 
 const submitDispute = async () => {
   if (!disputeForm.reason || !disputeForm.description) {
-    toast.add({
-      title: "กรุณากรอกข้อมูลให้ครบถ้วน",
-      color: "red",
-    });
+    alert.error("กรุณากรอกข้อมูลให้ครบถ้วน");
     return;
   }
 
-  isDisputing.value = true;
   try {
     await transactionStore.createDispute(route.params.id as string, {
       reason: disputeForm.reason,
@@ -903,21 +642,12 @@ const submitDispute = async () => {
       evidence: [],
     });
 
-    toast.add({
-      title: "ส่งเรื่องสำเร็จ",
-      description: "Admin จะตรวจสอบและติดต่อกลับภายใน 48 ชั่วโมง",
-      color: "green",
-    });
-
+    alert.success(
+      "ส่งเรื่องสำเร็จ Admin จะตรวจสอบและติดต่อกลับภายใน 48 ชั่วโมง",
+    );
     showDisputeModal.value = false;
   } catch (error: any) {
-    toast.add({
-      title: "เกิดข้อผิดพลาด",
-      description: error.data?.message || "ไม่สามารถส่งเรื่องได้",
-      color: "red",
-    });
-  } finally {
-    isDisputing.value = false;
+    alert.error(error.data?.message || "ไม่สามารถส่งเรื่องได้");
   }
 };
 </script>

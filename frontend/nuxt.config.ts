@@ -68,7 +68,7 @@ export default defineNuxtConfig({
   },
 
   imports: {
-    dirs: ["types/**", "composables/**"],
+    dirs: ["enums/**", "types/**", "composables/**"],
   },
 
   compatibilityDate: "2025-01-15",

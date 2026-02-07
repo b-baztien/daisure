@@ -1,7 +1,7 @@
 export const useTransactionService = () => {
   return {
     getTransactions: (options: CustomFetchOptions = {}) => {
-      return useCustomFetch<Transaction[]>("/transactions", {
+      return useCustomFetch<ResponsePagination<Transaction>>("/transactions", {
         method: "GET",
         ...options,
       });
