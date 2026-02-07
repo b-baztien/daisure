@@ -20,7 +20,7 @@
       </p>
     </div>
 
-    <UForm :state="form" @submit="onSubmit" class="space-y-6">
+    <UForm :state="form" @submit="onSubmit()" class="space-y-6">
       <UCard>
         <template #header>
           <h2 class="text-xl font-semibold">ข้อมูลสินค้า</h2>
@@ -72,12 +72,21 @@
           </UFormField>
 
           <UFormField class="col-span-full" label="รูปภาพสินค้า" required>
-            <UInput
-              class="w-full"
-              v-model="imageUrl"
-              placeholder="URL รูปภาพ"
-              @keyup.enter="addImage"
-            />
+            <div class="flex">
+              <UInput
+                class="w-full"
+                v-model="imageUrl"
+                placeholder="URL รูปภาพ"
+              />
+              <UButton
+                class="ml-2"
+                color="primary"
+                icon="i-heroicons-plus"
+                @click="addImage"
+                label="เพิ่ม"
+              />
+            </div>
+
             <div
               v-if="form.product.images.length > 0"
               class="grid grid-cols-4 gap-4 mt-4"
@@ -101,7 +110,6 @@
         </div>
       </UCard>
 
-      <!-- Shipping Fee -->
       <UCard>
         <template #header>
           <h2 class="text-xl font-semibold">ค่าจัดส่ง</h2>
@@ -120,7 +128,6 @@
         </UFormField>
       </UCard>
 
-      <!-- Summary -->
       <UCard>
         <template #header>
           <h2 class="text-xl font-semibold">สรุปยอดชำระ</h2>
@@ -153,11 +160,8 @@
         </div>
       </UCard>
 
-      <!-- Submit -->
       <div class="flex gap-4">
-        <UButton type="submit" block :loading="isLoading">
-          สร้างรายการ
-        </UButton>
+        <UButton type="submit" block> สร้างรายการ </UButton>
         <UButton to="/transactions" color="neutral" variant="outline">
           ยกเลิก
         </UButton>
@@ -204,23 +208,22 @@ const totalAmount = computed(() => {
   return price + escrowFee.value + shipping;
 });
 
-const addImage = () => {
+function addImage() {
   if (imageUrl.value) {
     form.product.images.push(imageUrl.value);
     imageUrl.value = "";
   }
-};
+}
 
-const removeImage = (index: number) => {
+function removeImage(index: number) {
   form.product.images.splice(index, 1);
-};
+}
 
-const formatNumber = (num: number) => {
+function formatNumber(num: number) {
   return new Intl.NumberFormat("th-TH").format(num);
-};
+}
 
-const onSubmit = async () => {
-  // Validation
+async function onSubmit() {
   if (!form.product.name || !form.product.description || !form.product.price) {
     alert.error("กรุณากรอกข้อมูลให้ครบถ้วน");
     return;
@@ -231,24 +234,28 @@ const onSubmit = async () => {
     return;
   }
 
-  isLoading.value = true;
-  try {
-    const payload = {
-      product: form.product,
-      shippingFee: form.shippingFee,
-    };
+  const payload = {
+    product: form.product,
+    shippingFee: form.shippingFee,
+  };
 
-    const transaction = await transactionStore.createTransaction(payload);
+  const { data, execute, error } =
+    await useTransactionService().createTransaction({
+      body: payload,
+      immediate: false,
+    });
 
-    alert.success(
-      `สร้างรายการสำเร็จ! เลขที่รายการ: ${transaction.transactionNumber}`,
-    );
+  await execute();
 
-    router.push(`/transactions/${transaction.id}`);
-  } catch (error: any) {
-    alert.error(error.data?.message || "ไม่สามารถสร้างรายการได้");
-  } finally {
-    isLoading.value = false;
+  if (error.value) {
+    useAlert(error.value);
+    return;
   }
-};
+
+  alert.success(
+    `สร้างรายการสำเร็จ! เลขที่รายการ: ${data.value.transactionNumber}`,
+  );
+
+  return navigateTo(`/transactions/${data.value.id}`);
+}
 </script>

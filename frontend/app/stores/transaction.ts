@@ -56,24 +56,6 @@ export const useTransactionStore = defineStore("transaction", () => {
     }
   }
 
-  async function createTransaction(payload: any) {
-    isLoading.value = true;
-    try {
-      const { apiFetch } = useApi();
-      const data = await apiFetch<Transaction>("/transactions", {
-        method: "POST",
-        body: payload,
-      });
-      transactions.value.unshift(data);
-      return data;
-    } catch (error) {
-      console.error("Create transaction error:", error);
-      throw error;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   async function confirmDelivery(id: string, note?: string) {
     isLoading.value = true;
     try {
@@ -158,7 +140,6 @@ export const useTransactionStore = defineStore("transaction", () => {
     completedTransactions,
 
     fetchTransaction,
-    createTransaction,
     confirmDelivery,
     createDispute,
     setFilter,

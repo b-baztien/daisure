@@ -6,5 +6,11 @@ export const useTransactionService = () => {
         ...options,
       });
     },
+    createTransaction: (options: CustomFetchOptions = {}) => {
+      return useCustomFetch<Transaction>("/transactions", {
+        method: "POST",
+        ...options,
+      });
+    },
   };
 };
