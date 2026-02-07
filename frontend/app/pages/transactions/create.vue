@@ -101,59 +101,6 @@
         </div>
       </UCard>
 
-      <!-- Seller Info (auto-populated from logged-in user) -->
-      <UCard>
-        <template #header>
-          <h2 class="text-xl font-semibold">ข้อมูลผู้ขาย</h2>
-        </template>
-
-        <div class="space-y-4">
-          <div class="flex items-center gap-4">
-            {{ authStore }}
-            <UAvatar
-              :src="authStore?.user?.profile?.pictureUrl"
-              :alt="authStore?.user?.profile?.displayName"
-              size="lg"
-            />
-            <div>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ authStore?.user?.profile?.displayName || "-" }}
-              </p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{
-                  authStore?.user?.auth?.email ||
-                  authStore?.user?.profile?.email ||
-                  "-"
-                }}
-              </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">เบอร์โทร</p>
-              <p class="font-medium text-gray-900 dark:text-white">
-                {{ authStore?.user?.profile?.phone || "ยังไม่ได้ระบุ" }}
-              </p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                คะแนนผู้ขาย
-              </p>
-              <p class="font-medium text-gray-900 dark:text-white">
-                <template
-                  v-if="authStore?.user?.rating?.asSeller?.count || 0 > 0"
-                >
-                  {{ authStore?.user?.rating?.asSeller?.average.toFixed(1) }} /
-                  5 ({{ authStore?.user?.rating?.asSeller?.count }} รีวิว)
-                </template>
-                <template v-else> ยังไม่มีรีวิว </template>
-              </p>
-            </div>
-          </div>
-        </div>
-      </UCard>
-
       <!-- Shipping Fee -->
       <UCard>
         <template #header>
@@ -221,7 +168,6 @@
 
 <script setup lang="ts">
 const transactionStore = useTransactionStore();
-const authStore = useAuthStore();
 const alert = useAlert();
 
 const form = reactive({
