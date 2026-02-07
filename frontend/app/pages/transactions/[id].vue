@@ -7,7 +7,7 @@ File: pages/transactions/[id].vue (COMPLETE)
     <div class="mb-6">
       <UButton
         to="/transactions"
-        color="gray"
+        color="neutral"
         variant="ghost"
         icon="i-heroicons-arrow-left"
         class="mb-4"
@@ -90,7 +90,7 @@ File: pages/transactions/[id].vue (COMPLETE)
               <UButton
                 :to="transaction.product.sourceUrl"
                 target="_blank"
-                color="gray"
+                color="neutral"
                 variant="outline"
                 icon="i-heroicons-arrow-top-right-on-square"
                 size="sm"
@@ -123,7 +123,7 @@ File: pages/transactions/[id].vue (COMPLETE)
                   {{ transaction.shipping.trackingNumber }}
                 </p>
                 <UButton
-                  color="gray"
+                  color="neutral"
                   variant="ghost"
                   icon="i-heroicons-clipboard-document"
                   size="xs"
@@ -409,7 +409,7 @@ File: pages/transactions/[id].vue (COMPLETE)
             <!-- Cancel Button -->
             <UButton
               v-if="canCancel"
-              color="gray"
+              color="neutral"
               variant="outline"
               block
               icon="i-heroicons-x-circle"
@@ -442,7 +442,7 @@ File: pages/transactions/[id].vue (COMPLETE)
                     {{ transaction.buyer.phone }}
                   </p>
                 </div>
-                <UBadge v-if="isBuyer" color="blue" variant="soft">
+                <UBadge v-if="isBuyer" color="info" variant="soft">
                   คุณ
                 </UBadge>
               </div>
@@ -552,7 +552,7 @@ File: pages/transactions/[id].vue (COMPLETE)
 
           <div class="flex gap-2 justify-end">
             <UButton
-              color="gray"
+              color="neutral"
               variant="outline"
               @click="showShippingModal = false"
             >
@@ -590,7 +590,7 @@ File: pages/transactions/[id].vue (COMPLETE)
 
           <div class="flex gap-2 justify-end">
             <UButton
-              color="gray"
+              color="neutral"
               variant="outline"
               @click="showDisputeModal = false"
             >
@@ -650,8 +650,8 @@ const transactionStore = useTransactionStore();
 const authStore = useAuthStore();
 const toast = useToast();
 
-const { currentTransaction: transaction, isLoading } =
-  storeToRefs(transactionStore);
+const id = useRouteParams<string>("id");
+const { data: transaction } = useTransactionService().getTransaction(id.value);
 
 // States
 const showShippingModal = ref(false);
@@ -918,19 +918,4 @@ const submitDispute = async () => {
     isDisputing.value = false;
   }
 };
-
-// Fetch transaction on mount
-onMounted(async () => {
-  await transactionStore.fetchTransaction(route.params.id as string);
-
-  // Check if user has reviewed this transaction
-  // TODO: Check from API
-  hasReviewed.value = false;
-});
-
-// Cleanup on unmount
-onUnmounted(() => {
-  // Clear current transaction
-  transactionStore.currentTransaction = null;
-});
 </script>

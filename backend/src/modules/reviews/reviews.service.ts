@@ -53,7 +53,7 @@ export class ReviewsService {
 
     if (transaction.buyer?.userId.toString() === userId) {
       reviewType = 'buyer_to_seller';
-      revieweeId = transaction.seller?.userId.toString();
+      revieweeId = transaction.seller?.userId?.toString() || '';
     } else if (transaction.seller?.userId.toString() === userId) {
       reviewType = 'seller_to_buyer';
       revieweeId = transaction.buyer?.userId.toString() as string;

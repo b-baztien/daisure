@@ -41,21 +41,6 @@ export const useTransactionStore = defineStore("transaction", () => {
     transactions.value.filter((t) => t.status === "completed"),
   );
 
-  async function fetchTransaction(id: string) {
-    isLoading.value = true;
-    try {
-      const { apiFetch } = useApi();
-      const data = await apiFetch<Transaction>(`/transactions/${id}`);
-      currentTransaction.value = data;
-      return data;
-    } catch (error) {
-      console.error("Fetch transaction error:", error);
-      throw error;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   async function confirmDelivery(id: string, note?: string) {
     isLoading.value = true;
     try {
@@ -139,7 +124,6 @@ export const useTransactionStore = defineStore("transaction", () => {
     pendingTransactions,
     completedTransactions,
 
-    fetchTransaction,
     confirmDelivery,
     createDispute,
     setFilter,
