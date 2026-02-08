@@ -4,7 +4,12 @@ export default defineAppConfig({
       slots: {
         root: 'relative flex items-center ',
       },
-    }
+    },
+    select: {
+      slots: {
+        base: [ 'relative w-full'],
+      },
+    },
   }
 })
 

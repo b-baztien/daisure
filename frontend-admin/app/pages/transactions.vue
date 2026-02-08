@@ -16,7 +16,7 @@
         <UFormField label="Status">
           <USelect
             v-model="filters.status"
-            :options="statusOptions"
+            :items="statusOptions"
             @change="refresh()"
           />
         </UFormField>
@@ -33,6 +33,7 @@
     </UCard>
 
     <!-- Transactions Table -->
+    <!-- {{ transactions.data }} -->
     <UCard>
       <UTable
         :data="transactions.data || []"
@@ -42,197 +43,103 @@
           label: 'No transactions found',
         }"
       >
+        <template #transactionNumber-cell="{ row }">
+          <span># {{ row.original.transactionNumber }}</span>
+        </template>
+
+        <template #seller_displayName-cell="{ row }">
+          <span>{{ row.original.seller.displayName }}</span>
+        </template>
+
+        <template #status-cell="{ row }">
+          <UBadge
+            :label="row.original.status"
+            :color="getStatusColor(row.original.status)"
+          />
+        </template>
+
+        <template #payment_totalAmount-cell="{ row }">
+          <UTooltip arrow>
+            <span class="font-semibold"
+              >฿ {{ formatNumber(row.original.payment.totalAmount) }}</span
+            >
+            <template #content>
+              <div class="flex gap-2 items-center justify-center h-full">
+                <div>
+                  <strong>escrowFee :</strong>
+                  {{ formatNumber(row.original.payment.escrowFee) }} ฿
+                </div>
+                <p>|</p>
+                <div>
+                  <strong>productPrice :</strong>
+                  {{ formatNumber(row.original.payment.productPrice) }} ฿
+                </div>
+                <p>|</p>
+                <div>
+                  <strong>shippingFee :</strong>
+                  {{ formatNumber(row.original.payment.shippingFee) }} ฿
+                </div>
+              </div>
+            </template>
+          </UTooltip>
+        </template>
+        <template #createdAt-cell="{ row }">
+          {{ formatDate(row.createdAt) }}
+        </template>
+
         <!-- <template #status-data="{ row }">
           <UBadge :color="getStatusColor(row.status)">
             {{ formatStatus(row.status) }}
           </UBadge>
-        </template>
+        </template> -->
 
-        <template #amount-data="{ row }">
+        <!-- <template #amount-data="{ row }">
           <span class="font-semibold"
             >฿{{ formatNumber(row.totalAmount) }}</span
           >
-        </template>
+        </template>-->
 
-        <template #createdAt-data="{ row }">
-          {{ formatDate(row.createdAt) }}
-        </template>
-
-        <template #actions-data="{ row }">
+        <template #actions-cell="{ row }">
           <div class="flex gap-2">
             <UButton
               v-if="row.status === 'payment_submitted'"
+              variant="solid"
               size="xs"
-              color="green"
+              color="primary"
               @click="openVerifyModal(row, true)"
             >
               Approve
             </UButton>
             <UButton
               v-if="row.status === 'payment_submitted'"
+              variant="solid"
               size="xs"
-              color="red"
+              color="error"
               @click="openVerifyModal(row, false)"
             >
               Reject
             </UButton>
+
             <UButton
+              variant="solid"
               size="xs"
-              color="gray"
+              color="secondary"
               icon="i-heroicons-eye"
               @click="viewDetails(row)"
             >
               View
             </UButton>
           </div>
-        </template> -->
+        </template>
       </UTable>
     </UCard>
-
-    <!-- Verify Payment Modal -->
-    <UModal v-model="showVerifyModal">
-      <UCard>
-        <template #header>
-          <h3 class="text-lg font-medium">
-            {{ verifyAction === "approve" ? "Approve" : "Reject" }} Payment
-          </h3>
-        </template>
-
-        <div class="space-y-4">
-          <div>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              Transaction ID:
-              <span class="font-mono">{{ selectedTransaction?._id }}</span>
-            </p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              Amount:
-              <span class="font-semibold"
-                >฿{{
-                  formatNumber(selectedTransaction?.totalAmount || 0)
-                }}</span
-              >
-            </p>
-          </div>
-
-          <UFormField label="Note (Optional)">
-            <UTextarea
-              v-model="verifyNote"
-              placeholder="Add a note about this verification..."
-              :rows="3"
-            />
-          </UFormField>
-
-          <UAlert
-            v-if="verifyAction === 'reject'"
-            color="amber"
-            variant="soft"
-            title="Warning"
-            description="Rejecting this payment will notify the buyer to resubmit payment proof."
-          />
-        </div>
-
-        <template #footer>
-          <div class="flex justify-end gap-2">
-            <UButton color="gray" variant="ghost" @click="closeVerifyModal">
-              Cancel
-            </UButton>
-            <UButton
-              :color="verifyAction === 'approve' ? 'green' : 'red'"
-              @click="verifyPayment"
-              :loading="verifying"
-            >
-              {{ verifyAction === "approve" ? "Approve" : "Reject" }}
-            </UButton>
-          </div>
-        </template>
-      </UCard>
-    </UModal>
-
-    <!-- Transaction Details Modal -->
-    <UModal v-model="showDetailsModal" :ui="{ width: 'max-w-2xl' }">
-      <UCard>
-        <template #header>
-          <h3 class="text-lg font-medium">Transaction Details</h3>
-        </template>
-
-        <div v-if="selectedTransaction" class="space-y-4">
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                Transaction ID
-              </p>
-              <p class="font-mono text-sm">{{ selectedTransaction._id }}</p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
-              <UBadge :color="getStatusColor(selectedTransaction.status)">
-                {{ formatStatus(selectedTransaction.status) }}
-              </UBadge>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Amount</p>
-              <p class="font-semibold">
-                ฿{{ formatNumber(selectedTransaction.amount) }}
-              </p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Escrow Fee</p>
-              <p class="font-semibold">
-                ฿{{ formatNumber(selectedTransaction.escrowFee) }}
-              </p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                Total Amount
-              </p>
-              <p class="font-semibold">
-                ฿{{ formatNumber(selectedTransaction.totalAmount) }}
-              </p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Created At</p>
-              <p>{{ formatDate(selectedTransaction.createdAt) }}</p>
-            </div>
-          </div>
-
-          <div v-if="selectedTransaction.paymentSlipUrl">
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
-              Payment Slip
-            </p>
-            <a
-              :href="selectedTransaction.paymentSlipUrl"
-              target="_blank"
-              class="text-blue-600 hover:text-blue-800 dark:text-blue-400"
-            >
-              View Payment Slip →
-            </a>
-          </div>
-
-          <div v-if="selectedTransaction.notes">
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Notes</p>
-            <p class="text-sm">{{ selectedTransaction.notes }}</p>
-          </div>
-        </div>
-
-        <template #footer>
-          <div class="flex justify-end">
-            <UButton
-              color="gray"
-              variant="ghost"
-              @click="showDetailsModal = false"
-            >
-              Close
-            </UButton>
-          </div>
-        </template>
-      </UCard>
-    </UModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { TableColumn } from "@nuxt/ui";
+import type { SelectItem, TableColumn } from "@nuxt/ui";
 import dayjs from "dayjs";
+import type { TransactionManage } from "~/types/transactionManage";
 
 const api = useApi();
 
@@ -242,12 +149,12 @@ const { data: transactions, refresh } =
   await useTransactionService().getTransactions();
 
 const filters = ref({
-  status: "",
+  status: "all",
   search: "",
 });
 
-const statusOptions = [
-  { label: "All", value: "" },
+const statusOptions = ref<SelectItem[]>([
+  { label: "All", value: "all" },
   { label: "Pending Payment", value: "pending_payment" },
   { label: "Payment Submitted", value: "payment_submitted" },
   { label: "Payment Verified", value: "payment_verified" },
@@ -256,12 +163,14 @@ const statusOptions = [
   { label: "Completed", value: "completed" },
   { label: "Cancelled", value: "cancelled" },
   { label: "Refunded", value: "refunded" },
-];
+]);
 
-const columns = computed<TableColumn<Transaction>[]>(() => [
-  { accessorKey: "_id", header: "ID" },
+const columns = computed<TableColumn<TransactionManage>[]>(() => [
+  { accessorKey: "transactionNumber", header: "Transaction Number" },
+  { accessorKey: "seller.displayName", header: "Seller Name" },
+  { accessorKey: "product.name", header: "Product Name" },
   { accessorKey: "status", header: "Status" },
-  { accessorKey: "amount", header: "Amount" },
+  { accessorKey: "payment.totalAmount", header: "Price" },
   { accessorKey: "createdAt", header: "Created" },
   { accessorKey: "actions", header: "Actions" },
 ]);
@@ -298,6 +207,7 @@ const getStatusColor = (status: string) => {
     completed: "green",
     cancelled: "gray",
     refunded: "orange",
+    initiated: "warning",
   };
   return colors[status] || "gray";
 };

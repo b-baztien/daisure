@@ -1,5 +1,6 @@
 export interface Transaction {
   _id: string;
+  transactionNumber: string;
   buyerId: string;
   sellerId: string;
   insurancePackageId: string;
