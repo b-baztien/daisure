@@ -84,7 +84,7 @@
           </UTooltip>
         </template>
         <template #createdAt-cell="{ row }">
-          {{ formatDate(row.createdAt) }}
+          {{ formatDate(row.original.createdAt) }}
         </template>
 
         <!-- <template #status-data="{ row }">
@@ -125,7 +125,7 @@
               size="xs"
               color="secondary"
               icon="i-heroicons-eye"
-              @click="viewDetails(row)"
+              @click="openModalTransactionDetail(row.original)"
             >
               View
             </UButton>
@@ -140,6 +140,7 @@
 import type { SelectItem, TableColumn } from "@nuxt/ui";
 import dayjs from "dayjs";
 import type { TransactionManage } from "~/types/transactionManage";
+import { LazyModalTransactionDetail } from "#components";
 
 const api = useApi();
 
@@ -197,21 +198,6 @@ const formatStatus = (status: string) => {
   return status.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
-const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    pending_payment: "gray",
-    payment_submitted: "yellow",
-    payment_verified: "blue",
-    in_escrow: "cyan",
-    in_dispute: "red",
-    completed: "green",
-    cancelled: "gray",
-    refunded: "orange",
-    initiated: "warning",
-  };
-  return colors[status] || "gray";
-};
-
 const openVerifyModal = (transaction: Transaction, isApprove: boolean) => {
   selectedTransaction.value = transaction;
   verifyAction.value = isApprove ? "approve" : "reject";
@@ -247,4 +233,10 @@ const viewDetails = (transaction: Transaction) => {
   selectedTransaction.value = transaction;
   showDetailsModal.value = true;
 };
+
+function openModalTransactionDetail(row: Transaction) {
+  useModal(LazyModalTransactionDetail, {
+    transactions: row,
+  });
+}
 </script>

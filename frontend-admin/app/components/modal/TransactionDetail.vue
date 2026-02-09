@@ -1,80 +1,104 @@
 <template>
   <!-- Transaction Details Modal -->
-  <UModal v-model="showDetailsModal" :ui="{ width: 'max-w-2xl' }">
-    <UCard>
-      <template #header>
-        <h3 class="text-lg font-medium">Transaction Details</h3>
-      </template>
-
-      <div v-if="selectedTransaction" class="space-y-4">
+  <UModal title="Transaction Details">
+    <template #body>
+      <div v-if="props.transactions" class="px-4">
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              Transaction ID
-            </p>
-            <p class="font-mono text-sm">{{ selectedTransaction._id }}</p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
-            <UBadge :color="getStatusColor(selectedTransaction.status)">
-              {{ formatStatus(selectedTransaction.status) }}
-            </UBadge>
-          </div>
-          <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Amount</p>
-            <p class="font-semibold">
-              ฿{{ formatNumber(selectedTransaction.amount) }}
+            <p>Transaction Number</p>
+            <p class="font-mono text-sm">
+              # {{ props.transactions.transactionNumber }}
             </p>
           </div>
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Escrow Fee</p>
-            <p class="font-semibold">
-              ฿{{ formatNumber(selectedTransaction.escrowFee) }}
-            </p>
+            <p>Status</p>
+            <UBadge
+              :label="props.transactions.status"
+              :color="getStatusColor(props.transactions.status)"
+            />
           </div>
-          <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Total Amount</p>
-            <p class="font-semibold">
-              ฿{{ formatNumber(selectedTransaction.totalAmount) }}
-            </p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Created At</p>
-            <p>{{ formatDate(selectedTransaction.createdAt) }}</p>
-          </div>
-        </div>
 
-        <div v-if="selectedTransaction.paymentSlipUrl">
-          <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
-            Payment Slip
-          </p>
-          <a
-            :href="selectedTransaction.paymentSlipUrl"
-            target="_blank"
-            class="text-blue-600 hover:text-blue-800 dark:text-blue-400"
-          >
-            View Payment Slip →
-          </a>
-        </div>
+          <div>
+            <p>Seller Name</p>
+            <p>{{ props.transactions.seller.displayName }}</p>
+          </div>
+          <div>
+            <p>Created At</p>
+            <p>{{ formatDate(props.transactions.createdAt) }}</p>
+          </div>
+          <div></div>
+          <UCard class="col-span-2">
+            <template #header><p>Product</p></template>
 
-        <div v-if="selectedTransaction.notes">
-          <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Notes</p>
-          <p class="text-sm">{{ selectedTransaction.notes }}</p>
+            <div class="flex gap-8">
+              <div>
+                <p>Name</p>
+                <p>{{ props.transactions.product.name }}</p>
+              </div>
+              <div>
+                <p>Price</p>
+                <p>฿ {{ formatNumber(props.transactions.product.price) }}</p>
+              </div>
+            </div>
+          </UCard>
+          <UCard class="col-span-2">
+            <template #header><p>Price Detail</p></template>
+
+            <div class="flex gap-8 justify-center items-center">
+              <div>
+                <p>Product Price</p>
+                <p class="font-semibold">
+                  ฿
+                  {{ formatNumber(props.transactions.payment.productPrice) }}
+                </p>
+              </div>
+              <div>
+                <p>Escrow Fee</p>
+                <p class="font-semibold">
+                  ฿ {{ formatNumber(props.transactions.payment.escrowFee) }}
+                </p>
+              </div>
+              <div>
+                <p>Shipping Fee</p>
+                <p class="font-semibold">
+                  ฿ {{ formatNumber(props.transactions.payment.shippingFee) }}
+                </p>
+              </div>
+            </div>
+            <template #footer
+              ><p>
+                Total Amount: ฿
+                {{ formatNumber(props.transactions.payment.totalAmount) }}
+              </p></template
+            >
+          </UCard>
+          <UCard class="col-span-2">
+            <template #header><p>Timeline</p></template>
+
+            <UTimeline :items="items" />
+          </UCard>
         </div>
       </div>
-
-      <template #footer>
-        <div class="flex justify-end">
-          <UButton
-            color="gray"
-            variant="ghost"
-            @click="showDetailsModal = false"
-          >
-            Close
-          </UButton>
-        </div>
-      </template>
-    </UCard>
+    </template>
   </UModal>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Transactions from "~/pages/transactions.vue";
+
+const props = defineProps({
+  transactions: {
+    type: Object as () => typeof Transactions,
+    required: true,
+  },
+});
+
+const items = computed(() => {
+  const timelineItems = props.transactions.timeline.map((event: any) => ({
+    date: formatDate(event.timestamp),
+    title: event.action,
+    description: event.description,
+    icon: "i-lucide-check-circle",
+  }));
+  return timelineItems;
+});
+</script>
